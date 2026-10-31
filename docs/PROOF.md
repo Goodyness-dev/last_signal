@@ -57,6 +57,8 @@ Final strict production build passed after font bundling, timer correction, phon
 
 No combat video was recorded. Keyboard only, physical touch, no WebGL fallback, performance profiling, human balance review and network security tests are pending.
 
+Final handoff review found that bundled font metrics made the medium height desktop briefing too tall. A CSS correction hides redundant briefing detail at that size and adds a bounded scroll fallback. At 1440 by 900, both start buttons and the whole briefing were confirmed inside the battlefield. The desktop evidence was refreshed and the production build repeated successfully. This last change only affects CSS.
+
 ## Not present
 
 No multiplayer match, local blockchain, contract tests, funding, settlement, timeout refund, public URL, chain address, transaction hash or organizer eligibility confirmation exists. Contract accounting and signature security are NOT_STARTED. Do not use these screenshots as chain evidence.

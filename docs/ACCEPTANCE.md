@@ -31,3 +31,11 @@
 | Full guided flow | PASS | tutorial-complete.jpg. Selection, movement, first capture, visible flank, reinforcement and shield advanced to You have command |
 | Hackathon compliance | BLOCKED | Organizer rules and mock token eligibility unconfirmed |
 | Handoff | PASS | README, facts, decisions, proof, source and lockfile. Remaining systems explicitly listed |
+
+
+| Private unfunded room and authoritative ticks | PASS LOCAL | Two real browser clients joined, readied, moved and received one result |
+| Durable spending and replay | PASS LOCAL | SQLite commit before ack; duplicate charge and restart tests; insert failure rollback |
+| Authorized snapshots and event data | PASS LOCAL | Tests assert hidden squads omitted, enemy intent removed and event endpoints reduced |
+| WebSocket validation and recovery | PASS LOCAL | Origin, frame size, rate, ownership, heartbeat, grace, abort and recovery tests |
+| Actual process restart | PASS LOCAL | Both browser sessions resumed the same room, scores, squads and reserve |
+| Funded or public multiplayer | NOT_STARTED | Wallet authentication, escrow, TLS and hosting remain pending |

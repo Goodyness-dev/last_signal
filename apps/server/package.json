@@ -1,5 +1,19 @@
 {
-  "name": "@last-signal/server", "private": true, "version": "0.1.0", "type": "module",
-  "scripts": {"dev": "tsx src/index.ts"},
-  "dependencies": {"@last-signal/sim": "*", "fastify": "5.12.7"}
+  "name": "@last-signal/server",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "@fastify/websocket": "11.3.6",
+    "@last-signal/protocol": "*",
+    "@last-signal/sim": "*",
+    "fastify": "5.12.7",
+    "ws": "8.22.1"
+  },
+  "devDependencies": {
+    "@types/ws": "8.18.2"
+  }
 }

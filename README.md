@@ -99,3 +99,25 @@ Choose ENDLESS FRONT on the opening screen for an action focused local run. Elim
 Health recovers at eight HP per second after five seconds without damage, up to 100. Fallen men stay down. H opens field supplies and pauses practice: 40 spare bullets cost five WIF, a four second shield costs five, and a replacement helper with full squad health costs ten after five seconds without damage. Every wave clear pays ten WIF and 20 spare bullets; pickups add five WIF. Supplies and tokens are simulated and reset each run. No real WIF or chain connection exists.
 
 Validated with `npm run build` and `npm test`. Launch from this directory using `npm run dev -w @last-signal/web -- --port 5174 --strictPort`, then open http://127.0.0.1:5174/.
+
+## Unfunded private multiplayer
+
+Start the service from the repository directory:
+
+```powershell
+npm run server
+```
+
+In a second terminal start the frontend:
+
+```powershell
+npm run dev -w @last-signal/web -- --port 5174 --strictPort
+```
+
+Open http://127.0.0.1:5174/private.html in two browser tabs. Create a room in one, enter its 16 character code in the other and press READY in both. Select a squad and use GO TO A, B or C, ground clicks or WASD to move. Squads fire automatically. EYE LEVEL adds manual left mouse shooting and right mouse drag looking; R reloads. Capture stations and reach 240 signal. CONCEDE ends the shared match; NEW ROOM creates another afterward. This is the classic untimed relay ruleset with equal 100 simulated credits, no hero recovery, local bot, WIF inventory or escrow. Endless Front remains a separate local mode.
+
+The server controls all match state. If a connection is lost, choose RECONNECT in that same tab within 60 seconds. Both connections must be present to advance. Server restart restores a verified SQLite checkpoint and waits for both sessions. Closing the tab can lose its session credential. Losing both participants aborts without a winner. P does not pause multiplayer.
+
+Service health: http://127.0.0.1:3001/health . Data: ignored .runtime/rooms.sqlite. Keep this data for recovery. Default origins are http://127.0.0.1:5174 and http://localhost:5174. Default binding is loopback only. ALLOWED_ORIGINS can explicitly configure a comma separated list for a later deployment. No public hosting or TLS is configured.
+
+Hidden background launch helpers for Windows: `node scripts/start-private.cjs` and `node scripts/start-preview.cjs`. Start each once; a second instance cannot share the same port. Logs and process IDs are under .runtime.

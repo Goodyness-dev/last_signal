@@ -1,5 +1,7 @@
 # Remaining delivery stages
 
+31 October 2026 update: Gate 3 local unfunded multiplayer is implemented and verified with 46 passing tests and two browser clients. See STATUS.md and FACTS.md for the precise evidence. No public multiplayer, wallet authentication, local escrow or chain integration is claimed.
+
 Sequence follows the supplied stage gates. Local practice remains available throughout. No real funds, paid services or mainnet deployments are authorized.
 
 ## Gate 3: authoritative private multiplayer
@@ -38,4 +40,4 @@ Exit evidence: verified public frontend and service URLs if deployed, two extern
 
 ## Immediate next implementation
 
-Once the period build and runtime review are verified, implement Gate 3's smallest complete slice: create a private room, join from a second browser session, ready both players, send validated movement commands and render server snapshots. Then add durability and failure cases before starting escrow. This document is a delivery plan; it does not mark these systems implemented.
+Gate 3 local private rooms, server snapshots, durable commands and failure cases are now implemented. Next is Gate 4 local chain and escrow using dedicated disposable development accounts, signed offers and results, conservation tests and actual local receipts. Wallet authentication must be added before integrating funded rooms. Public testnet and hosting still need the available free access and credentials described above.

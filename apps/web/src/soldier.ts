@@ -1,6 +1,6 @@
 import * as T from 'three';
 
-function periodRifle(view=false):T.Group {
+export function periodRifle(view=false):T.Group {
   const gun=new T.Group();gun.name='weapon';
   const wood=new T.MeshStandardMaterial({color:0x704429,roughness:.8,depthTest:!view});
   const steel=new T.MeshStandardMaterial({color:0x393e38,metalness:.7,roughness:.46,depthTest:!view});

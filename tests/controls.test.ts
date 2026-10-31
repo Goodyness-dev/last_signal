@@ -42,7 +42,7 @@ describe('player rifle and direct movement',()=>{
     expect(command(g,{...fire,id:'nan',direction:{x:NaN,y:0,z:0}}).ok).toBe(false);
     g.squads[0].disabledUntil=50;expect(command(g,{...fire,id:'emp'}).ok).toBe(false);g.squads[0].disabledUntil=0;
     g.squads[1].shield=30;g.squads[1].shieldUntil=100;command(g,fire);step(g);
-    expect(g.squads[1].hp).toBe(100);expect(g.squads[1].shield).toBe(15);
+    expect(g.squads[1].hp).toBe(100);expect(g.squads[1].shield).toBe(30-R.volley-R.rifleDamage);
     const home=createGame();home.countdown=0;Object.assign(home.squads[1],{x:10,z:16});
     expect(traceRifle(home,home.squads[0],{x:1,y:0,z:0}).target).toBeUndefined();
     const cover=encounter();cover.tick=30;Object.assign(cover.squads[0],{x:24,z:16});Object.assign(cover.squads[1],{x:30,z:16,coverId:3,coverSince:0});

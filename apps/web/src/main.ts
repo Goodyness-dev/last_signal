@@ -3,34 +3,37 @@ import './immersive.css';
 import './old-front.css';
 import './guidance.css';
 import { Battlefield } from './scene.ts';
-import { createGame, createCombatDrill, step, command, observe, botCommands, visible, distance, isMoving, traceRifle, MAP, RULES as R, type Command, type GameEvent, type Point } from '@last-signal/sim';
+import { createGame, createCombatDrill, step, command, observe, botCommands, visible, distance, isMoving, traceRifle, WEAPONS, lineOfSight, MAP, RULES as R, type Command, type GameEvent, type Point } from '@last-signal/sim';
 import './shooter.css';
+import './survival.css';
+import { BattleFeedback } from './battle-feedback.ts';
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
 app.innerHTML = `
   <header class="masthead"><a class="brand" href="/" aria-label="LAST SIGNAL home"><span class="brand-mark">▥</span><span>LAST SIGNAL<small>TACTICAL OPERATIONS / 001</small></span></a><div class="sector"><i></i> KESTREL FRONT <span>06:42 / RAIN</span></div><div class="mode"><span class="status-dot"></span> LOCAL PRACTICE <small>NO WALLET REQUIRED</small></div><button class="icon-button" id="settings-button" aria-label="Open settings">☷</button></header>
   <main>
-    <div class="matchbar"><div class="commander friendly"><span class="team-icon">◈</span><div><small>WEST COMMAND</small><strong>YOU <span>01</span></strong></div></div><div class="scoreboard"><span id="score-you">000</span><div class="match-time"><small id="phase">OPERATION STANDBY</small><strong id="timer">03:00</strong><div id="relay-status"><b>A</b><b>B</b><b>C</b></div></div><span id="score-bot">000</span></div><div class="commander hostile"><div><small>EAST COMMAND</small><strong>BOT <span>02</span></strong></div><span class="team-icon">◇</span></div></div>
+    <div class="matchbar"><div class="commander friendly"><span class="team-icon">◈</span><div><small>WEST COMMAND</small><strong>YOU <span>01</span></strong></div></div><div class="scoreboard"><span id="score-you">000</span><div class="match-time"><small id="phase">OPERATION STANDBY</small><strong id="timer">UNTIMED</strong><div id="relay-status"><b>A</b><b>B</b><b>C</b></div></div><span id="score-bot">000</span></div><div class="commander hostile"><div><small>EAST COMMAND</small><strong>BOT <span>02</span></strong></div><span class="team-icon">◇</span></div></div>
     <section id="battlefield" aria-label="Interactive 3D battlefield. Select a friendly squad and choose Move or right click a destination." tabindex="0"><div class="vignette"></div><div class="scene-meta"><span>LIVE TACTICAL VIEW</span><small>48 × 32 / SECTOR 7</small></div><div class="scene-controls"><button id="view-squad" class="active">SQUAD</button><button id="view-eyes">EYE LEVEL</button><button id="view-tactical">COMMAND</button><button id="overlay" title="Tactical overlay. Hold Space.">◎ <span>TACTICAL</span></button><button id="zoom-out" aria-label="Zoom out">−</button><button id="zoom-in" aria-label="Zoom in">+</button><button id="reset-camera" aria-label="Reset camera">⤢</button></div><div class="relay-label"></div><div class="relay-label"></div><div class="relay-label"></div><div id="field-reticle"></div><div id="damage-feedback"></div><div class="field-readout"><small id="camera-label">SQUAD CAMERA</small><strong id="field-state">READY TO DEPLOY</strong><span>WASD MOVE · MOUSE LOOK · LEFT FIRE · RIGHT AIM · ESC RELEASE</span></div><div class="objectives"><button data-relay="0">A <span>NORTH</span></button><button data-relay="1">B <span>CENTRAL</span></button><button data-relay="2">C <span>SOUTH</span></button></div><div class="minimap"><canvas id="minimap" width="192" height="128" aria-label="Tactical map. Click a point to move your selected squad."></canvas><small>TACTICAL MAP / CLICK TO MOVE</small></div><div class="map-home west">◈ WEST / HOME</div><div class="map-home east">EAST / HOME ◇</div><div id="toast" role="status" aria-live="polite">Select your squad. Hold the frequency.</div><div class="weather">↙  RAIN  /  12°C <span>VISIBILITY LIMITED</span></div><div class="map-coordinate">KESTREL // 07.24</div>
       <div class="briefing" id="briefing"><div class="eyebrow"><span>01</span> FIELD BRIEFING</div><h1>Hold the<br>line.</h1><p>A rain soaked front. Three field stations.<br>Keep the last signal alive.</p><div class="brief-rule"><b>01</b><span>Move squads into relay circles.<br>Hold ground to generate signal.</span></div><div class="brief-rule"><b>02</b><span>Use cover. Time your support.<br>Every credit is a decision.</span></div><button class="primary" id="start">ENTER THE FRONT <span>↗</span></button><button class="text-button" id="drill">QUICK COMBAT DRILL →</button><button class="text-button" id="tutorial">GUIDED FIRST MATCH →</button><small>Free practice against a local bot.<br>Credits are simulated. No token transactions.</small></div>
       <div id="countdown" hidden></div>
       <div id="order-hint" hidden role="status"><strong id="order-title"></strong><p id="order-copy"></p><button id="cancel-order">Cancel order · Esc</button></div>
-      <div id="shooter-hud"><strong id="aim-status">YOU AIM AND FIRE · YOUR SOLDIERS FIRE AUTOMATICALLY</strong><small id="shoot-status">WASD move · Mouse look · Left click fire · Hold right click aim · Esc release mouse</small><div><button id="take-control">TAKE CONTROL · MOUSE LOOK</button><button id="fire-rifle">FIRE RIFLE</button><button id="aim-rifle">AIM</button><button id="release-control">COMMAND VIEW</button></div></div>
+      <div id="battle-feedback"></div><div id="survival-hud"><strong id="hero-health">YOUR HEALTH · 100 / 100</strong><div id="player-health-track"><div id="player-health-fill"></div></div><span id="weapon-readout">SERVICE RIFLE · 6 / 24</span><b id="token-readout">PRACTICE WIF · 0</b><small>Simulated pickups · No real value</small><span id="loot-prompt"></span></div><div id="shooter-hud"><strong id="aim-status">YOU AIM AND FIRE · YOUR SOLDIERS FIRE AUTOMATICALLY</strong><small id="shoot-status">WASD move · Mouse look · Left click fire · Hold right click aim · Esc release mouse</small><div><button id="take-control">TAKE CONTROL · MOUSE LOOK</button><button id="fire-rifle">FIRE RIFLE</button><button id="aim-rifle">AIM</button><button id="reload-rifle">RELOAD · R</button><button id="pickup-loot">PICK UP · G</button><button id="switch-weapon">SWAP GUN · X</button><button id="release-control">COMMAND VIEW</button></div></div>
       <div id="tutorial-card" hidden><small id="tutorial-step">FIELD TRAINING</small><strong id="tutorial-title"></strong><p id="tutorial-copy"></p><button id="tutorial-action"></button><button id="tutorial-details">Hide instructions to see map</button><button id="skip-tutorial">Skip guidance</button></div>
     </section>
-    <section class="command-deck"><div class="squad-panel"><div class="panel-heading"><span>YOUR SQUADS</span><small id="slots">1 / 3 ACTIVE</small></div><div id="squad-cards"></div></div><div class="orders"><div class="panel-heading"><span>FIELD ORDERS</span><small id="selected-name">SELECT A SQUAD</small></div><div class="action-row"><button id="move" class="action"><span class="action-glyph">⌖</span><strong>MOVE</strong><small>FREE <kbd>M</kbd></small></button><button id="retreat" class="action"><span class="action-glyph">↶</span><strong>RETREAT</strong><small>FREE <kbd>R</kbd></small></button><button id="shield" class="action"><span class="action-glyph">⬡</span><strong>SHIELD</strong><small id="shield-cost">10 CR <kbd>Q</kbd></small></button><button id="emp" class="action"><span class="action-glyph">⌁</span><strong>EMP</strong><small id="emp-cost">15 CR <kbd>E</kbd></small></button></div></div><div class="reserve"><div class="panel-heading"><span>PRACTICE RESERVE</span><button id="ledger-button" aria-label="View spending ledger">↗</button></div><div class="budget"><strong id="budget">100</strong><span>CR<small>SIMULATED</small></span></div><button id="deploy">+ DEPLOY SQUAD <span>20 CR</span></button></div></section>
+    <section class="command-deck"><div class="squad-panel"><div class="panel-heading"><span>YOUR SQUADS</span><small id="slots">1 / 3 ACTIVE</small></div><div id="squad-cards"></div></div><div class="orders"><div class="panel-heading"><span>FIELD ORDERS</span><small id="selected-name">SELECT A SQUAD</small></div><div class="action-row"><button id="move" class="action"><span class="action-glyph">⌖</span><strong>MOVE</strong><small>FREE <kbd>M</kbd></small></button><button id="retreat" class="action"><span class="action-glyph">↶</span><strong>RETREAT</strong><small>FREE <kbd>T</kbd></small></button><button id="shield" class="action"><span class="action-glyph">⬡</span><strong>SHIELD</strong><small id="shield-cost">10 CR <kbd>Q</kbd></small></button><button id="emp" class="action"><span class="action-glyph">⌁</span><strong>EMP</strong><small id="emp-cost">15 CR <kbd>E</kbd></small></button></div></div><div class="reserve"><div class="panel-heading"><span>PRACTICE RESERVE</span><button id="ledger-button" aria-label="View spending ledger">↗</button></div><div class="budget"><strong id="budget">100</strong><span>CR<small>SIMULATED</small></span></div><button id="deploy">+ DEPLOY SQUAD <span>20 CR</span></button></div></section>
   </main><footer><span><i></i> OFFLINE READY <em> / </em> ORIGINAL PROCEDURAL WORLD</span><button id="help-button">HOW TO PLAY <span>?</span></button><span>TEST PROTOTYPE <em> / </em> v0.1</span></footer>
   <dialog id="settings"><div class="dialog-heading"><small>OPERATIONS</small><button data-close="settings" aria-label="Close settings">×</button></div><h2>Field settings</h2><label><span>Rain and combat effects</span><input type="checkbox" id="effects" checked></label><label><span>Reduced motion</span><input type="checkbox" id="motion"></label><label><span>Original synthesized audio</span><input type="checkbox" id="audio"></label><p>Low violence presentation uses sparks and dust. No blood assets are included in this slice.</p><button class="danger" id="surrender">Concede this practice match</button></dialog>
-  <dialog id="help"><div class="dialog-heading"><small>COMMAND REFERENCE</small><button data-close="help" aria-label="Close help">×</button></div><h2>Ground is signal.</h2><p>Select a cyan squad. Right click to move, or press Move and tap a destination. WASD moves your selected squad. In EYE LEVEL, TAKE CONTROL captures your mouse: move it to look, left click fires your rifle, hold right click to aim, and Escape releases it. Your soldiers keep firing automatically. V cycles camera views. The minimap and A, B, C buttons issue movement orders. Keys 1 to 3 select squads. M moves, R retreats, Q shields, E targets EMP. Hold Space for the tactical overlay. Escape cancels targeting.</p><p>Hold a relay alone for 5 seconds to capture it. Each owned relay gives 1 point per second, doubled in the last 30 seconds. Reach 240 or lead at 3 minutes. A tie allows 20 seconds of overtime.</p><p>Owners keep scoring while a relay is contested. Additional squads do not capture faster. Suppressed squads cannot capture, but still contest. Cover protects its marked front after half a second. Retreat gives no healing or refund.</p><p>Shield absorbs 30 damage for 4 seconds. EMP disables enemy weapons and shields for 2 seconds within its radius. Target within 10 units and friendly sight. Each side has 100 simulated credits, no top ups, and at most 3 squads including preparing reinforcements.</p><p>Practice only. No multiplayer, blockchain, real balances, or settlement is connected.</p></dialog>
+  <dialog id="help"><div class="dialog-heading"><small>COMMAND REFERENCE</small><button data-close="help" aria-label="Close help">×</button></div><h2>Ground is signal.</h2><p>Select a cyan squad. Right click to move, or press Move and tap a destination. WASD moves your selected squad. In EYE LEVEL, TAKE CONTROL captures your mouse: move it to look, left click fires your rifle, hold right click to aim, and Escape releases it. Your soldiers keep firing automatically. V cycles camera views. The minimap and A, B, C buttons issue movement orders. Keys 1 to 3 select squads. M moves, T retreats, Q shields, E targets EMP. R reloads, G picks up nearby guns and practice WIF, X swaps collected weapons. Hold Space for the tactical overlay. Escape cancels targeting.</p><p>Hold a relay alone for 5 seconds to capture it. Each station gives 1 point per second. Reach 240 to win. There is no time limit. Your main character can die; death ends the run. Your rifle starts with 6 rounds loaded and 24 spare. Press R to reload. Defeated enemies drop guns, ammunition and simulated practice WIF. Move close and press G to collect. These tokens have no real value.</p><p>Owners keep scoring while a relay is contested. Additional squads do not capture faster. Suppressed squads cannot capture, but still contest. Cover protects its marked front after half a second. Retreat gives no healing or refund.</p><p>Shield absorbs 30 damage for 4 seconds. EMP disables enemy weapons and shields for 2 seconds within its radius. Target within 10 units and friendly sight. Each side has 100 simulated credits, no top ups, and at most 3 squads including preparing reinforcements.</p><p>Practice only. No multiplayer, blockchain, real balances, or settlement is connected.</p></dialog>
   <dialog id="ledger"><div class="dialog-heading"><small>LOCAL ACCOUNTING</small><button data-close="ledger" aria-label="Close ledger">×</button></div><h2>Practice reserve</h2><div id="ledger-content"></div><p>These credits have no monetary value. tWIF is a proposed mock token, not official WIF. No chain is connected.</p></dialog>
   <dialog id="result"><small>TRANSMISSION COMPLETE</small><h2 id="result-title"></h2><p id="result-reason"></p><div id="result-stats"></div><p id="result-observations"></p><p class="honesty">LOCAL PRACTICE / NO CHAIN SETTLEMENT</p><button class="primary" id="rematch">REDEPLOY <span>↗</span></button></dialog>`;
 
 const el = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
 const dialog = (id: string) => el<HTMLDialogElement>(id);
-let game = createGame(), started = false, selected: number | null = null;
+const practiceOptions={untimed:true,hero:true};
+let game = createGame(1,practiceOptions), started = false, selected: number | null = null;
 let targeting: 'move' | 'emp' | null = null, seq = 0, accumulator = 0, lastFrame = performance.now(), lastHud = 0, lastNotice = 0, resultShown = false;
 let drill=false;
-let guided = false, tutorialStage = 0, tutorialFlankPhase = 0, tactical = false, paused = false;
+let guided = false, tutorialStage = 0, tutorialFlankPhase = 0, tactical = false, paused = false, userPaused=false;
 let audio: AudioContext | null = null, sound = true;
 let rainGain:GainNode|null=null;
 const heldKeys=new Set<string>();
@@ -41,6 +44,7 @@ const toast = (message: string) => { el('toast').textContent = message; };
 let scene: Battlefield;
 try { scene = new Battlefield(el('battlefield'), [...document.querySelectorAll<HTMLElement>('.relay-label')]); }
 catch { el('briefing').innerHTML = '<div class="eyebrow">RENDERER UNAVAILABLE</div><h1>WebGL 2 is required.</h1><p>Enable hardware acceleration in a current browser, then reload this page. No wallet or funds are needed.</p>'; throw new Error('WebGL initialization failed'); }
+const feedback=new BattleFeedback(el('battle-feedback'),(at,height)=>scene.screenPoint(at,height));
 try {
   const saved = JSON.parse(localStorage.getItem('last-signal-settings') ?? '{}');
   scene.effectsEnabled = saved.effects ?? true; scene.reducedMotion = saved.motion ?? scene.reducedMotion;
@@ -88,10 +92,12 @@ function issue(payload: Omit<Command, 'id' | 'side'> | Record<string, unknown>) 
   updateHud();
 }
 function begin(training: boolean) {
+  userPaused=false;
+  pauseButton.textContent='PAUSE · P';
   releaseMouse();
   rifleHits=0;
   drill=false;
-  game = createGame(); scene.resetMatch(); started = true; selected = 1; guided = training; tutorialStage = 0; tutorialFlankPhase = 0; targeting = null; resultShown = false; accumulator = 0; paused = false; lastNotice = 0; spending.length = 0;
+  game = createGame(1,practiceOptions); scene.resetMatch(); feedback.reset(); started = true; selected = 1; guided = training; tutorialStage = 0; tutorialFlankPhase = 0; targeting = null; resultShown = false; accumulator = 0; paused = false; lastNotice = 0; spending.length = 0;
   document.body.classList.add('in-match');
   clearTarget();
   el('tutorial-card').classList.remove('compact');
@@ -101,7 +107,7 @@ function begin(training: boolean) {
   el('briefing').hidden = true; dialog('result').close(); toast('Stand by. Deployment in three seconds.'); updateHud();
 }
 el('drill').onclick=()=>{
-  begin(false);drill=true;game=createCombatDrill();
+  begin(false);drill=true;game=createCombatDrill(1,practiceOptions);
   spending.push({tick:0,action:'DEPLOY',cost:R.deployCost},{tick:R.deployCooldown,action:'DEPLOY',cost:R.deployCost});
   selected=game.squads.find(s=>s.side===0&&s.z===16)!.id;
   toast('COMBAT DRILL. Two reinforcements already paid: 60 credits remain. Take control to aim and fire. Your soldiers fire automatically.');updateHud();
@@ -126,6 +132,9 @@ el('shield').onclick = () => issue({ kind: 'shield', squadId: selected }); el('r
 el('overlay').onclick = () => { tactical = !tactical; scene.setTactical(tactical); el('overlay').classList.toggle('active', tactical); };
 el('zoom-in').onclick = () => scene.setZoom(.1); el('zoom-out').onclick = () => scene.setZoom(-.1); el('reset-camera').onclick = () => scene.resetCamera();
 el('settings-button').onclick = () => dialog('settings').showModal(); el('help-button').onclick = () => dialog('help').showModal();
+const pauseButton=document.createElement('button');pauseButton.id='pause-game';pauseButton.textContent='PAUSE · P';document.querySelector('.scene-controls')!.append(pauseButton);
+function togglePause(){if(!started||game.result)return;userPaused=!userPaused;paused=userPaused||document.hidden;if(paused)releaseMouse();pauseButton.textContent=paused?'RESUME · P':'PAUSE · P';toast(paused?'Practice paused. Press P to resume.':'Practice resumed.');updateHud();}
+pauseButton.onclick=togglePause;
 document.querySelectorAll<HTMLButtonElement>('[data-close]').forEach(button => { button.onclick = () => dialog(button.dataset.close!).close(); });
 el('surrender').onclick = () => { if (started && !game.result) issue({ kind: 'surrender' }); dialog('settings').close(); };
 el('skip-tutorial').onclick = () => { guided = false; updateHud(); };
@@ -135,6 +144,7 @@ function selectSquad(id: number) {
   const squad = game.squads.find(s => s.side === 0 && s.id === id);
   if (!squad) return toast('That squad is not available. Deploy another squad for 20 credits.');
   selected = squad.id;
+  if(game.hero&&selected!==game.hero.squadId&&scene.viewMode==='eyes')changeView('tactical');
   clearTarget();
   if (guided && tutorialStage === 0) tutorialStage = 1;
   el('battlefield').focus({ preventScroll: true });
@@ -165,6 +175,7 @@ const canvas = scene.renderer.domElement;
 changeView('eyes');
 function changeView(mode:'squad'|'eyes'|'tactical') {
  if(mode!=='eyes') releaseMouse();
+ if(mode==='eyes'&&started&&game.hero?.alive)selected=game.hero.squadId;
  scene.setView(mode);
  for(const name of ['squad','eyes','tactical']) el('view-'+name).classList.toggle('active',name===mode);
  el('camera-label').textContent=mode==='eyes'?'EYE LEVEL / SQUAD LEAD':mode==='squad'?'SQUAD CAMERA':'COMMAND CAMERA';
@@ -174,10 +185,12 @@ document.querySelectorAll<HTMLButtonElement>('[data-relay]').forEach(b=>b.onclic
 const mapCanvas=el<HTMLCanvasElement>('minimap');
 mapCanvas.onclick=e=>{const rect=mapCanvas.getBoundingClientRect();issue({kind:'move',squadId:selected,target:{x:(e.clientX-rect.left)/rect.width*48,z:(e.clientY-rect.top)/rect.height*32}});};
 let pointerStart:{x:number;y:number}|null=null,dragged=false,previousPointer={x:0,y:0};
-function releaseMouse() { triggerHeld=false; freeMouseLook=false; heldKeys.clear(); if(scene)scene.view.aiming=false; document.body.classList.remove('mouse-captured'); if(document.pointerLockElement)document.exitPointerLock(); }
-function fallbackLook(){freeMouseLook=true;document.body.classList.add('mouse-captured');el('shoot-status').textContent='MOVE MOUSE OVER THE BATTLEFIELD TO LOOK · LEFT FIRE · RIGHT AIM · ESC RELEASE';}
+let lookPointer:{x:number;y:number}|null=null;
+function releaseMouse() { triggerHeld=false; freeMouseLook=false; lookPointer=null;heldKeys.clear(); if(scene)scene.view.aiming=false; document.body.classList.remove('mouse-captured'); if(document.pointerLockElement)document.exitPointerLock(); }
+function fallbackLook(){if(!started||game.result||scene.viewMode!=='eyes')return;freeMouseLook=true;lookPointer=null;document.body.classList.add('mouse-captured');el('shoot-status').textContent='MOVE MOUSE OVER THE BATTLEFIELD TO LOOK · LEFT FIRE · RIGHT AIM · ESC RELEASE';}
 function enterControl() {
  if(!started||game.result)return toast('Start a practice match first.');
+ if(game.hero){if(!game.hero.alive)return toast('Your character has died. Restart the run.');selected=game.hero.squadId;}
  if(selected===null){const first=game.squads.find(s=>s.side===0);if(!first)return toast('Deploy a squad first.');selectSquad(first.id);}
  clearTarget();changeView('eyes');el('tutorial-card').classList.add('compact');el('battlefield').focus({preventScroll:true});
  if(!canvas.requestPointerLock){fallbackLook();return;}
@@ -186,19 +199,32 @@ function enterControl() {
 }
 function fireRifle() {
  if(!started||paused||game.result||game.countdown||scene.viewMode!=='eyes'||selected===null)return;
- const s=game.squads.find(s=>s.id===selected&&s.side===0);if(!s||game.tick-(s.rifleAt??-100)<R.rifleTicks)return;
- const result=command(game,{id:`rifle:${++seq}`,side:0,kind:'fire',squadId:selected,direction:scene.aimDirection()});
+ const s=game.squads.find(s=>s.id===(game.hero?.squadId??selected)&&s.side===0);if(!s)return;
+ if(s.reloadUntil>game.tick){el('shoot-status').textContent='RELOADING…';return;}
+ if(!s.ammo){el('shoot-status').textContent=s.reserveAmmo?'EMPTY · PRESS R TO RELOAD':'OUT OF BULLETS · FIND A GUN PICKUP';return;}
+ if(game.tick-(s.rifleAt??-100)<WEAPONS[s.weapon].ticks)return;
+ const result=command(game,{id:`rifle:${++seq}`,side:0,kind:'fire',squadId:s.id,direction:scene.aimDirection()});
  if(result.ok){scene.fireWeapon();el('shoot-status').textContent='RIFLE FIRED · Cycling bolt · Squad continues automatic fire';}
  else el('shoot-status').textContent=result.reason;
 }
 el('take-control').onclick=enterControl;
 el('fire-rifle').onclick=fireRifle;
 el('aim-rifle').onclick=()=>{scene.view.aiming=!scene.view.aiming;};
+function nearestLoot(){const hero=game.squads.find(s=>s.id===game.hero?.squadId);return hero?observe(game,0).loot.filter(l=>lineOfSight(hero,l)).sort((a,b)=>distance(hero,a)-distance(hero,b))[0]:undefined;}
+function pickupLoot(){const drop=nearestLoot();if(!drop)return toast('No gun pickup nearby. Defeat an enemy first.');issue({kind:'loot',squadId:game.hero?.squadId,lootId:drop.id});}
+function reloadHero(){triggerHeld=false;issue({kind:'reload',squadId:game.hero?.squadId??selected});}
+el('reload-rifle').onclick=reloadHero;el('pickup-loot').onclick=pickupLoot;el('switch-weapon').onclick=()=>issue({kind:'switchWeapon',squadId:game.hero?.squadId??selected});
 el('release-control').onclick=()=>changeView('tactical');
 document.addEventListener('pointerlockchange',()=>{const locked=document.pointerLockElement===canvas;document.body.classList.toggle('mouse-captured',locked);triggerHeld=false;heldKeys.clear();scene.view.aiming=false;el('shoot-status').textContent=locked?'WASD MOVE · MOUSE LOOK · LEFT FIRE · HOLD RIGHT AIM · ESC RELEASE':'Click TAKE CONTROL to look freely. Your squad still fires automatically.';});
 document.addEventListener('pointerlockerror',fallbackLook);
-document.addEventListener('mousemove',e=>{if(scene.viewMode==='eyes'&&(document.pointerLockElement===canvas||(freeMouseLook&&e.target===canvas)))scene.view.rotate(e.movementX,e.movementY);});
+document.addEventListener('mousemove',e=>{
+ if(scene.viewMode!=='eyes')return;
+ if(document.pointerLockElement===canvas)scene.view.rotate(e.movementX,e.movementY);
+ else if(freeMouseLook&&e.target===canvas){if(lookPointer)scene.view.rotate(e.clientX-lookPointer.x,e.clientY-lookPointer.y);lookPointer={x:e.clientX,y:e.clientY};}
+ else lookPointer=null;
+});
 document.addEventListener('mouseup',e=>{if(e.button===0)triggerHeld=false;if(e.button===2)scene.view.aiming=false;});
+document.addEventListener('pointerup',e=>{if(e.button===0)triggerHeld=false;if(e.button===2)scene.view.aiming=false;});
 canvas.addEventListener('pointerdown',e=>{
  if(scene.viewMode==='eyes'&&!targeting&&e.pointerType==='mouse'){
    e.preventDefault();if(document.pointerLockElement!==canvas&&!freeMouseLook){enterControl();return;}
@@ -208,7 +234,7 @@ canvas.addEventListener('pointerdown',e=>{
 });
 canvas.addEventListener('pointermove',e=>{if(document.pointerLockElement===canvas||freeMouseLook)return;if(!pointerStart)return;if(Math.hypot(e.clientX-pointerStart.x,e.clientY-pointerStart.y)>5)dragged=true;if(dragged)scene.view.rotate(e.clientX-previousPointer.x,e.clientY-previousPointer.y);previousPointer={x:e.clientX,y:e.clientY};});
 canvas.addEventListener('pointerup',e=>{if(scene.viewMode==='eyes'&&!targeting&&e.pointerType==='mouse'){pointerStart=null;return;}if(pointerStart&&!dragged)battlefieldClick(e);pointerStart=null;});
-canvas.addEventListener('pointercancel',()=>{pointerStart=null;});
+canvas.addEventListener('pointercancel',()=>{pointerStart=null;triggerHeld=false;scene.view.aiming=false;lookPointer=null;});
 canvas.addEventListener('wheel',e=>{e.preventDefault();scene.setZoom(-e.deltaY*.0005);},{passive:false});
 function battlefieldClick(e: PointerEvent) {
   if (!started || game.result || game.countdown > 0) return;
@@ -229,6 +255,7 @@ window.addEventListener('keydown', e => {
   if(['KeyW','KeyA','KeyS','KeyD'].includes(e.code)){e.preventDefault();heldKeys.add(e.code);}
   if (e.repeat) return;
   const key = e.key.toLowerCase();
+  if(key==='p'){togglePause();return;}
   const squadKey = /^(?:Digit|Numpad)([123])$/.exec(e.code)?.[1] ?? (['1', '2', '3'].includes(key) ? key : null);
   if (squadKey) {
     e.preventDefault();
@@ -238,24 +265,36 @@ window.addEventListener('keydown', e => {
   }
   if(key==='v'){scene.view.cycle();changeView(scene.viewMode);}
   if(key==='f')scene.resetCamera();
-  if (key === 'm') target('move'); if (key === 'q') issue({ kind: 'shield', squadId: selected }); if (key === 'e') target('emp'); if (key === 'r') issue({ kind: 'retreat', squadId: selected });
+  if (key === 'm') target('move'); if (key === 'q') issue({ kind: 'shield', squadId: selected }); if (key === 'e') target('emp'); if (key === 't') issue({ kind: 'retreat', squadId: selected });
+  if(key==='r')reloadHero();if(key==='g')pickupLoot();if(key==='x')issue({kind:'switchWeapon',squadId:game.hero?.squadId??selected});
   if (key === 'escape') { if(scene.viewMode==='eyes'){releaseMouse();toast('Mouse released. Use the cards or station buttons, or TAKE CONTROL to resume.');return;} if (targeting) { clearTarget(); toast('Order cancelled. Your squad is still selected.'); } else { selected = null; toast('Selection cleared'); } updateHud(); }
 });
-window.addEventListener('keyup', e => { heldKeys.delete(e.code); if(!heldKeys.size&&['KeyW','KeyA','KeyS','KeyD'].includes(e.code)&&selected!==null)command(game,{id:`stop:${++seq}`,side:0,kind:'drive',squadId:selected,direction:{x:0,z:0}}); if (e.code === 'Space') scene.setTactical(tactical); });
+window.addEventListener('keyup', e => { heldKeys.delete(e.code); if(!heldKeys.size&&['KeyW','KeyA','KeyS','KeyD'].includes(e.code)&&selected!==null)command(game,{id:`stop:${++seq}`,side:0,kind:'drive',squadId:game.hero?.squadId??selected!,direction:{x:0,z:0}}); if (e.code === 'Space') scene.setTactical(tactical); });
 window.addEventListener('blur', () => {triggerHeld=false;scene.view.aiming=false;heldKeys.clear();scene.setTactical(tactical);});
-document.addEventListener('visibilitychange', () => { paused = document.hidden; heldKeys.clear();ambience(); accumulator = 0; lastFrame = performance.now(); if (started && !game.result) toast(paused ? 'Practice paused while the tab is hidden.' : 'Practice resumed.'); });
+document.addEventListener('visibilitychange', () => { paused = document.hidden||userPaused;triggerHeld=false;scene.view.aiming=false;heldKeys.clear();ambience(); accumulator = 0; lastFrame = performance.now(); if (started && !game.result) toast(paused ? 'Practice paused. Press P to resume when visible.' : 'Practice resumed.'); });
 const friendlyName = (id: number) => String(game.squads.filter(s => s.side === 0).findIndex(s => s.id === id) + 1).padStart(2, '0');
 function updateHud() {
-  const own = game.squads.filter(s => s.side === 0), remaining = Math.ceil(Math.max(0, R.regulation - game.tick) / R.ticks);
+  const own = game.squads.filter(s => s.side === 0);
+  const hero=own.find(s=>s.id===game.hero?.squadId),hp=hero?.hp??(game.hero?.alive?100:0);
+  el('hero-health').textContent=`YOUR HEALTH · ${Math.max(0,Math.ceil(hp))} / 100`;
+  el('player-health-fill').style.width=Math.max(0,hp)+'%';
+  el('player-health-fill').style.background=hp<30?'#ff7858':'#6fe5b4';
+  el('weapon-readout').textContent=hero?`${WEAPONS[hero.weapon].name.toUpperCase()} · ${hero.ammo} / ${hero.reserveAmmo}${hero.reloadUntil>game.tick?' · RELOADING':''}`:'CHARACTER DOWN';
+  el('token-readout').textContent=`PRACTICE WIF · ${game.hero?.tokens??0}`;
+  const nearby=nearestLoot(),near=!!hero&&!!nearby&&distance(hero,nearby)<=R.lootRange;
+  el('loot-prompt').textContent=near?`G · TAKE ${WEAPONS[nearby.weapon].name.toUpperCase()} + ${nearby.tokens} WIF`:nearby?`GUN PICKUP · ${Math.ceil(distance(hero!,nearby))} m away`:hero&&!hero.ammo&&!hero.reserveAmmo?'OUT OF BULLETS · FIND AN ENEMY GUN':'R RELOAD · G LOOT · X SWAP GUN';
+  el<HTMLButtonElement>('reload-rifle').disabled=!hero||!!game.result||hero.reloadUntil>game.tick||!hero.reserveAmmo||hero.ammo>=WEAPONS[hero.weapon].magazine;
+  el<HTMLButtonElement>('pickup-loot').disabled=!near||!!game.result;
+  el<HTMLButtonElement>('switch-weapon').disabled=!hero||hero.weapons.length<2||!!game.result;
   if (selected !== null && !own.some(s => s.id === selected)) {
     releaseMouse();
     clearTarget();
-    selected = own[0]?.id ?? null;
+    selected = game.hero&&!game.hero.alive?null:own[0]?.id ?? null;
     if (started && !game.result) toast(selected === null ? 'Your squad was lost. No soldiers remain. Deploy another squad if you have 20 credits.' : `Your selected squad was lost. Squad ${friendlyName(selected)} is now selected.`);
   }
   el('score-you').textContent = String(game.scores[0]).padStart(3, '0'); el('score-bot').textContent = String(game.scores[1]).padStart(3, '0');
-  el('timer').textContent = game.tick > R.regulation ? `OT ${Math.ceil((R.regulation + R.overtime - game.tick) / R.ticks)}` : `${Math.floor(remaining / 60).toString().padStart(2, '0')}:${Math.ceil(remaining % 60).toString().padStart(2, '0')}`;
-  el('phase').textContent = !started ? 'OPERATION STANDBY' : game.result ? 'TRANSMISSION ENDED' : paused ? 'PRACTICE PAUSED' : game.countdown ? 'DEPLOYMENT COUNTDOWN' : game.tick >= R.doubleAt ? 'SIGNAL ×2' : drill ? 'COMBAT DRILL / LOCAL' : 'RELAY CONTROL';
+  el('timer').textContent = 'UNTIMED';
+  el('phase').textContent = !started?'READY':game.result?'RUN ENDED':paused?'PAUSED':game.countdown?'GET READY':drill?'COMBAT DRILL':'HOLD THE STATIONS';
   el('budget').textContent = String(game.budgets[0]); el('slots').textContent = `${own.length} / 3 ACTIVE`;
   document.querySelector('.squad-panel .panel-heading > span')!.textContent = '1. YOUR TEAM · CLICK A SQUAD';
   document.body.dataset.trainingStep = guided && started && !game.result ? String(tutorialStage) : '';
@@ -282,7 +321,8 @@ function updateHud() {
   el('relay-status').innerHTML = game.relays.map(r => `<b class="${r.owner === 0 ? 'friendly' : r.owner === 1 ? 'hostile' : ''}">${r.id}</b>`).join('');
   document.querySelectorAll<HTMLButtonElement>('[data-relay]').forEach((b, i) => {
     const r = game.relays[i];
-    b.innerHTML = `<b>${r.id}</b><span>GO TO ${['NORTH', 'CENTRE', 'SOUTH'][i]}<small>${r.contested ? 'CONTESTED' : r.owner === 0 ? 'YOURS · +1 POINT / SEC' : r.owner === 1 ? 'ENEMY STATION' : 'CAPTURE THIS STATION'}</small></span>`;
+    const label=`${r.owner}:${r.contested}`;
+    if(b.dataset.label!==label){b.dataset.label=label;b.innerHTML = `<b>${r.id}</b><span>GO TO ${['NORTH', 'CENTRE', 'SOUTH'][i]}<small>${r.contested ? 'CONTESTED' : r.owner === 0 ? 'YOURS · +1 POINT / SEC' : r.owner === 1 ? 'ENEMY STATION' : 'CAPTURE THIS STATION'}</small></span>`;}
     b.disabled = !started || game.countdown > 0 || !!game.result || selected === null || !own.some(s => s.id === selected);
   });
   for (const kind of ['shield', 'emp', 'deploy'] as const) {
@@ -303,7 +343,7 @@ function updateHud() {
     ['Watch the northern flank', 'The training bot is approaching through relay A. Buildings block sight, so its position appears only when visible.'],
     ['Bring more soldiers', 'An enemy is visible. Click DEPLOY SQUAD at the bottom right or use the button here. It costs 20 of your 100 practice credits. After two seconds a second squad and its selection card appear at home.'],
     ['Protect your selected squad', 'Click SHIELD in the bottom controls or use the button here. It protects the selected squad for four seconds, absorbs 30 damage and costs 10 credits.'],
-    ['Now hold two stations', 'Select a squad card, then click GO TO NORTH or GO TO SOUTH to capture another station. Each station earns points. Reach 240 points, or lead when three minutes ends. WASD moves your squad; drag to look; V changes camera.'],
+    ['Now hold two stations', 'Select a squad card, then click GO TO NORTH or GO TO SOUTH to capture another station. Each station earns points. Reach 240 points. There is no match timer. Keep your main character alive. WASD moves your squad; drag to look; V changes camera.'],
   ];
   el('tutorial-card').hidden = !guided || !started || !!game.result;
   if (el('tutorial-card').dataset.stage !== String(tutorialStage)) { el('tutorial-card').dataset.stage = String(tutorialStage); el('tutorial-card').classList.remove('compact'); }
@@ -311,14 +351,15 @@ function updateHud() {
   el('tutorial-title').textContent = guidance[tutorialStage][0]; el('tutorial-copy').textContent = guidance[tutorialStage][1];
   el('tutorial-step').textContent = `FIELD TRAINING · STEP ${tutorialStage + 1} OF 7`;
   const trainingAction = el<HTMLButtonElement>('tutorial-action');
-  trainingAction.textContent = ['SELECT SQUAD 1', 'SEND SQUAD TO B', 'SHOW OVERHEAD MAP', 'SHOW OVERHEAD MAP', 'DEPLOY SECOND SQUAD · 20 CR', 'SHIELD SELECTED SQUAD · 10 CR', 'SHOW OVERHEAD MAP'][tutorialStage];
+  const actionLabel=['SELECT SQUAD 1', 'SEND SQUAD TO B', 'SHOW OVERHEAD MAP', 'SHOW OVERHEAD MAP', 'DEPLOY SECOND SQUAD · 20 CR', 'SHIELD SELECTED SQUAD · 10 CR', 'SHOW OVERHEAD MAP'][tutorialStage];
+  if(trainingAction.textContent!==actionLabel)trainingAction.textContent=actionLabel;
   trainingAction.disabled = tutorialStage === 1 ? game.countdown > 0 || selected === null : tutorialStage === 4 ? el<HTMLButtonElement>('deploy').disabled : tutorialStage === 5 ? el<HTMLButtonElement>('shield').disabled : false;
   if (game.result && !resultShown) {
     releaseMouse();
     clearTarget();
-    resultShown = true; el('result-title').textContent = game.result.winner === null ? 'Signal unresolved.' : game.result.winner === 0 ? 'Frequency secured.' : 'Transmission lost.';
+    resultShown = true; el('result-title').textContent = game.hero&&!game.hero.alive?'YOU DIED':game.result.winner === null ? 'Signal unresolved.' : game.result.winner === 0 ? 'Frequency secured.' : 'Transmission lost.';
     el('result-reason').textContent = `${game.result.reason}. You ${game.scores[0]} / Bot ${game.scores[1]}.`;
-    el('result-stats').innerHTML = `<p>Relays held <b>${game.relays.filter(r => r.owner === 0).length} / 3</b></p><p>Squads lost <b>${game.lost[0]}</b></p><p>Reserve spent <b>${game.spent[0]} CR</b></p><p>Reserve remaining <b>${game.budgets[0]} CR</b></p>`;
+    el('result-stats').innerHTML = `<p>Relays held <b>${game.relays.filter(r => r.owner === 0).length} / 3</b></p><p>Squads lost <b>${game.lost[0]}</b></p><p>Reserve spent <b>${game.spent[0]} CR</b></p><p>Reserve remaining <b>${game.budgets[0]} CR</b></p><p>Practice WIF looted <b>${game.hero?.tokens??0} · SIMULATED</b></p>`;
     el('result-observations').textContent = `You used ${spending.filter(s => s.action === 'DEPLOY').length} paid reinforcements and ${spending.filter(s => s.action !== 'DEPLOY').length} support abilities. ${game.budgets[0]} of your 100 starting practice credits remained.`;
     try { const history = JSON.parse(localStorage.getItem('last-signal-results') ?? '[]'); history.unshift({ at: new Date().toISOString(), mode: 'LOCAL_PRACTICE', drill, result: game.result, scores: game.scores, spent: game.spent[0] }); localStorage.setItem('last-signal-results', JSON.stringify(history.slice(0, 10))); } catch { /* Match results work without persistence. */ }
     dialog('result').showModal();
@@ -332,7 +373,7 @@ function frame(now: number) {
     while (accumulator >= 1 / R.ticks && catchup++ < 5) {
       if(triggerHeld)fireRifle();
       if(game.countdown===0&&heldKeys.size&&!document.querySelector('dialog[open]')) {
- const squad=game.squads.find(s=>s.id===selected&&s.side===0);
+ const squad=game.squads.find(s=>s.id===(game.hero?.squadId??selected)&&s.side===0);
  if(squad){const d=scene.view.direction(Number(heldKeys.has('KeyW'))-Number(heldKeys.has('KeyS')),Number(heldKeys.has('KeyD'))-Number(heldKeys.has('KeyA')));
  if(d.x||d.z){if(targeting)clearTarget();const accepted=command(game,{id:'keys:'+ ++seq,side:0,kind:'drive',squadId:squad.id,direction:d});if(accepted.ok&&guided&&tutorialStage===1)tutorialStage=2;}}
  }
@@ -360,8 +401,11 @@ function frame(now: number) {
   lastNotice = game.eventSeq;
   const observation=observe(game,0);
  scene.update(observation,selected,events,elapsed);
- const ownSelected=observation.squads.find(s=>s.id===selected);
+ const ownSelected=observation.squads.find(s=>s.id===(game.hero?.squadId??selected));
+ feedback.update(observation,events,now);
  if(ownSelected&&scene.viewMode==='eyes'){
+   const weaponStatus=paused?'PAUSED · PRESS P TO RESUME':ownSelected.reloadUntil>game.tick?'RELOADING…':ownSelected.disabledUntil>game.tick?'WEAPON DISABLED BY EMP':!ownSelected.ammo?(ownSelected.reserveAmmo?'EMPTY · PRESS R TO RELOAD':'OUT OF BULLETS · FIND AN ENEMY GUN'):game.tick-(ownSelected.rifleAt??-100)<WEAPONS[ownSelected.weapon].ticks?'CYCLING WEAPON':document.body.classList.contains('mouse-captured')?'WASD MOVE · LEFT FIRE · RIGHT AIM · R RELOAD · G LOOT · ESC RELEASE':'READY · TAKE CONTROL TO LOOK AND FIRE · R RELOAD · G LOOT';
+   if(el('shoot-status').textContent!==weaponStatus)el('shoot-status').textContent=weaponStatus;
    const sight=traceRifle(observation,ownSelected,scene.aimDirection());
    el('field-reticle').classList.toggle('on-target',!!sight.target);
    el('aim-status').textContent=(now<hitUntil?'HIT CONFIRMED':sight.target?`ENEMY IN SIGHTS · ${Math.round(distance(ownSelected,sight.target))} m · ${Math.ceil(sight.target.hp)} HP`:'AIM AT AN ENEMY · SQUAD FIRES AUTOMATICALLY')+` · YOUR HITS ${rifleHits}`;

@@ -1,5 +1,5 @@
 import * as T from 'three';
-import { createSoldier, animateSoldier, createViewWeapon } from './soldier.ts';
+import { createSoldier, animateSoldier, createViewWeapon, periodRifle } from './soldier.ts';
 import { FieldCamera, type ViewMode } from './field-camera.ts';
 import { CombatFX } from './combat-fx.ts';
 import { OldFront } from './old-front.ts';
@@ -33,6 +33,7 @@ export class Battlefield {
   private renderFrame=0;
   private viewWeapon=createViewWeapon();
   private ownFireAt=-100;
+  private lootMeshes=new Map<number,T.Group>();
   effectsEnabled = true;
   reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
   private materials = new Map<string, T.MeshStandardMaterial>();
@@ -106,7 +107,12 @@ export class Battlefield {
   resetCamera() {this.view.reset();}
   aimDirection() { const d=this.camera.getWorldDirection(new T.Vector3()); return {x:d.x,y:d.y,z:d.z}; }
   fireWeapon() { this.ownFireAt=this.time; }
+  screenPoint(at:Point,height:number){
+    const p=new T.Vector3(at.x,height,at.z).project(this.camera);
+    return {x:(p.x+1)*.5*this.container.clientWidth,y:(1-p.y)*.5*this.container.clientHeight,visible:p.z>-1&&p.z<1&&Math.abs(p.x)<.96&&Math.abs(p.y)<.94};
+  }
   resetMatch() {
+    for(const group of this.lootMeshes.values()){this.scene.remove(group);this.disposeObject(group);}this.lootMeshes.clear();
     this.lastEvent=0;this.ownFireAt=-100;this.fx.reset();this.view.reset();
     for(const group of this.units.values()){this.scene.remove(group);this.disposeObject(group);}this.units.clear();
     this.clearGroup(this.paths);this.pathSignature='';
@@ -145,7 +151,8 @@ export class Battlefield {
       group.getObjectByName('shield')!.visible = s.shield > 0;
       group.getObjectByName('hp')!.scale.x = Math.max(.01, s.hp / 100);
     }
-    const s = o.squads.find(s => s.id === selected)??o.squads.find(s=>s.side===0);
+    const cameraId=this.viewMode==='eyes'&&o.hero?o.hero.squadId:selected;
+    const s = o.squads.find(s => s.id === cameraId)??(o.hero&&this.viewMode==='eyes'?undefined:o.squads.find(s=>s.side===0));
     this.view.update(s,dt,this.reducedMotion,this.time,o.tick);
     this.viewWeapon.visible=this.viewMode==='eyes'&&!!s;
     const kick=this.reducedMotion?0:Math.max(0,1-(this.time-this.ownFireAt)/.2);
@@ -154,6 +161,13 @@ export class Battlefield {
     this.viewWeapon.getObjectByName('bolt')!.position.z=-.17+kick*.08;
     this.viewWeapon.position.y=(this.view.aiming?-.22:-.34)+(!this.reducedMotion&&s&&isMoving(s,o.tick)?Math.sin(this.time*10)*.012:0);
     this.viewWeapon.getObjectByName('flash')!.visible=this.effectsEnabled&&this.time-this.ownFireAt<.055;
+    this.viewWeapon.getObjectByName('weapon')!.scale.set(.8,.8,s?.weapon==='carbine'?.58:.8);
+    for(const [id,mesh] of this.lootMeshes)if(!o.loot.some(l=>l.id===id)){this.scene.remove(mesh);this.disposeObject(mesh);this.lootMeshes.delete(id);}
+    for(const drop of o.loot){
+      let group=this.lootMeshes.get(drop.id);
+      if(!group){group=new T.Group();const gun=periodRifle();gun.rotation.set(0,.5,Math.PI/2);gun.position.y=.3;group.add(gun);const beacon=this.ring(.7,0xffdc76,.1);group.add(beacon);this.scene.add(group);this.lootMeshes.set(drop.id,group);}
+      group.position.set(drop.x,.05+Math.sin(this.time*2)*.025,drop.z);
+    }
     this.selection.visible = !!s;
     if (s) this.selection.position.set(s.x, .06, s.z);
     this.destination.visible = !!s?.route.length;

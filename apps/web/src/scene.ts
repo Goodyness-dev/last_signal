@@ -160,6 +160,12 @@ export class Battlefield {
     this.viewWeapon.position.z=(this.view.aiming?-.5:-.65)+kick*.09;
     this.viewWeapon.getObjectByName('bolt')!.position.z=-.17+kick*.08;
     this.viewWeapon.position.y=(this.view.aiming?-.22:-.34)+(!this.reducedMotion&&s&&isMoving(s,o.tick)?Math.sin(this.time*10)*.012:0);
+    const reloading=!!s&&s.reloadUntil>o.tick;
+    const reloadDip=reloading?Math.sin(Math.PI*(1-(s!.reloadUntil-o.tick)/RULES.reloadTicks)):0;
+    this.viewWeapon.rotation.z=this.reducedMotion?0:-reloadDip*.5;
+    this.viewWeapon.rotation.x=this.reducedMotion?0:reloadDip*.25;
+    this.viewWeapon.position.y-=this.reducedMotion?0:reloadDip*.3;
+    this.viewWeapon.getObjectByName('bolt')!.position.z+=reloadDip*.15;
     this.viewWeapon.getObjectByName('flash')!.visible=this.effectsEnabled&&this.time-this.ownFireAt<.055;
     this.viewWeapon.getObjectByName('weapon')!.scale.set(.8,.8,s?.weapon==='carbine'?.58:.8);
     for(const [id,mesh] of this.lootMeshes)if(!o.loot.some(l=>l.id===id)){this.scene.remove(mesh);this.disposeObject(mesh);this.lootMeshes.delete(id);}

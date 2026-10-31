@@ -20,3 +20,5 @@ Revision: articulated figures and the eye level weapon now live in apps/web/src/
 License texts preserve source notices. File sizes can be inspected in the local public/fonts folder. Procedural geometry has no downloaded model size. Polygon profiling and audio mix measurements are pending. Runtime evidence under docs/evidence comes from this application and is not proof of multiplayer or chain integration.
 
 Survival revision assets: dropped rifle and carbine models reuse the original locally authored periodRifle procedural geometry and materials. Ground pickup rings, enemy HP panels, health bars and damage numbers are original code generated visuals. No third party guns, token logos, models or textures were added. These remain temporary procedural prototype assets.
+
+Survival polish uses original code authored reload motion, progress UI and pickup highlight styling. It reuses existing procedural weapon geometry; no additional third party assets were added.

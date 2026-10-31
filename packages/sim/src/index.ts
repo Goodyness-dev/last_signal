@@ -34,6 +34,13 @@ export function createCombatDrill(seed=1,options:PracticeOptions={}):Game {
   if(g.hero)g.hero.squadId=g.squads.find(s=>s.side===0&&s.z===16)!.id;
   return g;
 }
+// Explicit teaching fixture. The target cannot fire; ammo, damage and loot use normal rules.
+export function createLootTraining(seed=1):Game {
+  const g=createGame(seed,{untimed:true,hero:true});g.countdown=0;
+  Object.assign(g.squads[0],{x:21,z:16});
+  Object.assign(g.squads[1],{x:25,z:16,disabledUntil:Number.MAX_SAFE_INTEGER});
+  return g;
+}
 export const protectedHome = (s: Squad) => distance(s, HOMES[s.side]) <= R.homeRadius;
 export function visible(g: Pick<Game, 'squads'>, side: Side, p: Point): boolean {
   return (distance(p, HOMES[side]) <= 6 && lineOfSight(HOMES[side], p)) || g.squads.some(s => s.side === side && distance(s, p) <= R.vision && lineOfSight(s, p));

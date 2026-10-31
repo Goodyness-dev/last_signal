@@ -1,6 +1,6 @@
 # Status
 
-Latest revision: untimed survival practice, rules practice-3-survival. Strict build and all 25 tests pass. Player death, visible enemy HP, ammo exhaustion, reload conservation and pause were checked in the browser. Loot, weapon switching, WIF accounting and coordinated evasion pass simulation tests; browser loot collection and a survival victory remain unverified. Practice WIF has no real value. Earlier revision notes below are historical and may describe superseded controls or balance.
+Latest revision: untimed survival practice, rules practice-3-survival. Strict build and all 26 tests pass. Player death, visible enemy HP, ammo exhaustion, reload conservation and pause were checked in the browser. Loot, weapon switching, WIF accounting and coordinated evasion pass simulation tests; training loot collection is now verified in the browser; a full survival victory remains unverified. Practice WIF has no real value. Earlier revision notes below are historical and may describe superseded controls or balance.
 
 31 October 2026. Local practice slice.
 
@@ -54,3 +54,6 @@ Player control revision, 31 October 2026: the owner explicitly requested mouse l
 
 
 Untimed survival revision, 31 October 2026. Owner requested removal of the timer, main character death, meaningful damage, obvious enemy health, finite bullets, recoverable guns and WIF, and coordinated enemies. All web modes now create untimed practice games with a fixed main character. Timed regulation remains available only in the underlying legacy simulation mode and tests. The web run ends at 240 points, concession or main character death. NPC death drops a gun, 12 bullets and five simulated practice WIF; collection requires the living main character within two metres and line of sight. Duplicate collection cannot award twice. WIF is a separate local counter with no real value or chain read. Service rifle damage is 20 with six rounds, carbine damage is 12 with ten rounds and faster cadence. R reloads from finite reserve, G loots, X swaps collected types and T retreats. Shared ammo is conserved across switching. Automatic squad volleys remain 10 damage. Player health remains linked to the main character squad entity; individual soldier hitboxes are not implemented.
+
+
+Survival polish: added explicit disarmed Shoot & Loot Training, contextual pickup distance and highlight, reload progress and weapon motion, and a button to start a fresh live match. Browser verified a player hit, target death, walking to the drop, G collection, field carbine 10 / 31, practice WIF 0 to 5, X weapon cycling, reload conservation and clean reset to a live match. This closes the browser pickup verification gap using a clearly labelled training fixture.

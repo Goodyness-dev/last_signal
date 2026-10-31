@@ -1,8 +1,19 @@
 import {describe,it,expect} from 'vitest';
-import {createGame,createCombatDrill,command,step,observe,botCommands,distance,legal,RULES as R,WEAPONS,type Game} from '@last-signal/sim';
+import {createGame,createCombatDrill,createLootTraining,command,step,observe,botCommands,distance,legal,RULES as R,WEAPONS,type Game} from '@last-signal/sim';
 const advance=(g:Game,ticks:number)=>{for(let i=0;i<ticks;i++)step(g);};
 const practice=()=>{const g=createGame(1,{untimed:true,hero:true});g.countdown=0;return g;};
 describe('untimed survival practice',()=>{
+  it('teaches loot with a disarmed target while using ordinary damage and pickup commands',()=>{
+    const g=createLootTraining(),hero=g.squads[0],target=g.squads[1];
+    expect(g.hero?.squadId).toBe(hero.id);expect(g.untimed).toBe(true);expect(g.loot).toHaveLength(0);
+    for(let i=0;i<4&&g.squads.some(s=>s.id===target.id);i++){
+      expect(command(g,{id:'range:'+i,side:0,kind:'fire',squadId:hero.id,direction:{x:4,y:-.59,z:0}}).ok).toBe(true);advance(g,R.rifleTicks);
+    }
+    expect(g.squads.some(s=>s.id===target.id)).toBe(false);expect(hero.hp).toBe(100);expect(g.loot).toHaveLength(1);expect(hero.ammo).toBeLessThan(R.magazine);
+    command(g,{id:'approach',side:0,kind:'move',squadId:hero.id,target:{x:24,z:16}});advance(g,40);
+    expect(command(g,{id:'collect',side:0,kind:'loot',squadId:hero.id,lootId:target.id}).ok).toBe(true);
+    expect(g.hero!.tokens).toBe(R.lootTokens);expect(hero.weapon).toBe('carbine');expect(g.budgets).toEqual([100,100]);
+  });
   it('has no regulation, overtime or late match double score deadline',()=>{
     const g=practice();g.tick=R.regulation-1;g.scores=[3,1];step(g);expect(g.result).toBeNull();
     g.tick=R.regulation+R.overtime;step(g);expect(g.result).toBeNull();

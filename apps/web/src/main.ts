@@ -3,7 +3,7 @@ import './immersive.css';
 import './old-front.css';
 import './guidance.css';
 import { Battlefield } from './scene.ts';
-import { createGame, createCombatDrill, step, command, observe, botCommands, visible, distance, isMoving, traceRifle, WEAPONS, lineOfSight, MAP, RULES as R, type Command, type GameEvent, type Point } from '@last-signal/sim';
+import { createGame, createCombatDrill, createLootTraining, step, command, observe, botCommands, visible, distance, isMoving, traceRifle, WEAPONS, lineOfSight, MAP, RULES as R, type Command, type GameEvent, type Point } from '@last-signal/sim';
 import './shooter.css';
 import './survival.css';
 import { BattleFeedback } from './battle-feedback.ts';
@@ -14,10 +14,10 @@ app.innerHTML = `
   <main>
     <div class="matchbar"><div class="commander friendly"><span class="team-icon">◈</span><div><small>WEST COMMAND</small><strong>YOU <span>01</span></strong></div></div><div class="scoreboard"><span id="score-you">000</span><div class="match-time"><small id="phase">OPERATION STANDBY</small><strong id="timer">UNTIMED</strong><div id="relay-status"><b>A</b><b>B</b><b>C</b></div></div><span id="score-bot">000</span></div><div class="commander hostile"><div><small>EAST COMMAND</small><strong>BOT <span>02</span></strong></div><span class="team-icon">◇</span></div></div>
     <section id="battlefield" aria-label="Interactive 3D battlefield. Select a friendly squad and choose Move or right click a destination." tabindex="0"><div class="vignette"></div><div class="scene-meta"><span>LIVE TACTICAL VIEW</span><small>48 × 32 / SECTOR 7</small></div><div class="scene-controls"><button id="view-squad" class="active">SQUAD</button><button id="view-eyes">EYE LEVEL</button><button id="view-tactical">COMMAND</button><button id="overlay" title="Tactical overlay. Hold Space.">◎ <span>TACTICAL</span></button><button id="zoom-out" aria-label="Zoom out">−</button><button id="zoom-in" aria-label="Zoom in">+</button><button id="reset-camera" aria-label="Reset camera">⤢</button></div><div class="relay-label"></div><div class="relay-label"></div><div class="relay-label"></div><div id="field-reticle"></div><div id="damage-feedback"></div><div class="field-readout"><small id="camera-label">SQUAD CAMERA</small><strong id="field-state">READY TO DEPLOY</strong><span>WASD MOVE · MOUSE LOOK · LEFT FIRE · RIGHT AIM · ESC RELEASE</span></div><div class="objectives"><button data-relay="0">A <span>NORTH</span></button><button data-relay="1">B <span>CENTRAL</span></button><button data-relay="2">C <span>SOUTH</span></button></div><div class="minimap"><canvas id="minimap" width="192" height="128" aria-label="Tactical map. Click a point to move your selected squad."></canvas><small>TACTICAL MAP / CLICK TO MOVE</small></div><div class="map-home west">◈ WEST / HOME</div><div class="map-home east">EAST / HOME ◇</div><div id="toast" role="status" aria-live="polite">Select your squad. Hold the frequency.</div><div class="weather">↙  RAIN  /  12°C <span>VISIBILITY LIMITED</span></div><div class="map-coordinate">KESTREL // 07.24</div>
-      <div class="briefing" id="briefing"><div class="eyebrow"><span>01</span> FIELD BRIEFING</div><h1>Hold the<br>line.</h1><p>A rain soaked front. Three field stations.<br>Keep the last signal alive.</p><div class="brief-rule"><b>01</b><span>Move squads into relay circles.<br>Hold ground to generate signal.</span></div><div class="brief-rule"><b>02</b><span>Use cover. Time your support.<br>Every credit is a decision.</span></div><button class="primary" id="start">ENTER THE FRONT <span>↗</span></button><button class="text-button" id="drill">QUICK COMBAT DRILL →</button><button class="text-button" id="tutorial">GUIDED FIRST MATCH →</button><small>Free practice against a local bot.<br>Credits are simulated. No token transactions.</small></div>
+      <div class="briefing" id="briefing"><div class="eyebrow"><span>01</span> FIELD BRIEFING</div><h1>Hold the<br>line.</h1><p>A rain soaked front. Three field stations.<br>Keep the last signal alive.</p><div class="brief-rule"><b>01</b><span>Move squads into relay circles.<br>Hold ground to generate signal.</span></div><div class="brief-rule"><b>02</b><span>Use cover. Time your support.<br>Every credit is a decision.</span></div><button class="primary" id="start">ENTER THE FRONT <span>↗</span></button><button class="text-button" id="loot-training">SHOOT &amp; LOOT TRAINING →</button><button class="text-button" id="drill">QUICK COMBAT DRILL →</button><button class="text-button" id="tutorial">GUIDED FIRST MATCH →</button><small>Free practice against a local bot.<br>Credits are simulated. No token transactions.</small></div>
       <div id="countdown" hidden></div>
       <div id="order-hint" hidden role="status"><strong id="order-title"></strong><p id="order-copy"></p><button id="cancel-order">Cancel order · Esc</button></div>
-      <div id="battle-feedback"></div><div id="survival-hud"><strong id="hero-health">YOUR HEALTH · 100 / 100</strong><div id="player-health-track"><div id="player-health-fill"></div></div><span id="weapon-readout">SERVICE RIFLE · 6 / 24</span><b id="token-readout">PRACTICE WIF · 0</b><small>Simulated pickups · No real value</small><span id="loot-prompt"></span></div><div id="shooter-hud"><strong id="aim-status">YOU AIM AND FIRE · YOUR SOLDIERS FIRE AUTOMATICALLY</strong><small id="shoot-status">WASD move · Mouse look · Left click fire · Hold right click aim · Esc release mouse</small><div><button id="take-control">TAKE CONTROL · MOUSE LOOK</button><button id="fire-rifle">FIRE RIFLE</button><button id="aim-rifle">AIM</button><button id="reload-rifle">RELOAD · R</button><button id="pickup-loot">PICK UP · G</button><button id="switch-weapon">SWAP GUN · X</button><button id="release-control">COMMAND VIEW</button></div></div>
+      <div id="battle-feedback"></div><div id="survival-hud"><strong id="hero-health">YOUR HEALTH · 100 / 100</strong><div id="player-health-track"><div id="player-health-fill"></div></div><span id="weapon-readout">SERVICE RIFLE · 6 / 24</span><progress id="reload-progress" max="40" value="0" hidden aria-label="Reload progress"></progress><b id="token-readout">PRACTICE WIF · 0</b><small>Simulated pickups · No real value</small><span id="loot-prompt"></span></div><div id="shooter-hud"><strong id="range-guide" hidden></strong><strong id="aim-status">YOU AIM AND FIRE · YOUR SOLDIERS FIRE AUTOMATICALLY</strong><small id="shoot-status">WASD move · Mouse look · Left click fire · Hold right click aim · Esc release mouse</small><div><button id="take-control">TAKE CONTROL · MOUSE LOOK</button><button id="fire-rifle">FIRE RIFLE</button><button id="aim-rifle">AIM</button><button id="reload-rifle">RELOAD · R</button><button id="pickup-loot">PICK UP · G</button><button id="switch-weapon">SWAP GUN · X</button><button id="training-live" hidden>START LIVE MATCH</button><button id="release-control">COMMAND VIEW</button></div></div>
       <div id="tutorial-card" hidden><small id="tutorial-step">FIELD TRAINING</small><strong id="tutorial-title"></strong><p id="tutorial-copy"></p><button id="tutorial-action"></button><button id="tutorial-details">Hide instructions to see map</button><button id="skip-tutorial">Skip guidance</button></div>
     </section>
     <section class="command-deck"><div class="squad-panel"><div class="panel-heading"><span>YOUR SQUADS</span><small id="slots">1 / 3 ACTIVE</small></div><div id="squad-cards"></div></div><div class="orders"><div class="panel-heading"><span>FIELD ORDERS</span><small id="selected-name">SELECT A SQUAD</small></div><div class="action-row"><button id="move" class="action"><span class="action-glyph">⌖</span><strong>MOVE</strong><small>FREE <kbd>M</kbd></small></button><button id="retreat" class="action"><span class="action-glyph">↶</span><strong>RETREAT</strong><small>FREE <kbd>T</kbd></small></button><button id="shield" class="action"><span class="action-glyph">⬡</span><strong>SHIELD</strong><small id="shield-cost">10 CR <kbd>Q</kbd></small></button><button id="emp" class="action"><span class="action-glyph">⌁</span><strong>EMP</strong><small id="emp-cost">15 CR <kbd>E</kbd></small></button></div></div><div class="reserve"><div class="panel-heading"><span>PRACTICE RESERVE</span><button id="ledger-button" aria-label="View spending ledger">↗</button></div><div class="budget"><strong id="budget">100</strong><span>CR<small>SIMULATED</small></span></div><button id="deploy">+ DEPLOY SQUAD <span>20 CR</span></button></div></section>
@@ -32,7 +32,7 @@ const dialog = (id: string) => el<HTMLDialogElement>(id);
 const practiceOptions={untimed:true,hero:true};
 let game = createGame(1,practiceOptions), started = false, selected: number | null = null;
 let targeting: 'move' | 'emp' | null = null, seq = 0, accumulator = 0, lastFrame = performance.now(), lastHud = 0, lastNotice = 0, resultShown = false;
-let drill=false;
+let drill=false,rangeTraining=false;
 let guided = false, tutorialStage = 0, tutorialFlankPhase = 0, tactical = false, paused = false, userPaused=false;
 let audio: AudioContext | null = null, sound = true;
 let rainGain:GainNode|null=null;
@@ -96,7 +96,7 @@ function begin(training: boolean) {
   pauseButton.textContent='PAUSE · P';
   releaseMouse();
   rifleHits=0;
-  drill=false;
+  drill=false;rangeTraining=false;
   game = createGame(1,practiceOptions); scene.resetMatch(); feedback.reset(); started = true; selected = 1; guided = training; tutorialStage = 0; tutorialFlankPhase = 0; targeting = null; resultShown = false; accumulator = 0; paused = false; lastNotice = 0; spending.length = 0;
   document.body.classList.add('in-match');
   clearTarget();
@@ -112,6 +112,7 @@ el('drill').onclick=()=>{
   selected=game.squads.find(s=>s.side===0&&s.z===16)!.id;
   toast('COMBAT DRILL. Two reinforcements already paid: 60 credits remain. Take control to aim and fire. Your soldiers fire automatically.');updateHud();
 };
+el('loot-training').onclick=()=>{begin(false);rangeTraining=true;game=createLootTraining();selected=game.hero!.squadId;changeView('eyes');toast('FIRING RANGE. The target is disarmed. Your soldiers assist. Shoot, approach its gun, then press G.');updateHud();};
 el('start').onclick = () => begin(false); el('tutorial').onclick = () => begin(true); el('rematch').onclick = () => begin(guided);
 function clearTarget() { targeting = null; el('battlefield').classList.remove('targeting'); document.body.dataset.orderMode = ''; el('order-hint').hidden = true; }
 function target(kind: 'move' | 'emp') {
@@ -214,6 +215,7 @@ function nearestLoot(){const hero=game.squads.find(s=>s.id===game.hero?.squadId)
 function pickupLoot(){const drop=nearestLoot();if(!drop)return toast('No gun pickup nearby. Defeat an enemy first.');issue({kind:'loot',squadId:game.hero?.squadId,lootId:drop.id});}
 function reloadHero(){triggerHeld=false;issue({kind:'reload',squadId:game.hero?.squadId??selected});}
 el('reload-rifle').onclick=reloadHero;el('pickup-loot').onclick=pickupLoot;el('switch-weapon').onclick=()=>issue({kind:'switchWeapon',squadId:game.hero?.squadId??selected});
+el('training-live').onclick=()=>{begin(false);changeView('eyes');};
 el('release-control').onclick=()=>changeView('tactical');
 document.addEventListener('pointerlockchange',()=>{const locked=document.pointerLockElement===canvas;document.body.classList.toggle('mouse-captured',locked);triggerHeld=false;heldKeys.clear();scene.view.aiming=false;el('shoot-status').textContent=locked?'WASD MOVE · MOUSE LOOK · LEFT FIRE · HOLD RIGHT AIM · ESC RELEASE':'Click TAKE CONTROL to look freely. Your squad still fires automatically.';});
 document.addEventListener('pointerlockerror',fallbackLook);
@@ -280,6 +282,10 @@ function updateHud() {
   el('player-health-fill').style.width=Math.max(0,hp)+'%';
   el('player-health-fill').style.background=hp<30?'#ff7858':'#6fe5b4';
   el('weapon-readout').textContent=hero?`${WEAPONS[hero.weapon].name.toUpperCase()} · ${hero.ammo} / ${hero.reserveAmmo}${hero.reloadUntil>game.tick?' · RELOADING':''}`:'CHARACTER DOWN';
+  const reloadProgress=el<HTMLProgressElement>('reload-progress');reloadProgress.hidden=!hero||hero.reloadUntil<=game.tick;reloadProgress.max=R.reloadTicks;reloadProgress.value=hero?Math.max(0,R.reloadTicks-(hero.reloadUntil-game.tick)):0;
+  el('weapon-readout').classList.toggle('ammo-empty',!!hero&&!hero.ammo);
+  el('range-guide').hidden=!rangeTraining;el('training-live').hidden=!rangeTraining;
+  if(rangeTraining)el('range-guide').textContent=game.hero!.tokens>0?'LOOT COLLECTED · X SWAPS GUNS · R RELOADS':game.loot.length?(hero&&distance(hero,game.loot[0])<=R.lootRange?'PRESS G TO COLLECT THE GUN AND PRACTICE WIF':'WASD · WALK TO THE DROPPED GUN'):'SHOOT THE DISARMED TARGET · YOUR SQUAD ASSISTS';
   el('token-readout').textContent=`PRACTICE WIF · ${game.hero?.tokens??0}`;
   const nearby=nearestLoot(),near=!!hero&&!!nearby&&distance(hero,nearby)<=R.lootRange;
   el('loot-prompt').textContent=near?`G · TAKE ${WEAPONS[nearby.weapon].name.toUpperCase()} + ${nearby.tokens} WIF`:nearby?`GUN PICKUP · ${Math.ceil(distance(hero!,nearby))} m away`:hero&&!hero.ammo&&!hero.reserveAmmo?'OUT OF BULLETS · FIND AN ENEMY GUN':'R RELOAD · G LOOT · X SWAP GUN';
@@ -294,7 +300,7 @@ function updateHud() {
   }
   el('score-you').textContent = String(game.scores[0]).padStart(3, '0'); el('score-bot').textContent = String(game.scores[1]).padStart(3, '0');
   el('timer').textContent = 'UNTIMED';
-  el('phase').textContent = !started?'READY':game.result?'RUN ENDED':paused?'PAUSED':game.countdown?'GET READY':drill?'COMBAT DRILL':'HOLD THE STATIONS';
+  el('phase').textContent = !started?'READY':game.result?'RUN ENDED':paused?'PAUSED':game.countdown?'GET READY':rangeTraining?'DISARMED TRAINING TARGET':drill?'COMBAT DRILL':'HOLD THE STATIONS';
   el('budget').textContent = String(game.budgets[0]); el('slots').textContent = `${own.length} / 3 ACTIVE`;
   document.querySelector('.squad-panel .panel-heading > span')!.textContent = '1. YOUR TEAM · CLICK A SQUAD';
   document.body.dataset.trainingStep = guided && started && !game.result ? String(tutorialStage) : '';
@@ -357,11 +363,12 @@ function updateHud() {
   if (game.result && !resultShown) {
     releaseMouse();
     clearTarget();
-    resultShown = true; el('result-title').textContent = game.hero&&!game.hero.alive?'YOU DIED':game.result.winner === null ? 'Signal unresolved.' : game.result.winner === 0 ? 'Frequency secured.' : 'Transmission lost.';
+    resultShown = true; el('result-title').textContent = rangeTraining?(game.hero?.tokens?'TRAINING COMPLETE':'TRAINING ENDED'):game.hero&&!game.hero.alive?'YOU DIED':game.result.winner === null ? 'Signal unresolved.' : game.result.winner === 0 ? 'Frequency secured.' : 'Transmission lost.';
     el('result-reason').textContent = `${game.result.reason}. You ${game.scores[0]} / Bot ${game.scores[1]}.`;
     el('result-stats').innerHTML = `<p>Relays held <b>${game.relays.filter(r => r.owner === 0).length} / 3</b></p><p>Squads lost <b>${game.lost[0]}</b></p><p>Reserve spent <b>${game.spent[0]} CR</b></p><p>Reserve remaining <b>${game.budgets[0]} CR</b></p><p>Practice WIF looted <b>${game.hero?.tokens??0} · SIMULATED</b></p>`;
     el('result-observations').textContent = `You used ${spending.filter(s => s.action === 'DEPLOY').length} paid reinforcements and ${spending.filter(s => s.action !== 'DEPLOY').length} support abilities. ${game.budgets[0]} of your 100 starting practice credits remained.`;
-    try { const history = JSON.parse(localStorage.getItem('last-signal-results') ?? '[]'); history.unshift({ at: new Date().toISOString(), mode: 'LOCAL_PRACTICE', drill, result: game.result, scores: game.scores, spent: game.spent[0] }); localStorage.setItem('last-signal-results', JSON.stringify(history.slice(0, 10))); } catch { /* Match results work without persistence. */ }
+    try { const history = JSON.parse(localStorage.getItem('last-signal-results') ?? '[]'); history.unshift({ at: new Date().toISOString(), mode: 'LOCAL_PRACTICE', drill, rangeTraining, result: game.result, scores: game.scores, spent: game.spent[0] }); localStorage.setItem('last-signal-results', JSON.stringify(history.slice(0, 10))); } catch { /* Match results work without persistence. */ }
+    el('result').querySelector('.honesty')!.textContent=rangeTraining?'FIRING RANGE · DISARMED TARGET · SIMULATED PICKUPS':'LOCAL PRACTICE / NO CHAIN SETTLEMENT';
     dialog('result').showModal();
   }
 }
@@ -379,7 +386,7 @@ function frame(now: number) {
  }
  step(game);
       if(game.countdown===0&&game.tick===0)toast('WASD moves you. TAKE CONTROL enables mouse look, left fire and right aim. Your soldiers fire automatically.');
-      if (game.countdown === 0) {
+      if (game.countdown === 0 && !rangeTraining) {
         const observation = observe(game, 1);
         if (!guided || tutorialStage >= 6) {
           for (const c of botCommands(observation, 1)) command(game, c);

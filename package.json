@@ -1,14 +1,31 @@
 {
-  "name": "last-signal", "private": true, "version": "0.1.0", "type": "module",
-  "workspaces": ["apps/*", "packages/*"],
+  "name": "last-signal",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "dev": "npm run dev -w @last-signal/web",
     "server": "npm run dev -w @last-signal/server",
     "build": "npm run typecheck && npm run build -w @last-signal/web",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "preview": "npm run preview -w @last-signal/web"
+    "preview": "npm run preview -w @last-signal/web",
+    "chain:node": "npm run node -w @last-signal/contracts",
+    "chain:compile": "npm run compile -w @last-signal/contracts",
+    "chain:test": "npm run test -w @last-signal/contracts",
+    "chain:proof": "npm run proof -w @last-signal/contracts"
   },
-  "devDependencies": {"typescript": "7.0.2", "vitest": "5.0.5", "tsx": "4.23.15", "@types/node": "24.10.1"},
-  "engines": {"node": ">=24.0.0"}
+  "devDependencies": {
+    "typescript": "7.0.2",
+    "vitest": "5.0.5",
+    "tsx": "4.23.15",
+    "@types/node": "24.10.1"
+  },
+  "engines": {
+    "node": ">=24.0.0"
+  }
 }

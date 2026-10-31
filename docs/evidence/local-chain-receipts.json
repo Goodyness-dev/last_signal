@@ -1,0 +1,823 @@
+{
+  "mode": "LOCAL_EVM_ONLY",
+  "network": "Disposable local Hardhat EVM, not Robinhood Chain testnet",
+  "rpc": "http://127.0.0.1:8545/",
+  "chainId": "31337",
+  "tokenIdentity": "LAST SIGNAL Test WIF (tWIF), 18 decimals, NOT official WIF, no monetary value",
+  "compiler": "0.8.38+commit.1835d247.Emscripten.clang",
+  "evmTarget": "cancun",
+  "token": "0x1D9Dc673dB6DEF9E4961CAeC1664754a93C51d28",
+  "escrow": "0x787C8Bd49D18976Ca1248c739Ea6354A6C603314",
+  "deployer": "0x2436161917CA28344BEAB5D57458D06B1940E8e9",
+  "settlementSigner": "0x4F1a825EF31E70B796a93A82DBFA947726b48FEE",
+  "participants": {
+    "A": "0xAA448D89Fb4c5C9D295fF78E726cC4dcb3107A44",
+    "B": "0xd6E0cD9d457fd4BEc3693a3cE35BecB71409dB26"
+  },
+  "tokenCodeHash": "0x2f8341822bed33eab839256c19212141c75be04f4f89cca348ba15e9c00a0abf",
+  "escrowCodeHash": "0x2951bc1de5927180c1310b159b0984478ad12c8f7bc74b1da38f8889e6215915",
+  "normal": {
+    "offer": {
+      "matchId": "0x501444ef6095636e41a0de92b78ac77115509cf40d282c9b78458fd98cd94666",
+      "playerA": "0xAA448D89Fb4c5C9D295fF78E726cC4dcb3107A44",
+      "playerB": "0xd6E0cD9d457fd4BEc3693a3cE35BecB71409dB26",
+      "rulesHash": "0xefb9353c263ed0470928c8026411c8d4f91a91926ad1b87298febeeb7006e775",
+      "deposit": "100000000000000000000",
+      "createdAt": "1793488157",
+      "fundingExpiry": "1793488757",
+      "nonce": "0"
+    },
+    "result": {
+      "matchId": "0x501444ef6095636e41a0de92b78ac77115509cf40d282c9b78458fd98cd94666",
+      "playerA": "0xAA448D89Fb4c5C9D295fF78E726cC4dcb3107A44",
+      "playerB": "0xd6E0cD9d457fd4BEc3693a3cE35BecB71409dB26",
+      "rulesHash": "0xefb9353c263ed0470928c8026411c8d4f91a91926ad1b87298febeeb7006e775",
+      "spendA": "45000000000000000000",
+      "spendB": "60000000000000000000",
+      "outcome": 0,
+      "terminalTick": "5060",
+      "resultHash": "0xc8ae76fd2e5a92127a084d428fae1389e7120a2b7d11c90d013800fe4649a89b",
+      "nonce": "0",
+      "expiry": "1793489359"
+    },
+    "terminal": {
+      "rulesHash": "0xefb9353c263ed0470928c8026411c8d4f91a91926ad1b87298febeeb7006e775",
+      "tick": 5060,
+      "winner": 0,
+      "scores": [
+        240,
+        0
+      ],
+      "spent": [
+        45,
+        60
+      ],
+      "reason": "Signal threshold reached"
+    },
+    "burn": "10500000000000000000",
+    "creditA": "149500000000000000000",
+    "creditB": "40000000000000000000",
+    "balanceA": "149500000000000000000",
+    "balanceB": "40000000000000000000",
+    "supplyBefore": "200000000000000000000",
+    "supplyAfter": "189500000000000000000"
+  },
+  "timeout": {
+    "offer": {
+      "matchId": "0x406cb093b5f918d6197063324127cd913a2e4f9c63559649cd1b871f6c50d3fb",
+      "playerA": "0xAA448D89Fb4c5C9D295fF78E726cC4dcb3107A44",
+      "playerB": "0xd6E0cD9d457fd4BEc3693a3cE35BecB71409dB26",
+      "rulesHash": "0xefb9353c263ed0470928c8026411c8d4f91a91926ad1b87298febeeb7006e775",
+      "deposit": "100000000000000000000",
+      "createdAt": "1793491766",
+      "fundingExpiry": "1793492366",
+      "nonce": "0"
+    },
+    "deadline": "1793492968",
+    "beforeA": "249500000000000000000",
+    "afterA": "249500000000000000000",
+    "beforeB": "140000000000000000000",
+    "afterB": "140000000000000000000",
+    "burn": "0"
+  },
+  "unmatched": {
+    "offer": {
+      "matchId": "0xa3da0b4eff502bbbd8590dffbf6ab69e0a4ec3636aac4d394cb1c5a4e712422b",
+      "playerA": "0xAA448D89Fb4c5C9D295fF78E726cC4dcb3107A44",
+      "playerB": "0xd6E0cD9d457fd4BEc3693a3cE35BecB71409dB26",
+      "rulesHash": "0xefb9353c263ed0470928c8026411c8d4f91a91926ad1b87298febeeb7006e775",
+      "deposit": "100000000000000000000",
+      "createdAt": "1793492971",
+      "fundingExpiry": "1793493571",
+      "nonce": "0"
+    },
+    "refunded": "100000000000000000000"
+  },
+  "abort": {
+    "offer": {
+      "matchId": "0xff2d39df7ed9762885a1c24ea121cc7b7a23a38e9a3c1426a034ccb101a45576",
+      "playerA": "0xAA448D89Fb4c5C9D295fF78E726cC4dcb3107A44",
+      "playerB": "0xd6E0cD9d457fd4BEc3693a3cE35BecB71409dB26",
+      "rulesHash": "0xefb9353c263ed0470928c8026411c8d4f91a91926ad1b87298febeeb7006e775",
+      "deposit": "100000000000000000000",
+      "createdAt": "1793493574",
+      "fundingExpiry": "1793494174",
+      "nonce": "0"
+    },
+    "result": {
+      "matchId": "0xff2d39df7ed9762885a1c24ea121cc7b7a23a38e9a3c1426a034ccb101a45576",
+      "playerA": "0xAA448D89Fb4c5C9D295fF78E726cC4dcb3107A44",
+      "playerB": "0xd6E0cD9d457fd4BEc3693a3cE35BecB71409dB26",
+      "rulesHash": "0xefb9353c263ed0470928c8026411c8d4f91a91926ad1b87298febeeb7006e775",
+      "spendA": "0",
+      "spendB": "0",
+      "outcome": 3,
+      "terminalTick": "5000",
+      "resultHash": "0x64e39a70e229a14d144becff8c6e0de3f4007f44650458a3e5dd3325aa425953",
+      "nonce": "0",
+      "expiry": "1793494776"
+    },
+    "refundedA": "100000000000000000000",
+    "refundedB": "100000000000000000000",
+    "burn": "0"
+  },
+  "finalLiability": "0",
+  "finalEscrowBalance": "0",
+  "developmentClockAdvanced": true,
+  "receipts": [
+    {
+      "label": "deploy token",
+      "hash": "0x9ad325eb4567228f2d76081b8d6bef1b5f38e6beae192ac63965ec12559741cf",
+      "block": 32,
+      "status": 1,
+      "gasUsed": "612654",
+      "logs": []
+    },
+    {
+      "label": "deploy escrow",
+      "hash": "0x049f62726248f9dd421afeb64d430158fc4065d38e926501d560a2b7ba8d6e49",
+      "block": 33,
+      "status": 1,
+      "gasUsed": "1970637",
+      "logs": []
+    },
+    {
+      "label": "faucet A",
+      "hash": "0x2d0022ae45f5876325e4ea77afd1e9de293479d4c5f85e29e5c875b8aa0e5cb3",
+      "block": 34,
+      "status": 1,
+      "gasUsed": "91975",
+      "logs": [
+        {
+          "address": "0x1D9Dc673dB6DEF9E4961CAeC1664754a93C51d28",
+          "topics": [
+            "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+            "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "0x000000000000000000000000aa448d89fb4c5c9d295ff78e726cc4dcb3107a44"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000056bc75e2d63100000"
+        },
+        {
+          "address": "0x1D9Dc673dB6DEF9E4961CAeC1664754a93C51d28",
+          "topics": [
+            "0x214e597359607d253d273b990ec10788316369f1c0a60fd7d46d8ad75beb7f8e",
+            "0x000000000000000000000000aa448d89fb4c5c9d295ff78e726cc4dcb3107a44"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000056bc75e2d63100000000000000000000000000000000000000000000000000000000000006ae6832a"
+        }
+      ]
+    },
+    {
+      "label": "faucet B",
+      "hash": "0xc91787facb6fb696d0374cad4445d7ea444f24a3bb534f0e3c60f02f1a987a0f",
+      "block": 35,
+      "status": 1,
+      "gasUsed": "74875",
+      "logs": [
+        {
+          "address": "0x1D9Dc673dB6DEF9E4961CAeC1664754a93C51d28",
+          "topics": [
+            "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+            "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "0x000000000000000000000000d6e0cd9d457fd4bec3693a3ce35becb71409db26"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000056bc75e2d63100000"
+        },
+        {
+          "address": "0x1D9Dc673dB6DEF9E4961CAeC1664754a93C51d28",
+          "topics": [
+            "0x214e597359607d253d273b990ec10788316369f1c0a60fd7d46d8ad75beb7f8e",
+            "0x000000000000000000000000d6e0cd9d457fd4bec3693a3ce35becb71409db26"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000056bc75e2d63100000000000000000000000000000000000000000000000000000000000006ae6832b"
+        }
+      ]
+    },
+    {
+      "label": "approve A exactly 100",
+      "hash": "0xf34f27e08e6fdc58a0dae0facf9784cf489bba233602ad7bc98bce8cdede1ba6",
+      "block": 36,
+      "status": 1,
+      "gasUsed": "46401",
+      "logs": [
+        {
+          "address": "0x1D9Dc673dB6DEF9E4961CAeC1664754a93C51d28",
+          "topics": [
+            "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925",
+            "0x000000000000000000000000aa448d89fb4c5c9d295ff78e726cc4dcb3107a44",
+            "0x000000000000000000000000787c8bd49d18976ca1248c739ea6354a6c603314"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000056bc75e2d63100000"
+        }
+      ]
+    },
+    {
+      "label": "approve B exactly 100",
+      "hash": "0xfa29e426cf4a1045dc3ee1cb5dd5469684d110f4b60f48a4b8206fbc37b4492d",
+      "block": 37,
+      "status": 1,
+      "gasUsed": "46401",
+      "logs": [
+        {
+          "address": "0x1D9Dc673dB6DEF9E4961CAeC1664754a93C51d28",
+          "topics": [
+            "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925",
+            "0x000000000000000000000000d6e0cd9d457fd4bec3693a3ce35becb71409db26",
+            "0x000000000000000000000000787c8bd49d18976ca1248c739ea6354a6c603314"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000056bc75e2d63100000"
+        }
+      ]
+    },
+    {
+      "label": "fund A",
+      "hash": "0x1732cbce684ae1859006f6991afc293cf0bb03b15af8c436b9309cafb4ac8ebb",
+      "block": 38,
+      "status": 1,
+      "gasUsed": "227459",
+      "logs": [
+        {
+          "address": "0x1D9Dc673dB6DEF9E4961CAeC1664754a93C51d28",
+          "topics": [
+            "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+            "0x000000000000000000000000aa448d89fb4c5c9d295ff78e726cc4dcb3107a44",
+            "0x000000000000000000000000787c8bd49d18976ca1248c739ea6354a6c603314"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000056bc75e2d63100000"
+        },
+        {
+          "address": "0x787C8Bd49D18976Ca1248c739Ea6354A6C603314",
+          "topics": [
+            "0x4bcda3b85131fc5aa24f415efaad370efc678d3800457997c2fc2af2957a3557",
+            "0x501444ef6095636e41a0de92b78ac77115509cf40d282c9b78458fd98cd94666",
+            "0x000000000000000000000000aa448d89fb4c5c9d295ff78e726cc4dcb3107a44"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000056bc75e2d631000000000000000000000000000000000000000000000000000000000000000000000"
+        }
+      ]
+    },
+    {
+      "label": "fund B",
+      "hash": "0xd484289bc86bb11f2fbb43cff934066880b17916e8a48080f29bf8ddd0a9bf6d",
+      "block": 39,
+      "status": 1,
+      "gasUsed": "87547",
+      "logs": [
+        {
+          "address": "0x1D9Dc673dB6DEF9E4961CAeC1664754a93C51d28",
+          "topics": [
+            "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+            "0x000000000000000000000000d6e0cd9d457fd4bec3693a3ce35becb71409db26",
+            "0x000000000000000000000000787c8bd49d18976ca1248c739ea6354a6c603314"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000056bc75e2d63100000"
+        },
+        {
+          "address": "0x787C8Bd49D18976Ca1248c739Ea6354A6C603314",
+          "topics": [
+            "0x4bcda3b85131fc5aa24f415efaad370efc678d3800457997c2fc2af2957a3557",
+            "0x501444ef6095636e41a0de92b78ac77115509cf40d282c9b78458fd98cd94666",
+            "0x000000000000000000000000d6e0cd9d457fd4bec3693a3ce35becb71409db26"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000056bc75e2d63100000000000000000000000000000000000000000000000000000000000006ae679cf"
+        }
+      ]
+    },
+    {
+      "label": "normal settlement and burn",
+      "hash": "0x73d85374091bb58b3bc9a74bdec2de4328a6d410050b01d15cf7994c09bca820",
+      "block": 40,
+      "status": 1,
+      "gasUsed": "142010",
+      "logs": [
+        {
+          "address": "0x1D9Dc673dB6DEF9E4961CAeC1664754a93C51d28",
+          "topics": [
+            "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+            "0x000000000000000000000000787c8bd49d18976ca1248c739ea6354a6c603314",
+            "0x0000000000000000000000000000000000000000000000000000000000000000"
+          ],
+          "data": "0x00000000000000000000000000000000000000000000000091b77e5e5d9a0000"
+        },
+        {
+          "address": "0x787C8Bd49D18976Ca1248c739Ea6354A6C603314",
+          "topics": [
+            "0x2ec2e836d709a6ea619a81cf8c632f82cea5c9f157d30d7ffc2f66362a7bf0d2",
+            "0x501444ef6095636e41a0de92b78ac77115509cf40d282c9b78458fd98cd94666"
+          ],
+          "data": "0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000270801d946c94000000000000000000000000000000000000000000000000000340aad21b3b70000000000000000000000000000000000000000000000000000091b77e5e5d9a00000000000000000000000000000000000000000000000000081abab1ea40e600000000000000000000000000000000000000000000000000022b1c8c1227a00000c8ae76fd2e5a92127a084d428fae1389e7120a2b7d11c90d013800fe4649a89b"
+        }
+      ]
+    },
+    {
+      "label": "normal claim A",
+      "hash": "0xdfcd7f13c9672d2dfc3e821e9e535010f2f29c9da3fa0e3af2e2546a7bf1b25a",
+      "block": 41,
+      "status": 1,
+      "gasUsed": "65447",
+      "logs": [
+        {
+          "address": "0x1D9Dc673dB6DEF9E4961CAeC1664754a93C51d28",
+          "topics": [
+            "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+            "0x000000000000000000000000787c8bd49d18976ca1248c739ea6354a6c603314",
+            "0x000000000000000000000000aa448d89fb4c5c9d295ff78e726cc4dcb3107a44"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000081abab1ea40e60000"
+        },
+        {
+          "address": "0x787C8Bd49D18976Ca1248c739Ea6354A6C603314",
+          "topics": [
+            "0xd8138f8a3f377c5259ca548e70e4c2de94f129f5a11036a15b69513cba2b426a",
+            "0x000000000000000000000000aa448d89fb4c5c9d295ff78e726cc4dcb3107a44"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000081abab1ea40e60000"
+        }
+      ]
+    },
+    {
+      "label": "normal claim B",
+      "hash": "0x3c4ed9e26f17ff37bfed367b3ae0ffa4a3b4ed8d8615a0f445e09e1cac4923b0",
+      "block": 42,
+      "status": 1,
+      "gasUsed": "58438",
+      "logs": [
+        {
+          "address": "0x1D9Dc673dB6DEF9E4961CAeC1664754a93C51d28",
+          "topics": [
+            "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+            "0x000000000000000000000000787c8bd49d18976ca1248c739ea6354a6c603314",
+            "0x000000000000000000000000d6e0cd9d457fd4bec3693a3ce35becb71409db26"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000022b1c8c1227a00000"
+        },
+        {
+          "address": "0x787C8Bd49D18976Ca1248c739Ea6354A6C603314",
+          "topics": [
+            "0xd8138f8a3f377c5259ca548e70e4c2de94f129f5a11036a15b69513cba2b426a",
+            "0x000000000000000000000000d6e0cd9d457fd4bec3693a3ce35becb71409db26"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000022b1c8c1227a00000"
+        }
+      ]
+    },
+    {
+      "label": "second capped faucet A",
+      "hash": "0xc34d429417221ae7d3e3b522ce62f95fb1ee8579741befd8571671777c225cb4",
+      "block": 43,
+      "status": 1,
+      "gasUsed": "40675",
+      "logs": [
+        {
+          "address": "0x1D9Dc673dB6DEF9E4961CAeC1664754a93C51d28",
+          "topics": [
+            "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+            "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "0x000000000000000000000000aa448d89fb4c5c9d295ff78e726cc4dcb3107a44"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000056bc75e2d63100000"
+        },
+        {
+          "address": "0x1D9Dc673dB6DEF9E4961CAeC1664754a93C51d28",
+          "topics": [
+            "0x214e597359607d253d273b990ec10788316369f1c0a60fd7d46d8ad75beb7f8e",
+            "0x000000000000000000000000aa448d89fb4c5c9d295ff78e726cc4dcb3107a44"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000056bc75e2d63100000000000000000000000000000000000000000000000000000000000006ae69143"
+        }
+      ]
+    },
+    {
+      "label": "second capped faucet B",
+      "hash": "0xd97d2ac4e63e2fee22d246a7455a697c79ba1396e62831a2e68844c175c095af",
+      "block": 44,
+      "status": 1,
+      "gasUsed": "40675",
+      "logs": [
+        {
+          "address": "0x1D9Dc673dB6DEF9E4961CAeC1664754a93C51d28",
+          "topics": [
+            "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+            "0x0000000000000000000000000000000000000000000000000000000000000000",
+            "0x000000000000000000000000d6e0cd9d457fd4bec3693a3ce35becb71409db26"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000056bc75e2d63100000"
+        },
+        {
+          "address": "0x1D9Dc673dB6DEF9E4961CAeC1664754a93C51d28",
+          "topics": [
+            "0x214e597359607d253d273b990ec10788316369f1c0a60fd7d46d8ad75beb7f8e",
+            "0x000000000000000000000000d6e0cd9d457fd4bec3693a3ce35becb71409db26"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000056bc75e2d63100000000000000000000000000000000000000000000000000000000000006ae69144"
+        }
+      ]
+    },
+    {
+      "label": "new exact approval A",
+      "hash": "0x5dbd93cbebdd4331c2daf8fc4192e7fca11997f277334dc32211b9530356a2ec",
+      "block": 45,
+      "status": 1,
+      "gasUsed": "46401",
+      "logs": [
+        {
+          "address": "0x1D9Dc673dB6DEF9E4961CAeC1664754a93C51d28",
+          "topics": [
+            "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925",
+            "0x000000000000000000000000aa448d89fb4c5c9d295ff78e726cc4dcb3107a44",
+            "0x000000000000000000000000787c8bd49d18976ca1248c739ea6354a6c603314"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000056bc75e2d63100000"
+        }
+      ]
+    },
+    {
+      "label": "new exact approval B",
+      "hash": "0xdd1d2cdb769430b332a5340a1ae426ffa9b18e91436fa8bfa0c51329e5826b45",
+      "block": 46,
+      "status": 1,
+      "gasUsed": "46401",
+      "logs": [
+        {
+          "address": "0x1D9Dc673dB6DEF9E4961CAeC1664754a93C51d28",
+          "topics": [
+            "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925",
+            "0x000000000000000000000000d6e0cd9d457fd4bec3693a3ce35becb71409db26",
+            "0x000000000000000000000000787c8bd49d18976ca1248c739ea6354a6c603314"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000056bc75e2d63100000"
+        }
+      ]
+    },
+    {
+      "label": "fund A",
+      "hash": "0xea8922ce93ac579e0ecb767709d8ed00dcaaaaf46eb0961c4743ee2efddd1f68",
+      "block": 47,
+      "status": 1,
+      "gasUsed": "232247",
+      "logs": [
+        {
+          "address": "0x1D9Dc673dB6DEF9E4961CAeC1664754a93C51d28",
+          "topics": [
+            "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+            "0x000000000000000000000000aa448d89fb4c5c9d295ff78e726cc4dcb3107a44",
+            "0x000000000000000000000000787c8bd49d18976ca1248c739ea6354a6c603314"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000056bc75e2d63100000"
+        },
+        {
+          "address": "0x787C8Bd49D18976Ca1248c739Ea6354A6C603314",
+          "topics": [
+            "0x4bcda3b85131fc5aa24f415efaad370efc678d3800457997c2fc2af2957a3557",
+            "0x406cb093b5f918d6197063324127cd913a2e4f9c63559649cd1b871f6c50d3fb",
+            "0x000000000000000000000000aa448d89fb4c5c9d295ff78e726cc4dcb3107a44"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000056bc75e2d631000000000000000000000000000000000000000000000000000000000000000000000"
+        }
+      ]
+    },
+    {
+      "label": "fund B",
+      "hash": "0x6dc3b4ba5dc8544fb90a2222895839841a6bcb6583446cf1843c9c7f6c15517e",
+      "block": 48,
+      "status": 1,
+      "gasUsed": "92335",
+      "logs": [
+        {
+          "address": "0x1D9Dc673dB6DEF9E4961CAeC1664754a93C51d28",
+          "topics": [
+            "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+            "0x000000000000000000000000d6e0cd9d457fd4bec3693a3ce35becb71409db26",
+            "0x000000000000000000000000787c8bd49d18976ca1248c739ea6354a6c603314"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000056bc75e2d63100000"
+        },
+        {
+          "address": "0x787C8Bd49D18976Ca1248c739Ea6354A6C603314",
+          "topics": [
+            "0x4bcda3b85131fc5aa24f415efaad370efc678d3800457997c2fc2af2957a3557",
+            "0x406cb093b5f918d6197063324127cd913a2e4f9c63559649cd1b871f6c50d3fb",
+            "0x000000000000000000000000d6e0cd9d457fd4bec3693a3ce35becb71409db26"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000056bc75e2d63100000000000000000000000000000000000000000000000000000000000006ae687e8"
+        }
+      ]
+    },
+    {
+      "label": "hard deadline timeout refund",
+      "hash": "0x6ddad1b05c54383f3161df33306a6649a08d7719dadc127aa3aff39141e8953d",
+      "block": 49,
+      "status": 1,
+      "gasUsed": "107660",
+      "logs": [
+        {
+          "address": "0x787C8Bd49D18976Ca1248c739Ea6354A6C603314",
+          "topics": [
+            "0x0609e749042bf714da0cf43eb5f443edb12a62618a6ea1f00df08b56943b8276",
+            "0x406cb093b5f918d6197063324127cd913a2e4f9c63559649cd1b871f6c50d3fb"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000056bc75e2d631000000000000000000000000000000000000000000000000000056bc75e2d63100000"
+        }
+      ]
+    },
+    {
+      "label": "timeout claim A",
+      "hash": "0x0e3c4a0968eeda094b65ed73f748752690216a7789ddebc4e7d39f09ed12ed4c",
+      "block": 50,
+      "status": 1,
+      "gasUsed": "48347",
+      "logs": [
+        {
+          "address": "0x1D9Dc673dB6DEF9E4961CAeC1664754a93C51d28",
+          "topics": [
+            "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+            "0x000000000000000000000000787c8bd49d18976ca1248c739ea6354a6c603314",
+            "0x000000000000000000000000aa448d89fb4c5c9d295ff78e726cc4dcb3107a44"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000056bc75e2d63100000"
+        },
+        {
+          "address": "0x787C8Bd49D18976Ca1248c739Ea6354A6C603314",
+          "topics": [
+            "0xd8138f8a3f377c5259ca548e70e4c2de94f129f5a11036a15b69513cba2b426a",
+            "0x000000000000000000000000aa448d89fb4c5c9d295ff78e726cc4dcb3107a44"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000056bc75e2d63100000"
+        }
+      ]
+    },
+    {
+      "label": "timeout claim B",
+      "hash": "0xbb22d66d3faf059fe65e3db8ebf2af36af3eb94c4de97325ef6021bbe92e14a7",
+      "block": 51,
+      "status": 1,
+      "gasUsed": "44758",
+      "logs": [
+        {
+          "address": "0x1D9Dc673dB6DEF9E4961CAeC1664754a93C51d28",
+          "topics": [
+            "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+            "0x000000000000000000000000787c8bd49d18976ca1248c739ea6354a6c603314",
+            "0x000000000000000000000000d6e0cd9d457fd4bec3693a3ce35becb71409db26"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000056bc75e2d63100000"
+        },
+        {
+          "address": "0x787C8Bd49D18976Ca1248c739Ea6354A6C603314",
+          "topics": [
+            "0xd8138f8a3f377c5259ca548e70e4c2de94f129f5a11036a15b69513cba2b426a",
+            "0x000000000000000000000000d6e0cd9d457fd4bec3693a3ce35becb71409db26"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000056bc75e2d63100000"
+        }
+      ]
+    },
+    {
+      "label": "unmatched exact approval",
+      "hash": "0x3c9db7e7299bae8ee9a4ce55349095bcb3bbb576198a59da24431514c0b810f4",
+      "block": 52,
+      "status": 1,
+      "gasUsed": "46401",
+      "logs": [
+        {
+          "address": "0x1D9Dc673dB6DEF9E4961CAeC1664754a93C51d28",
+          "topics": [
+            "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925",
+            "0x000000000000000000000000aa448d89fb4c5c9d295ff78e726cc4dcb3107a44",
+            "0x000000000000000000000000787c8bd49d18976ca1248c739ea6354a6c603314"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000056bc75e2d63100000"
+        }
+      ]
+    },
+    {
+      "label": "unmatched funding A only",
+      "hash": "0xc5661f23900a9ddd061f2c1e54f7e6def15628f29ebe63006db55ea0d0f068cc",
+      "block": 53,
+      "status": 1,
+      "gasUsed": "232259",
+      "logs": [
+        {
+          "address": "0x1D9Dc673dB6DEF9E4961CAeC1664754a93C51d28",
+          "topics": [
+            "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+            "0x000000000000000000000000aa448d89fb4c5c9d295ff78e726cc4dcb3107a44",
+            "0x000000000000000000000000787c8bd49d18976ca1248c739ea6354a6c603314"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000056bc75e2d63100000"
+        },
+        {
+          "address": "0x787C8Bd49D18976Ca1248c739Ea6354A6C603314",
+          "topics": [
+            "0x4bcda3b85131fc5aa24f415efaad370efc678d3800457997c2fc2af2957a3557",
+            "0xa3da0b4eff502bbbd8590dffbf6ab69e0a4ec3636aac4d394cb1c5a4e712422b",
+            "0x000000000000000000000000aa448d89fb4c5c9d295ff78e726cc4dcb3107a44"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000056bc75e2d631000000000000000000000000000000000000000000000000000000000000000000000"
+        }
+      ]
+    },
+    {
+      "label": "unmatched expiry refund",
+      "hash": "0x53c15a2da0bac238a4fd82b175cd8a0c61a907f95f41a2a8ade9fad19f03b0ab",
+      "block": 54,
+      "status": 1,
+      "gasUsed": "87779",
+      "logs": [
+        {
+          "address": "0x787C8Bd49D18976Ca1248c739Ea6354A6C603314",
+          "topics": [
+            "0x0609e749042bf714da0cf43eb5f443edb12a62618a6ea1f00df08b56943b8276",
+            "0xa3da0b4eff502bbbd8590dffbf6ab69e0a4ec3636aac4d394cb1c5a4e712422b"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000056bc75e2d631000000000000000000000000000000000000000000000000000000000000000000000"
+        }
+      ]
+    },
+    {
+      "label": "unmatched claim A",
+      "hash": "0xdf0708888729acb7728eea75f9b7efab57396b2a04aa3539b9268721054e1566",
+      "block": 55,
+      "status": 1,
+      "gasUsed": "44758",
+      "logs": [
+        {
+          "address": "0x1D9Dc673dB6DEF9E4961CAeC1664754a93C51d28",
+          "topics": [
+            "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+            "0x000000000000000000000000787c8bd49d18976ca1248c739ea6354a6c603314",
+            "0x000000000000000000000000aa448d89fb4c5c9d295ff78e726cc4dcb3107a44"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000056bc75e2d63100000"
+        },
+        {
+          "address": "0x787C8Bd49D18976Ca1248c739Ea6354A6C603314",
+          "topics": [
+            "0xd8138f8a3f377c5259ca548e70e4c2de94f129f5a11036a15b69513cba2b426a",
+            "0x000000000000000000000000aa448d89fb4c5c9d295ff78e726cc4dcb3107a44"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000056bc75e2d63100000"
+        }
+      ]
+    },
+    {
+      "label": "new exact approval A",
+      "hash": "0x25673b60c022f2e5e962a70e837cd8b6d3edce7f4cde559eb1bf8ab881292474",
+      "block": 56,
+      "status": 1,
+      "gasUsed": "46401",
+      "logs": [
+        {
+          "address": "0x1D9Dc673dB6DEF9E4961CAeC1664754a93C51d28",
+          "topics": [
+            "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925",
+            "0x000000000000000000000000aa448d89fb4c5c9d295ff78e726cc4dcb3107a44",
+            "0x000000000000000000000000787c8bd49d18976ca1248c739ea6354a6c603314"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000056bc75e2d63100000"
+        }
+      ]
+    },
+    {
+      "label": "new exact approval B",
+      "hash": "0x0d538d2e80b23cdb6aee7e09c18cb4688bd37fa84294c832c26b51854735a44d",
+      "block": 57,
+      "status": 1,
+      "gasUsed": "46401",
+      "logs": [
+        {
+          "address": "0x1D9Dc673dB6DEF9E4961CAeC1664754a93C51d28",
+          "topics": [
+            "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925",
+            "0x000000000000000000000000d6e0cd9d457fd4bec3693a3ce35becb71409db26",
+            "0x000000000000000000000000787c8bd49d18976ca1248c739ea6354a6c603314"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000056bc75e2d63100000"
+        }
+      ]
+    },
+    {
+      "label": "fund A",
+      "hash": "0x72f7dbe146f0ceefad4faaab9856587c4321738f17af372e6cab5665dcde0e0f",
+      "block": 58,
+      "status": 1,
+      "gasUsed": "232259",
+      "logs": [
+        {
+          "address": "0x1D9Dc673dB6DEF9E4961CAeC1664754a93C51d28",
+          "topics": [
+            "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+            "0x000000000000000000000000aa448d89fb4c5c9d295ff78e726cc4dcb3107a44",
+            "0x000000000000000000000000787c8bd49d18976ca1248c739ea6354a6c603314"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000056bc75e2d63100000"
+        },
+        {
+          "address": "0x787C8Bd49D18976Ca1248c739Ea6354A6C603314",
+          "topics": [
+            "0x4bcda3b85131fc5aa24f415efaad370efc678d3800457997c2fc2af2957a3557",
+            "0xff2d39df7ed9762885a1c24ea121cc7b7a23a38e9a3c1426a034ccb101a45576",
+            "0x000000000000000000000000aa448d89fb4c5c9d295ff78e726cc4dcb3107a44"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000056bc75e2d631000000000000000000000000000000000000000000000000000000000000000000000"
+        }
+      ]
+    },
+    {
+      "label": "fund B",
+      "hash": "0xed83c5ab722d49e9250f9569cc5d9d6e160505579313550069f10e58394f2392",
+      "block": 59,
+      "status": 1,
+      "gasUsed": "92347",
+      "logs": [
+        {
+          "address": "0x1D9Dc673dB6DEF9E4961CAeC1664754a93C51d28",
+          "topics": [
+            "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+            "0x000000000000000000000000d6e0cd9d457fd4bec3693a3ce35becb71409db26",
+            "0x000000000000000000000000787c8bd49d18976ca1248c739ea6354a6c603314"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000056bc75e2d63100000"
+        },
+        {
+          "address": "0x787C8Bd49D18976Ca1248c739Ea6354A6C603314",
+          "topics": [
+            "0x4bcda3b85131fc5aa24f415efaad370efc678d3800457997c2fc2af2957a3557",
+            "0xff2d39df7ed9762885a1c24ea121cc7b7a23a38e9a3c1426a034ccb101a45576",
+            "0x000000000000000000000000d6e0cd9d457fd4bec3693a3ce35becb71409db26"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000056bc75e2d63100000000000000000000000000000000000000000000000000000000000006ae68ef8"
+        }
+      ]
+    },
+    {
+      "label": "signed abort full refund",
+      "hash": "0x7270c600fe025b2e5f48d74129ae4f29b3f51daf297a2d2fdf7cbc5c023534ba",
+      "block": 60,
+      "status": 1,
+      "gasUsed": "122218",
+      "logs": [
+        {
+          "address": "0x787C8Bd49D18976Ca1248c739Ea6354A6C603314",
+          "topics": [
+            "0x2ec2e836d709a6ea619a81cf8c632f82cea5c9f157d30d7ffc2f66362a7bf0d2",
+            "0xff2d39df7ed9762885a1c24ea121cc7b7a23a38e9a3c1426a034ccb101a45576"
+          ],
+          "data": "0x00000000000000000000000000000000000000000000000000000000000000030000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000056bc75e2d631000000000000000000000000000000000000000000000000000056bc75e2d6310000064e39a70e229a14d144becff8c6e0de3f4007f44650458a3e5dd3325aa425953"
+        }
+      ]
+    },
+    {
+      "label": "abort claim A",
+      "hash": "0x8417f3e5f1fc4e0f9cec90641578d1d6d1ed71210325999f702a2a648f95cbca",
+      "block": 61,
+      "status": 1,
+      "gasUsed": "48347",
+      "logs": [
+        {
+          "address": "0x1D9Dc673dB6DEF9E4961CAeC1664754a93C51d28",
+          "topics": [
+            "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+            "0x000000000000000000000000787c8bd49d18976ca1248c739ea6354a6c603314",
+            "0x000000000000000000000000aa448d89fb4c5c9d295ff78e726cc4dcb3107a44"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000056bc75e2d63100000"
+        },
+        {
+          "address": "0x787C8Bd49D18976Ca1248c739Ea6354A6C603314",
+          "topics": [
+            "0xd8138f8a3f377c5259ca548e70e4c2de94f129f5a11036a15b69513cba2b426a",
+            "0x000000000000000000000000aa448d89fb4c5c9d295ff78e726cc4dcb3107a44"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000056bc75e2d63100000"
+        }
+      ]
+    },
+    {
+      "label": "abort claim B",
+      "hash": "0xf6acad519e2d5bbe8696a43e1752af001d66cf715b8e06a19a66caa8cf41df18",
+      "block": 62,
+      "status": 1,
+      "gasUsed": "44758",
+      "logs": [
+        {
+          "address": "0x1D9Dc673dB6DEF9E4961CAeC1664754a93C51d28",
+          "topics": [
+            "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+            "0x000000000000000000000000787c8bd49d18976ca1248c739ea6354a6c603314",
+            "0x000000000000000000000000d6e0cd9d457fd4bec3693a3ce35becb71409db26"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000056bc75e2d63100000"
+        },
+        {
+          "address": "0x787C8Bd49D18976Ca1248c739Ea6354A6C603314",
+          "topics": [
+            "0xd8138f8a3f377c5259ca548e70e4c2de94f129f5a11036a15b69513cba2b426a",
+            "0x000000000000000000000000d6e0cd9d457fd4bec3693a3ce35becb71409db26"
+          ],
+          "data": "0x0000000000000000000000000000000000000000000000056bc75e2d63100000"
+        }
+      ]
+    }
+  ]
+}

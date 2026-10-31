@@ -121,3 +121,20 @@ The server controls all match state. If a connection is lost, choose RECONNECT i
 Service health: http://127.0.0.1:3001/health . Data: ignored .runtime/rooms.sqlite. Keep this data for recovery. Default origins are http://127.0.0.1:5174 and http://localhost:5174. Default binding is loopback only. ALLOWED_ORIGINS can explicitly configure a comma separated list for a later deployment. No public hosting or TLS is configured.
 
 Hidden background launch helpers for Windows: `node scripts/start-private.cjs` and `node scripts/start-preview.cjs`. Start each once; a second instance cannot share the same port. Logs and process IDs are under .runtime.
+
+## Local chain and escrow
+
+Gate 4 is implemented on a disposable local EVM. LAST SIGNAL Test WIF (tWIF) is our original 18 decimal mock token, not official WIF, with no monetary value. The escrow takes exactly 100 per participant and trusts a separate server signer for results. It enforces caps, a real ten percent spent pool burn, draw rounding, pull claims and deadline refunds. No owner can withdraw deposits.
+
+Start and reproduce from the repository directory:
+
+```powershell
+node scripts/start-chain.cjs
+npm run chain:compile
+npm run chain:test
+npm run chain:proof
+```
+
+The hidden helper starts a fresh local EVM at http://127.0.0.1:8545 with chain ID 31337. Test accounts are disposable and their keys are not saved or logged. Contract tests use a separate node on port 18545. The proof writes actual local receipts to docs/evidence/local-chain-receipts.json. Restarting the EVM loses its state, so run the proof again afterward. Do not expose the unlocked development node publicly.
+
+The private multiplayer service is still unfunded; its practice credits and WIF score are separate from chain balances. Robinhood Chain testnet is the intended public target. Wallet login, funded room integration, public testnet deployment and hosting are not part of this local proof. See docs/ESCROW.md for trust, deadlines, ABI, tests and development dependency audit limitations.

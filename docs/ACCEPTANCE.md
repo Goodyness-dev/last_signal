@@ -39,3 +39,15 @@
 | WebSocket validation and recovery | PASS LOCAL | Origin, frame size, rate, ownership, heartbeat, grace, abort and recovery tests |
 | Actual process restart | PASS LOCAL | Both browser sessions resumed the same room, scores, squads and reserve |
 | Funded or public multiplayer | NOT_STARTED | Wallet authentication, escrow, TLS and hosting remain pending |
+
+
+## Local escrow verification
+
+| Requirement | State | Evidence |
+| --- | --- | --- |
+| Original tWIF and immutable escrow | PASS LOCAL | Deployed production contracts and generated ABI |
+| Exact deposits and signed authorization | PASS LOCAL | EIP712 domain and field tests, ownership and duplicate funding checks |
+| Spent pool burn, rounding and conservation | PASS LOCAL | 26 EVM tests and actual 10.5 burn in receipt proof |
+| Pull claims and recovery | PASS LOCAL | Actual normal, unmatched, timeout and abort transactions |
+| Reentrancy and failed transfer behavior | PASS LOCAL | Hostile token and callback fixture tests |
+| Robinhood Chain testnet | NOT_STARTED | Local chain 31337 proof only |

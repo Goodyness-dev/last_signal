@@ -1,5 +1,7 @@
 # Remaining delivery stages
 
+31 October 2026 Gate 4 update: local token and escrow are implemented, with 26 contract tests and 31 actual local receipts. See ESCROW.md. Robinhood Chain testnet remains the public target. No public testnet transaction or deployed public game is claimed.
+
 31 October 2026 update: Gate 3 local unfunded multiplayer is implemented and verified with 46 passing tests and two browser clients. See STATUS.md and FACTS.md for the precise evidence. No public multiplayer, wallet authentication, local escrow or chain integration is claimed.
 
 Sequence follows the supplied stage gates. Local practice remains available throughout. No real funds, paid services or mainnet deployments are authorized.
@@ -40,4 +42,4 @@ Exit evidence: verified public frontend and service URLs if deployed, two extern
 
 ## Immediate next implementation
 
-Gate 3 local private rooms, server snapshots, durable commands and failure cases are now implemented. Next is Gate 4 local chain and escrow using dedicated disposable development accounts, signed offers and results, conservation tests and actual local receipts. Wallet authentication must be added before integrating funded rooms. Public testnet and hosting still need the available free access and credentials described above.
+Gate 3 local private rooms, server snapshots, durable commands and failure cases are now implemented. Gate 4 local chain and escrow is now implemented and verified. Next is Gate 5: verify official Robinhood Chain testnet configuration and actual eth_chainId, free RPC and faucet access, dedicated credentials and wallet funding integration. Wallet authentication must be added before integrating funded rooms. Public testnet and hosting still need the available free access and credentials described above.

@@ -1,5 +1,7 @@
 # Status
 
+Latest revision: Gate 4 local escrow PASS. Original mock tWIF and nonupgradeable escrow are implemented and actually deployed to disposable local EVM chain 31337. All 26 contract tests and 46 game/server tests pass, plus strict production build. The proof records 31 successful actual local transactions for funding, winning settlement, 10.5 tWIF burn, pull claims, unmatched refund, full timeout refunds and signed abort recovery. All receipts and code hashes were checked again by RPC; final liability and escrow balance are zero. Details and limitations: docs/ESCROW.md. Robinhood Chain testnet is the intended public target, but no public testnet deployment, wallet integration or hosting is claimed. Earlier notes below are historical.
+
 Latest revision: Gate 3 local unfunded private multiplayer. Production build and strict checking pass; all 46 tests pass. Two real browser clients readied, moved, spent server owned credits, recovered after an actual service process restart and received matching results after one conceded. SQLite spending deduplication, visibility filtering, malformed transport, connection loss and recovery are covered by tests. The separate private relay mode is at /private.html. Local practice and Endless Front remain available at /. No wallet authentication, escrow, local blockchain, public testnet or public deployment is implemented. Remaining delivery stages continue in docs/NEXT_STAGES.md. Earlier notes below are historical.
 
 Latest revision: Endless Front and recovery, rules practice 5. The owner selected the action loop and practice WIF before multiplayer. Build passes and all 35 tests pass. Living allied squads recover eight HP per second after five seconds without damage; casualties persist until explicit replacement. Optional Endless Front loops waves with eight second breaks and a capped difficulty, WIF rewards and three supply choices. Classic relay practice remains available.
@@ -28,7 +30,7 @@ Revision validation: strict build passes and 14 simulation tests pass, including
 | 1 Visual proof | PASS | Original 3D compound, rain, lighting, three relays, selectable moving squad, HUD. docs/evidence/desktop-1440.jpg and live-practice-1440.jpg |
 | 2 Local full match | PASS | Core simulation and normal bot, 14 tests passed again on the period source revision. Earlier natural browser result, reserve ledger and rematch verified. Fresh period browser review remains pending |
 | 3 Authoritative multiplayer | LOCAL_PASS | Unfunded private rooms, WebSocket transport, SQLite durability, validation, visibility and recovery tests. Two browser clients finished a conceded match after process restart. Wallet authentication remains required before funded rooms. |
-| 4 Local escrow | NOT_STARTED | No contracts or local chain |
+| 4 Local escrow | LOCAL_PASS | Original tWIF and escrow, 26 EVM tests, 31 actual local transaction receipts, burn, claims and refunds. docs/ESCROW.md |
 | 5 Public testnet | NOT_STARTED | No credentials, RPC calls, faucets, token deployments or receipts used |
 | 6 Polish and deployment | IN_PROGRESS | Period build and local HTTP verified. Fresh visual automation is blocked. No public hosting or live combat video |
 

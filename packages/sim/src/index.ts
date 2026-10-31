@@ -2,17 +2,19 @@ export * from './rules.ts';
 import { RULES as R, HOMES, RELAYS, MAP, distance, quantize, legal, lineOfSight, path, type Point, type Side } from './rules.ts';
 export type Aim = { x: number; y: number; z: number };
 export type Weapon = 'rifle' | 'carbine';
-export const WEAPONS = { rifle: {name:'Service rifle',damage:R.rifleDamage,ticks:R.rifleTicks,magazine:R.magazine},carbine:{name:'Field carbine',damage:12,ticks:10,magazine:10} } as const;
+export const WEAPONS = { rifle: {name:'Service rifle',damage:R.rifleDamage,ticks:R.rifleTicks,magazine:R.magazine},carbine:{name:'Field carbine',damage:12,ticks:3,magazine:30} } as const;
 export type Loot = Point & {id:number;weapon:Weapon;ammo:number;tokens:number};
-export type Hero = {squadId:number;alive:boolean;tokens:number};
+export type Hero = {squadId:number;alive:boolean;tokens:number;lastDamageAt:number};
 export type PracticeOptions = {untimed?:boolean;hero?:boolean};
 export type Squad = Point & { id: number; side: Side; hp: number; suppression: number; lastHit: number; shotAt: number; disabledUntil: number; shield: number; shieldUntil: number; coverId: number | null; coverSince: number; route: Point[]; rifleAt?: number; rifleAim?: Aim; drive?: Point; driveUntil?: number;ammo:number;reserveAmmo:number;reloadUntil:number;weapon:Weapon;weapons:Weapon[];dodgeAt:number;evadeUntil:number;focusId?:number };
 export type Relay = Point & { id: string; owner: Side | null; attacker: Side | null; progress: number; contested: boolean };
 export type Command = { id: string; side: Side } & ({kind:'reload';squadId:number}|{kind:'switchWeapon';squadId:number}|{kind:'loot';squadId:number;lootId:number}|{kind:'focus';squadId:number;targetId:number}|{kind:'evade';squadId:number;target:Point}|{ kind: 'drive'; direction: Point; squadId: number } | { kind: 'fire'; direction: Aim; squadId: number } | { kind: 'move'; target: Point; squadId: number } | { kind: 'emp'; target: Point; squadId: number } | { kind: 'shield'; squadId: number } | { kind: 'retreat'; squadId: number } | { kind: 'deploy' } | { kind: 'surrender' });
-export type GameEvent = { seq: number; tick: number; kind: string; from?: Point; to?: Point; side?: Side; text?: string; height?: number;damage?:number;targetId?:number };
+export type GameEvent = { seq: number; tick: number; kind: string; from?: Point; to?: Point; side?: Side; text?: string; height?: number;damage?:number;targetId?:number;memberIndex?:number };
 export type Game = { tick: number; countdown: number; squads: Squad[]; relays: Relay[]; budgets: [number, number]; scores: [number, number]; spent: [number, number]; lost: [number, number]; cooldowns: { deploy: number; shield: number; emp: number }[]; pending: { side: Side; at: number }[]; nextId: number; events: GameEvent[]; eventSeq: number; seen: Record<string, { ok: boolean; reason: string }>; result: null | { winner: Side | null; reason: string }; seed: number;untimed:boolean;hero:Hero|null;loot:Loot[] };
 export type Observation = { tick: number; squads: Squad[]; relays: Relay[]; budgets: [number, number]; scores: [number, number]; cooldowns: Game['cooldowns']; pending: Game['pending']; result: Game['result']; seed: number;untimed:boolean;hero:Hero|null;loot:Loot[] };
 export const isMoving = (s: Squad, tick: number) => s.route.length > 0 || ((s.driveUntil ?? -1) >= tick && Math.hypot(s.drive?.x ?? 0, s.drive?.z ?? 0) > 0);
+export const survivingMembers=(hp:number)=>Math.max(0,Math.min(3,Math.ceil(hp/(R.squadHp/3)-.00001)));
+const volleyDamage=(g:Game,s:Squad)=>!g.hero?R.volley:g.hero.squadId===s.id?R.volley*Math.max(0,survivingMembers(s.hp)-1)/2:R.volley*survivingMembers(s.hp)/3;
 function event(g: Game, e: Omit<GameEvent, 'seq' | 'tick'>) { g.events.push({ ...e, seq: ++g.eventSeq, tick: g.tick }); if (g.events.length > 100) g.events.shift(); }
 function spawn(g: Game, side: Side) {
   const id=g.nextId++,weapon:Weapon=side===1&&id%3!==0?'carbine':'rifle';
@@ -20,7 +22,7 @@ function spawn(g: Game, side: Side) {
   g.squads.push(s); event(g, { kind: 'SquadSpawned', side, to: { x: s.x, z: s.z }, text: side === 0 ? 'Friendly squad ready' : 'Bot reinforcement' });
 }
 export function createGame(seed = 1, options:PracticeOptions={}): Game {
-  const g: Game = { tick: 0, countdown: R.countdown, squads: [], relays: RELAYS.map(r => ({ ...r, owner: null, attacker: null, progress: 0, contested: false })), budgets: [100, 100], scores: [0, 0], spent: [0, 0], lost: [0, 0], cooldowns: [{ deploy: 0, shield: 0, emp: 0 }, { deploy: 0, shield: 0, emp: 0 }], pending: [], nextId: 1, events: [], eventSeq: 0, seen: {}, result: null, seed,untimed:options.untimed??false,hero:options.hero?{squadId:1,alive:true,tokens:0}:null,loot:[] };
+  const g: Game = { tick: 0, countdown: R.countdown, squads: [], relays: RELAYS.map(r => ({ ...r, owner: null, attacker: null, progress: 0, contested: false })), budgets: [100, 100], scores: [0, 0], spent: [0, 0], lost: [0, 0], cooldowns: [{ deploy: 0, shield: 0, emp: 0 }, { deploy: 0, shield: 0, emp: 0 }], pending: [], nextId: 1, events: [], eventSeq: 0, seen: {}, result: null, seed,untimed:options.untimed??false,hero:options.hero?{squadId:1,alive:true,tokens:0,lastDamageAt:-100}:null,loot:[] };
   spawn(g, 0); spawn(g, 1); return g;
 }
 // Explicit local drill fixture. Normal match spawning and costs are unchanged.
@@ -68,7 +70,7 @@ export function command(g: Game, c: Command): { ok: boolean; reason: string } {
     if(s!.reloadUntil>g.tick)return answer(false,'Finish reloading first');
     if(s!.weapons.length<2)return answer(false,'Collect another enemy gun first');
     s!.weapon=s!.weapons[(s!.weapons.indexOf(s!.weapon)+1)%s!.weapons.length];
-    const excess=Math.max(0,s!.ammo-WEAPONS[s!.weapon].magazine);s!.ammo-=excess;s!.reserveAmmo=Math.min(60,s!.reserveAmmo+excess);
+    const excess=Math.max(0,s!.ammo-WEAPONS[s!.weapon].magazine);s!.ammo-=excess;s!.reserveAmmo=Math.min(R.maxReserveAmmo,s!.reserveAmmo+excess);
     return answer(true,`${WEAPONS[s!.weapon].name} equipped`);
   }
   if(c.kind==='loot'){
@@ -78,7 +80,7 @@ export function command(g: Game, c: Command): { ok: boolean; reason: string } {
     if(s!.reloadUntil>g.tick)return answer(false,'Finish reloading before taking a gun');
     if(!s!.weapons.includes(drop.weapon))s!.weapons.push(drop.weapon);
     s!.weapon=drop.weapon;
-    const bullets=s!.ammo+s!.reserveAmmo+drop.ammo;s!.ammo=Math.min(WEAPONS[drop.weapon].magazine,bullets);s!.reserveAmmo=Math.min(60,bullets-s!.ammo);
+    const bullets=s!.ammo+s!.reserveAmmo+drop.ammo;s!.ammo=Math.min(WEAPONS[drop.weapon].magazine,bullets);s!.reserveAmmo=Math.min(R.maxReserveAmmo,bullets-s!.ammo);
     g.hero.tokens+=drop.tokens;g.loot=g.loot.filter(l=>l.id!==drop.id);
     event(g,{kind:'LootCollected',side:0,to:drop,text:`${WEAPONS[drop.weapon].name}, ammunition and ${drop.tokens} practice WIF collected`});
     return answer(true,'Enemy gun collected. Practice WIF has no monetary value.');
@@ -168,7 +170,7 @@ export function step(g: Game) {
   for (const s of g.squads) {
     if (s.disabledUntil > g.tick || g.tick - s.shotAt < R.weaponTicks || protectedHome(s)) continue;
     const target = g.squads.filter(e => e.side !== s.side && !protectedHome(e) && distance(s, e) <= R.range && visible(g, s.side, e) && lineOfSight(s, e)).sort((a, b) => Number(b.id===s.focusId)-Number(a.id===s.focusId)||distance(s, a) - distance(s, b) || a.id - b.id)[0];
-    if (target) attacks.push({ from: s, to: target, damage: R.volley });
+    if (target && volleyDamage(g,s)>0) attacks.push({ from: s, to: target, damage: volleyDamage(g,s) });
   }
   for (const s of g.squads) {
     const aim = s.rifleAim; delete s.rifleAim;
@@ -181,11 +183,19 @@ export function step(g: Game) {
     const { from, to, rifle } = attack;
     if (!rifle) from.shotAt = g.tick;
     let damage = attack.damage;
+    if(g.hero?.squadId===to.id&&from.side===1){
+      if(g.tick-g.hero.lastDamageAt<R.heroHitGraceTicks)damage=0;
+      else {damage*=R.heroDamageScale;g.hero.lastDamageAt=g.tick;}
+    }
+    const beforeHp=to.hp;
     const absorbed = Math.min(to.shield, damage); to.shield -= absorbed; damage -= absorbed;
     if (damage > 0) {
       const cover = MAP.covers.find(c => c.id === to.coverId);
       if (cover && g.tick - to.coverSince >= R.coverTicks && (from.x - to.x) * cover.facing / distance(from, to) >= .5) damage *= R.coverReduction;
-      to.hp -= damage; to.suppression = Math.min(100, to.suppression + R.suppressionHit); to.lastHit = g.tick;
+      to.hp = quantize(to.hp-damage); to.suppression = Math.min(100, to.suppression + R.suppressionHit); to.lastHit = g.tick;
+    }
+    for(let member=survivingMembers(beforeHp);member>survivingMembers(to.hp);member--){
+      event(g,{kind:'SoldierFallen',side:to.side,to:{x:to.x,z:to.z},targetId:to.id,memberIndex:[0,2,1][3-member],text:(to.side===0?'Your soldier fell. ':'Enemy soldier fell. ')+(member-1)+'/3 remain.'});
     }
     event(g, { kind: rifle ? 'PlayerHit' : 'ShotFired', from: { x: from.x, z: from.z }, to: { x: to.x, z: to.z }, side: from.side,damage:quantize(damage),targetId:to.id });
   }

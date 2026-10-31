@@ -41,3 +41,8 @@ Use deterministic observation limited team tactics: shared focus targets, distin
 
 26. Provide a labelled, disarmed firing range for learning the real shooting and pickup loop without incoming damage. Normal command validation, finite ammo, damage and loot remain active; ordinary bot commands are paused only for that explicit fixture. Keep its result label and history metadata distinct from normal bot practice. START LIVE MATCH resets the run instead of carrying training pickups into combat.
 27. Show pickup distance and interaction readiness on world markers. Add a reload progress bar and original procedural weapon lowering and bolt motion; reduced motion suppresses the larger view movement.
+
+
+Squad survival balance, 31 October 2026. Rules practice 4. The main character takes half incoming damage and has a 0.5 second protection window after a hit to prevent simultaneous focused volleys stacking. Death still ends the run. Rifle: 20 damage, four shots per second, 20 loaded and 80 reserve. Carbine: 12 damage, about 6.7 shots per second, 30 loaded. Reload: 1.5 seconds. Reserve capacity: 180. Holding left click repeats shots and spends finite ammunition.
+
+Squads lose one visible soldier at each third of health, helpers before the leader. Falling bodies remain at the casualty position for up to 12 seconds, bounded to 18 bodies. Casualties remain visible with combat effects disabled. Fog removal does not create bodies. Automatic support weakens with losses: main character helpers deal 10, then 5, then 0 per volley; other squads deal 10, then about 6.67, then about 3.33. Legacy timed simulation without a hero keeps its original volley damage. Health and hitboxes remain aggregated per squad; independent soldier targeting is not implemented.

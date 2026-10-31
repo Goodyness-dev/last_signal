@@ -1,12 +1,28 @@
 import {describe,it,expect} from 'vitest';
-import {createGame,createCombatDrill,createLootTraining,command,step,observe,botCommands,distance,legal,RULES as R,WEAPONS,type Game} from '@last-signal/sim';
+import {createGame,createCombatDrill,createLootTraining,command,step,observe,botCommands,distance,legal,RULES as R,WEAPONS,survivingMembers,type Game} from '@last-signal/sim';
 const advance=(g:Game,ticks:number)=>{for(let i=0;i<ticks;i++)step(g);};
 const practice=()=>{const g=createGame(1,{untimed:true,hero:true});g.countdown=0;return g;};
 describe('untimed survival practice',()=>{
+  it('halves hero damage and protects against simultaneous focused volleys',()=>{
+    const g=createCombatDrill(1,{untimed:true,hero:true}),hero=g.squads.find(s=>s.id===g.hero!.squadId)!;
+    for(const enemy of g.squads.filter(s=>s.side===1)){enemy.x=27;enemy.z=16;enemy.focusId=hero.id;}
+    step(g);expect(hero.hp).toBe(95);expect(g.hero!.alive).toBe(true);
+  });
+  it('loses individual men once at each threshold and weakens automatic support',()=>{
+    const g=createLootTraining(),hero=g.squads[0],target=g.squads[1];
+    expect(survivingMembers(66.6667)).toBe(2);expect(survivingMembers(33.3333)).toBe(1);
+    hero.hp=60;step(g);expect(target.hp).toBe(95);expect(survivingMembers(hero.hp)).toBe(2);
+    hero.hp=30;advance(g,R.weaponTicks);expect(target.hp).toBe(95);
+    for(let i=0;i<5;i++){
+      expect(command(g,{id:'casualty:'+i,side:0,kind:'fire',squadId:hero.id,direction:{x:4,y:-.59,z:0}}).ok).toBe(true);advance(g,R.rifleTicks);
+    }
+    expect(g.events.filter(e=>e.kind==='SoldierFallen'&&e.targetId===target.id).map(e=>e.memberIndex)).toEqual([0,2,1]);
+    expect(g.loot).toHaveLength(1);
+  });
   it('teaches loot with a disarmed target while using ordinary damage and pickup commands',()=>{
     const g=createLootTraining(),hero=g.squads[0],target=g.squads[1];
     expect(g.hero?.squadId).toBe(hero.id);expect(g.untimed).toBe(true);expect(g.loot).toHaveLength(0);
-    for(let i=0;i<4&&g.squads.some(s=>s.id===target.id);i++){
+    for(let i=0;i<R.magazine&&g.squads.some(s=>s.id===target.id);i++){
       expect(command(g,{id:'range:'+i,side:0,kind:'fire',squadId:hero.id,direction:{x:4,y:-.59,z:0}}).ok).toBe(true);advance(g,R.rifleTicks);
     }
     expect(g.squads.some(s=>s.id===target.id)).toBe(false);expect(hero.hp).toBe(100);expect(g.loot).toHaveLength(1);expect(hero.ammo).toBeLessThan(R.magazine);
@@ -22,7 +38,7 @@ describe('untimed survival practice',()=>{
   });
   it('ends the run when the main character dies even with surviving allies',()=>{
     const g=createCombatDrill(1,{untimed:true,hero:true}),hero=g.squads.find(s=>s.id===g.hero!.squadId)!;
-    hero.hp=10;step(g);
+    hero.hp=5;step(g);
     expect(g.hero!.alive).toBe(false);expect(g.result?.reason).toBe('Your main character was killed');
     expect(g.squads.some(s=>s.side===0)).toBe(true);const tick=g.tick;step(g);expect(g.tick).toBe(tick);
     expect(command(g,{id:'after-death',side:0,kind:'fire',squadId:g.squads.find(s=>s.side===0)!.id,direction:{x:1,y:0,z:0}}).ok).toBe(false);
@@ -30,10 +46,10 @@ describe('untimed survival practice',()=>{
   it('uses real finite bullets and transfers only available reserve on reload',()=>{
     const g=practice(),hero=g.squads[0];
     for(let i=0;i<R.magazine;i++){g.tick=i*R.rifleTicks;expect(command(g,{id:'shot:'+i,side:0,kind:'fire',squadId:hero.id,direction:{x:0,y:1,z:0}}).ok).toBe(true);step(g);}
-    expect(hero.ammo).toBe(0);expect(hero.reserveAmmo).toBe(24);
+    expect(hero.ammo).toBe(0);expect(hero.reserveAmmo).toBe(R.reserveAmmo);
     expect(command(g,{id:'dry',side:0,kind:'fire',squadId:1,direction:{x:0,y:1,z:0}}).ok).toBe(false);
     expect(command(g,{id:'reload',side:0,kind:'reload',squadId:1}).ok).toBe(true);
-    advance(g,R.reloadTicks-1);expect(hero.ammo).toBe(0);step(g);expect(hero.ammo).toBe(6);expect(hero.reserveAmmo).toBe(18);
+    advance(g,R.reloadTicks-1);expect(hero.ammo).toBe(0);step(g);expect(hero.ammo).toBe(R.magazine);expect(hero.reserveAmmo).toBe(R.reserveAmmo-R.magazine);
     hero.ammo=0;hero.reserveAmmo=2;command(g,{id:'partial',side:0,kind:'reload',squadId:1});advance(g,R.reloadTicks);
     expect(hero.ammo).toBe(2);expect(hero.reserveAmmo).toBe(0);
     hero.ammo=0;expect(command(g,{id:'empty-reserve',side:0,kind:'reload',squadId:1}).ok).toBe(false);

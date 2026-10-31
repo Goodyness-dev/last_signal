@@ -1,5 +1,7 @@
 # Status
 
+Latest revision: squad survival balance. Main character damage halved with a short focused fire protection window. Faster finite weapons, larger magazines, progressive visible casualties and reduced automatic support after casualties. Strict build and 28 tests pass. Browser live drill showed main character 65 HP with 2/3 men and allies at 1/3 men. A 1.6 second held trigger spent seven bullets, from 20 / 80 to 13 / 80. Screenshot: docs/evidence/squad-survival-balance.png. Browser verification confirmed casualty counts; individual fall animations were not separately captured in this compact viewport. No full live survival victory is claimed. Local practice only. Earlier notes below are historical and may describe superseded balance.
+
 Latest revision: untimed survival practice, rules practice-3-survival. Strict build and all 26 tests pass. Player death, visible enemy HP, ammo exhaustion, reload conservation and pause were checked in the browser. Loot, weapon switching, WIF accounting and coordinated evasion pass simulation tests; training loot collection is now verified in the browser; a full survival victory remains unverified. Practice WIF has no real value. Earlier revision notes below are historical and may describe superseded controls or balance.
 
 31 October 2026. Local practice slice.

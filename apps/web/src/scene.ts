@@ -3,7 +3,7 @@ import { createSoldier, animateSoldier, createViewWeapon, periodRifle } from './
 import { FieldCamera, type ViewMode } from './field-camera.ts';
 import { CombatFX } from './combat-fx.ts';
 import { OldFront } from './old-front.ts';
-import { MAP, HOMES, RULES, distance, isMoving, type Observation, type Point, type Squad, type GameEvent } from '@last-signal/sim';
+import { MAP, HOMES, RULES, distance, isMoving, survivingMembers, type Observation, type Point, type Squad, type GameEvent } from '@last-signal/sim';
 const CYAN = 0xa7bea0, AMBER = 0xcda471;
 export class Battlefield {
   readonly renderer: T.WebGLRenderer;
@@ -95,11 +95,22 @@ export class Battlefield {
   }
   private unit(s: Squad) {
     const group = new T.Group(); for (let i = 0; i < 3; i++) group.add(createSoldier(s.side, i));
+    for(const index of [0,2,1].slice(0,3-survivingMembers(s.hp)))group.children[index].userData.fallen=true;
+    group.userData.side=s.side;
     group.rotation.y=s.side===0?Math.PI/2:-Math.PI/2;
     const ring = this.ring(.95, s.side === 0 ? CYAN : AMBER, .04); ring.name = 'unitRing'; group.add(ring);
     const shield = new T.Mesh(new T.SphereGeometry(1.1, 20, 12), new T.MeshBasicMaterial({ color: CYAN, transparent: true, opacity: .13, wireframe: true, depthWrite: false })); shield.position.y = .6; shield.name = 'shield'; group.add(shield);
     const hp = this.box(1, .08, .08, 0, 2.1, 0, s.side === 0 ? CYAN : AMBER, group); hp.name = 'hp';
     group.position.set(s.x, 0, s.z); this.scene.add(group); this.units.set(s.id, group); return group;
+  }
+  private fallen(source:T.Object3D,side:number,index:number){
+    if(source.userData.fallen)return;
+    source.userData.fallen=true;source.visible=false;
+    source.updateWorldMatrix(true,false);
+    const body=createSoldier(side,index);
+    source.getWorldPosition(body.position);
+    source.getWorldQuaternion(body.quaternion);
+    this.scene.add(body);this.corpses.push({group:body,born:this.time});
   }
   get viewMode(): ViewMode { return this.view.mode; }
   setView(mode:ViewMode) {this.view.setMode(mode);this.container.dataset.view=mode;}
@@ -134,8 +145,8 @@ export class Battlefield {
     const ids = new Set(o.squads.map(s => s.id));
     for (const [id, group] of this.units) if (!ids.has(id)) {
       const died=events.some(e=>e.seq>this.lastEvent&&e.kind==='SquadDestroyed'&&e.to&&distance(e.to,{x:group.position.x,z:group.position.z})<1);
-      if(died&&this.effectsEnabled){group.getObjectByName('hp')!.visible=false;group.getObjectByName('unitRing')!.visible=false;group.getObjectByName('shield')!.visible=false;this.corpses.push({group,born:this.time});}
-      else{this.scene.remove(group);this.disposeObject(group);}this.units.delete(id);
+      if(died)group.children.slice(0,3).forEach((soldier,index)=>this.fallen(soldier,group.userData.side,index));
+      this.scene.remove(group);this.disposeObject(group);this.units.delete(id);
     }
     for (const s of o.squads) {
       const group = this.units.get(s.id) ?? this.unit(s);
@@ -145,9 +156,10 @@ export class Battlefield {
       const face=(fireAge<.7?group.userData.aim as Point|undefined:undefined)??target;
       if(face){const angle=Math.atan2(face.x-s.x,face.z-s.z);const delta=Math.atan2(Math.sin(angle-group.rotation.y),Math.cos(angle-group.rotation.y));group.rotation.y+=delta*Math.min(1,dt*14);}
       const firing=fireAge<.24?Math.max(0,Math.cos(fireAge*65)):0;
-      group.children.slice(0,3).forEach(soldier=>animateSoldier(soldier,this.time,!!target,s.suppression>=RULES.suppressionThreshold||(s.coverId!==null&&o.tick-s.coverSince>=RULES.coverTicks),firing,this.reducedMotion));
+      for(const index of [0,2,1].slice(0,3-survivingMembers(s.hp)))this.fallen(group.children[index],s.side,index);
+      group.children.slice(0,3).forEach(soldier=>{if(!soldier.userData.fallen)animateSoldier(soldier,this.time,!!target,s.suppression>=RULES.suppressionThreshold||(s.coverId!==null&&o.tick-s.coverSince>=RULES.coverTicks),firing,this.reducedMotion);});
       const cameraId=o.squads.find(unit=>unit.id===selected)?.id??o.squads.find(unit=>unit.side===0)?.id;
-      group.children[1].visible=!(this.viewMode==='eyes'&&s.id===cameraId);
+      group.children.slice(0,3).forEach((soldier,index)=>soldier.visible=!soldier.userData.fallen&&!(index===1&&this.viewMode==='eyes'&&s.id===cameraId));
       group.getObjectByName('shield')!.visible = s.shield > 0;
       group.getObjectByName('hp')!.scale.x = Math.max(.01, s.hp / 100);
     }
@@ -209,9 +221,9 @@ export class Battlefield {
       if (effect.until < this.time) { this.scene.remove(effect.object); this.disposeObject(effect.object); }
     }
     this.effects = this.effects.filter(e => e.until >= this.time);
-    for(const c of this.corpses){c.group.children.slice(0,3).forEach((soldier,i)=>{soldier.rotation.z=this.reducedMotion?-Math.PI/2:-Math.min(Math.PI/2,(this.time-c.born)*3+i*.1);soldier.position.y=.12;});if(this.time-c.born>6){this.scene.remove(c.group);this.disposeObject(c.group);}}
-    this.corpses=this.corpses.filter(c=>this.time-c.born<=6);
-    while(this.corpses.length>6){const old=this.corpses.shift()!;this.scene.remove(old.group);this.disposeObject(old.group);}
+    for(const c of this.corpses){c.group.rotation.z=this.reducedMotion?-Math.PI/2:-Math.min(Math.PI/2,(this.time-c.born)*3);c.group.position.y=.12;if(this.time-c.born>12){this.scene.remove(c.group);this.disposeObject(c.group);}}
+    this.corpses=this.corpses.filter(c=>this.time-c.born<=12);
+    while(this.corpses.length>18){const old=this.corpses.shift()!;this.scene.remove(old.group);this.disposeObject(old.group);}
     if(this.effectsEnabled&&this.time-this.splashAt>.17){for(const unit of o.squads)if(unit.route.length)this.fx.splash(unit,this.time);this.splashAt=this.time;}
     this.fx.update(this.time,dt);
     this.rain.visible = this.effectsEnabled && !this.reducedMotion;

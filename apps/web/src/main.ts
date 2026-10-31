@@ -1,6 +1,7 @@
 import './style.css';
 import './immersive.css';
 import './old-front.css';
+import './guidance.css';
 import { Battlefield } from './scene.ts';
 import { createGame, createCombatDrill, step, command, observe, botCommands, visible, distance, MAP, RULES as R, type Command, type GameEvent, type Point } from '@last-signal/sim';
 
@@ -12,7 +13,8 @@ app.innerHTML = `
     <section id="battlefield" aria-label="Interactive 3D battlefield. Select a friendly squad and choose Move or right click a destination." tabindex="0"><div class="vignette"></div><div class="scene-meta"><span>LIVE TACTICAL VIEW</span><small>48 × 32 / SECTOR 7</small></div><div class="scene-controls"><button id="view-squad" class="active">SQUAD</button><button id="view-eyes">EYE LEVEL</button><button id="view-tactical">COMMAND</button><button id="overlay" title="Tactical overlay. Hold Space.">◎ <span>TACTICAL</span></button><button id="zoom-out" aria-label="Zoom out">−</button><button id="zoom-in" aria-label="Zoom in">+</button><button id="reset-camera" aria-label="Reset camera">⤢</button></div><div class="relay-label"></div><div class="relay-label"></div><div class="relay-label"></div><div id="field-reticle"></div><div id="damage-feedback"></div><div class="field-readout"><small id="camera-label">SQUAD CAMERA</small><strong id="field-state">READY TO DEPLOY</strong><span>WASD MOVE · DRAG TO LOOK · V CHANGE VIEW</span></div><div class="objectives"><button data-relay="0">A <span>NORTH</span></button><button data-relay="1">B <span>CENTRAL</span></button><button data-relay="2">C <span>SOUTH</span></button></div><div class="minimap"><canvas id="minimap" width="192" height="128" aria-label="Tactical map. Click a point to move your selected squad."></canvas><small>TACTICAL MAP / CLICK TO MOVE</small></div><div class="map-home west">◈ WEST / HOME</div><div class="map-home east">EAST / HOME ◇</div><div id="toast" role="status" aria-live="polite">Select your squad. Hold the frequency.</div><div class="weather">↙  RAIN  /  12°C <span>VISIBILITY LIMITED</span></div><div class="map-coordinate">KESTREL // 07.24</div>
       <div class="briefing" id="briefing"><div class="eyebrow"><span>01</span> FIELD BRIEFING</div><h1>Hold the<br>line.</h1><p>A rain soaked front. Three field stations.<br>Keep the last signal alive.</p><div class="brief-rule"><b>01</b><span>Move squads into relay circles.<br>Hold ground to generate signal.</span></div><div class="brief-rule"><b>02</b><span>Use cover. Time your support.<br>Every credit is a decision.</span></div><button class="primary" id="start">ENTER THE FRONT <span>↗</span></button><button class="text-button" id="drill">QUICK COMBAT DRILL →</button><button class="text-button" id="tutorial">GUIDED FIRST MATCH →</button><small>Free practice against a local bot.<br>Credits are simulated. No token transactions.</small></div>
       <div id="countdown" hidden></div>
-      <div id="tutorial-card" hidden><small>FIELD TRAINING</small><strong id="tutorial-title"></strong><p id="tutorial-copy"></p><button id="skip-tutorial">Skip guidance</button></div>
+      <div id="order-hint" hidden role="status"><strong id="order-title"></strong><p id="order-copy"></p><button id="cancel-order">Cancel order · Esc</button></div>
+      <div id="tutorial-card" hidden><small id="tutorial-step">FIELD TRAINING</small><strong id="tutorial-title"></strong><p id="tutorial-copy"></p><button id="tutorial-action"></button><button id="tutorial-details">Hide instructions to see map</button><button id="skip-tutorial">Skip guidance</button></div>
     </section>
     <section class="command-deck"><div class="squad-panel"><div class="panel-heading"><span>YOUR SQUADS</span><small id="slots">1 / 3 ACTIVE</small></div><div id="squad-cards"></div></div><div class="orders"><div class="panel-heading"><span>FIELD ORDERS</span><small id="selected-name">SELECT A SQUAD</small></div><div class="action-row"><button id="move" class="action"><span class="action-glyph">⌖</span><strong>MOVE</strong><small>FREE <kbd>M</kbd></small></button><button id="retreat" class="action"><span class="action-glyph">↶</span><strong>RETREAT</strong><small>FREE <kbd>R</kbd></small></button><button id="shield" class="action"><span class="action-glyph">⬡</span><strong>SHIELD</strong><small id="shield-cost">10 CR <kbd>Q</kbd></small></button><button id="emp" class="action"><span class="action-glyph">⌁</span><strong>EMP</strong><small id="emp-cost">15 CR <kbd>E</kbd></small></button></div></div><div class="reserve"><div class="panel-heading"><span>PRACTICE RESERVE</span><button id="ledger-button" aria-label="View spending ledger">↗</button></div><div class="budget"><strong id="budget">100</strong><span>CR<small>SIMULATED</small></span></div><button id="deploy">+ DEPLOY SQUAD <span>20 CR</span></button></div></section>
   </main><footer><span><i></i> OFFLINE READY <em> / </em> ORIGINAL PROCEDURAL WORLD</span><button id="help-button">HOW TO PLAY <span>?</span></button><span>TEST PROTOTYPE <em> / </em> v0.1</span></footer>
@@ -23,7 +25,7 @@ app.innerHTML = `
 
 const el = <T extends HTMLElement = HTMLElement>(id: string) => document.getElementById(id) as T;
 const dialog = (id: string) => el<HTMLDialogElement>(id);
-let game = createGame(), started = false, selected: number | null = 1;
+let game = createGame(), started = false, selected: number | null = null;
 let targeting: 'move' | 'emp' | null = null, seq = 0, accumulator = 0, lastFrame = performance.now(), lastHud = 0, lastNotice = 0, resultShown = false;
 let drill=false;
 let guided = false, tutorialStage = 0, tutorialFlankPhase = 0, tactical = false, paused = false;
@@ -73,6 +75,7 @@ function issue(payload: Omit<Command, 'id' | 'side'> | Record<string, unknown>) 
   const c = { ...payload, id: `player:${++seq}`, side: 0 } as Command;
   const before = game.budgets[0], result = command(game, c); toast(result.reason);
   if (result.ok) {
+    if (c.kind === 'move' || c.kind === 'emp' || c.kind === 'retreat') clearTarget();
     tone(c.kind === 'emp' ? 140 : 420);
     if (before > game.budgets[0]) spending.push({ tick: game.tick, action: c.kind.toUpperCase(), cost: before - game.budgets[0] });
     if (guided && c.kind === 'move' && tutorialStage === 1) tutorialStage = 2;
@@ -85,6 +88,9 @@ function begin(training: boolean) {
   drill=false;
   game = createGame(); scene.resetMatch(); started = true; selected = 1; guided = training; tutorialStage = 0; tutorialFlankPhase = 0; targeting = null; resultShown = false; accumulator = 0; paused = false; lastNotice = 0; spending.length = 0;
   document.body.classList.add('in-match');
+  clearTarget();
+  el('tutorial-card').classList.remove('compact');
+  if (training) changeView('tactical');
   if(sound){audio??=new AudioContext();void audio.resume();ambience();}
   soundEvent=0;
   el('briefing').hidden = true; dialog('result').close(); toast('Stand by. Deployment in three seconds.'); updateHud();
@@ -96,7 +102,20 @@ el('drill').onclick=()=>{
   toast('COMBAT DRILL. Two reinforcements already paid: 60 credits remain. Weapons fire on contact.');updateHud();
 };
 el('start').onclick = () => begin(false); el('tutorial').onclick = () => begin(true); el('rematch').onclick = () => begin(guided);
-function target(kind: 'move' | 'emp') { if (!game.squads.some(s => s.id === selected && s.side === 0)) return toast('Select a living friendly squad.'); targeting = kind; el('battlefield').classList.add('targeting'); toast(kind === 'emp' ? 'EMP targeting: tap a point. 15 credits on valid confirmation. Escape cancels.' : 'Tap a legal destination. Move is free.'); }
+function clearTarget() { targeting = null; el('battlefield').classList.remove('targeting'); document.body.dataset.orderMode = ''; el('order-hint').hidden = true; }
+function target(kind: 'move' | 'emp') {
+  if (!started || game.result || game.countdown > 0) return toast('Start practice and wait for the countdown first.');
+  if (!game.squads.some(s => s.id === selected && s.side === 0)) return toast('Select a living friendly squad.');
+  if (targeting === kind) { clearTarget(); updateHud(); return; }
+  targeting = kind; el('battlefield').classList.add('targeting'); document.body.dataset.orderMode = kind;
+  changeView('tactical');
+  el('order-hint').hidden = false;
+  el('order-title').textContent = kind === 'move' ? 'NOW CLICK THE GROUND' : 'NOW CLICK THE EMP TARGET';
+  el('order-copy').textContent = kind === 'move' ? 'Move is waiting for a destination. Click open ground on the map and your squad will walk there. Or click GO TO CENTRE above to move straight to B.' : 'Click a visible point within range of your selected squad. A valid pulse costs 15 credits.';
+  toast(kind === 'move' ? 'Choose where to go. Click open ground or a station button.' : 'Choose the EMP location.');
+  updateHud();
+}
+el('cancel-order').onclick = () => { clearTarget(); updateHud(); };
 el('move').onclick = () => target('move'); el('emp').onclick = () => target('emp');
 el('shield').onclick = () => issue({ kind: 'shield', squadId: selected }); el('retreat').onclick = () => issue({ kind: 'retreat', squadId: selected }); el('deploy').onclick = () => issue({ kind: 'deploy' });
 el('overlay').onclick = () => { tactical = !tactical; scene.setTactical(tactical); el('overlay').classList.toggle('active', tactical); };
@@ -105,6 +124,31 @@ el('settings-button').onclick = () => dialog('settings').showModal(); el('help-b
 document.querySelectorAll<HTMLButtonElement>('[data-close]').forEach(button => { button.onclick = () => dialog(button.dataset.close!).close(); });
 el('surrender').onclick = () => { if (started && !game.result) issue({ kind: 'surrender' }); dialog('settings').close(); };
 el('skip-tutorial').onclick = () => { guided = false; updateHud(); };
+function selectSquad(id: number) {
+  if (game.result) return toast('This match is over. Choose REDEPLOY to play again.');
+  if (!started) begin(true);
+  const squad = game.squads.find(s => s.side === 0 && s.id === id);
+  if (!squad) return toast('That squad is not available. Deploy another squad for 20 credits.');
+  selected = squad.id;
+  clearTarget();
+  if (guided && tutorialStage === 0) tutorialStage = 1;
+  el('battlefield').focus({ preventScroll: true });
+  toast(`Squad ${friendlyName(selected)} selected. ${game.countdown ? 'Wait for the countdown, then click GO TO CENTRE.' : 'Click GO TO CENTRE to send it to station B.'}`);
+  updateHud();
+}
+el('squad-cards').onclick = e => {
+  const card = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-squad]');
+  if (card) selectSquad(Number(card.dataset.squad));
+};
+el('tutorial-details').onclick = () => { el('tutorial-card').classList.toggle('compact'); updateHud(); };
+el('tutorial-action').onclick = () => {
+  if (tutorialStage === 0) { const first = game.squads.find(s => s.side === 0); if (first) selectSquad(first.id); }
+  else if (tutorialStage === 1) { const r = game.relays[1]; issue({ kind: 'move', squadId: selected, target: { x: r.x - 1, z: r.z } }); }
+  else if (tutorialStage === 4) issue({ kind: 'deploy' });
+  else if (tutorialStage === 5) issue({ kind: 'shield', squadId: selected });
+  else { changeView('tactical'); el('tutorial-card').classList.add('compact'); }
+  updateHud();
+};
 el('ledger-button').onclick = () => {
   el('ledger-content').innerHTML = `<p>Starting reserve <b>100 CR</b></p>${spending.map(s => `<p>${Math.floor(s.tick / R.ticks)}s / ${s.action} <b>${s.cost} CR</b></p>`).join('')}<p>Spent <b>${game.spent[0]} CR</b></p><p>Remaining <b>${game.budgets[0]} CR</b></p>`; dialog('ledger').showModal();
 };
@@ -133,10 +177,10 @@ function battlefieldClick(e: PointerEvent) {
   if (!started || game.result || game.countdown > 0) return;
   const p = scene.pick(e.clientX, e.clientY); if (!p) return;
   if (e.button === 2 || targeting) {
-    issue({ kind: targeting === 'emp' ? 'emp' : 'move', squadId: selected, target: p }); targeting = null; el('battlefield').classList.remove('targeting'); return;
+    issue({ kind: targeting === 'emp' ? 'emp' : 'move', squadId: selected, target: p }); return;
   }
   const closest = game.squads.filter(s => s.side === 0 && distance(s, p) < 2.4).sort((a, b) => distance(a, p) - distance(b, p))[0];
-  if (closest) { selected = closest.id; if (guided && tutorialStage === 0) tutorialStage = 1; toast(`Squad ${friendlyName(selected)} selected. Right click or choose Move.`); }
+  if (closest) selectSquad(closest.id);
   else if (selected && (e.pointerType === 'touch' || scene.viewMode!=='tactical')) issue({ kind: 'move', squadId: selected, target: p });
   else toast('Select a cyan squad or use the squad cards below.');
   updateHud();
@@ -148,11 +192,17 @@ window.addEventListener('keydown', e => {
   if(['KeyW','KeyA','KeyS','KeyD'].includes(e.code)){e.preventDefault();heldKeys.add(e.code);}
   if (e.repeat) return;
   const key = e.key.toLowerCase();
-  if (['1', '2', '3'].includes(key)) { selected = game.squads.filter(s => s.side === 0)[Number(key) - 1]?.id ?? null; if (guided && tutorialStage === 0 && selected) tutorialStage = 1; updateHud(); }
+  const squadKey = /^(?:Digit|Numpad)([123])$/.exec(e.code)?.[1] ?? (['1', '2', '3'].includes(key) ? key : null);
+  if (squadKey) {
+    e.preventDefault();
+    const squad = game.squads.filter(s => s.side === 0)[Number(squadKey) - 1];
+    if (squad) selectSquad(squad.id);
+    else toast(`Squad ${squadKey} is not deployed. Use DEPLOY SQUAD first. Your current selection is unchanged.`);
+  }
   if(key==='v'){scene.view.cycle();changeView(scene.viewMode);}
   if(key==='f')scene.resetCamera();
   if (key === 'm') target('move'); if (key === 'q') issue({ kind: 'shield', squadId: selected }); if (key === 'e') target('emp'); if (key === 'r') issue({ kind: 'retreat', squadId: selected });
-  if (key === 'escape') { targeting = null; selected = null; el('battlefield').classList.remove('targeting'); toast('Selection cleared'); updateHud(); }
+  if (key === 'escape') { if (targeting) { clearTarget(); toast('Order cancelled. Your squad is still selected.'); } else { selected = null; toast('Selection cleared'); } updateHud(); }
 });
 window.addEventListener('keyup', e => { heldKeys.delete(e.code); if (e.code === 'Space') scene.setTactical(tactical); });
 window.addEventListener('blur', () => {heldKeys.clear();scene.setTactical(tactical);});
@@ -160,19 +210,42 @@ document.addEventListener('visibilitychange', () => { paused = document.hidden; 
 const friendlyName = (id: number) => String(game.squads.filter(s => s.side === 0).findIndex(s => s.id === id) + 1).padStart(2, '0');
 function updateHud() {
   const own = game.squads.filter(s => s.side === 0), remaining = Math.ceil(Math.max(0, R.regulation - game.tick) / R.ticks);
-  if(selected!==null&&own.length&&!own.some(s=>s.id===selected))selected=own[0].id;
+  if (selected !== null && !own.some(s => s.id === selected)) {
+    clearTarget();
+    selected = own[0]?.id ?? null;
+    if (started && !game.result) toast(selected === null ? 'Your squad was lost. No soldiers remain. Deploy another squad if you have 20 credits.' : `Your selected squad was lost. Squad ${friendlyName(selected)} is now selected.`);
+  }
   el('score-you').textContent = String(game.scores[0]).padStart(3, '0'); el('score-bot').textContent = String(game.scores[1]).padStart(3, '0');
   el('timer').textContent = game.tick > R.regulation ? `OT ${Math.ceil((R.regulation + R.overtime - game.tick) / R.ticks)}` : `${Math.floor(remaining / 60).toString().padStart(2, '0')}:${Math.ceil(remaining % 60).toString().padStart(2, '0')}`;
   el('phase').textContent = !started ? 'OPERATION STANDBY' : game.result ? 'TRANSMISSION ENDED' : paused ? 'PRACTICE PAUSED' : game.countdown ? 'DEPLOYMENT COUNTDOWN' : game.tick >= R.doubleAt ? 'SIGNAL ×2' : drill ? 'COMBAT DRILL / LOCAL' : 'RELAY CONTROL';
   el('budget').textContent = String(game.budgets[0]); el('slots').textContent = `${own.length} / 3 ACTIVE`;
+  document.querySelector('.squad-panel .panel-heading > span')!.textContent = '1. YOUR TEAM · CLICK A SQUAD';
+  document.body.dataset.trainingStep = guided && started && !game.result ? String(tutorialStage) : '';
   el('selected-name').textContent = selected && own.some(s => s.id === selected) ? `SQUAD ${friendlyName(selected)} SELECTED` : 'SELECT A SQUAD';
-  const squadSignature = own.map(s => `${s.id}:${s.hp}:${s.suppression}:${s.shield}:${s.disabledUntil > game.tick}:${s.coverId}:${s.id === selected}`).join('|') + game.pending.filter(p => p.side === 0).length;
+  const squadSignature = own.map(s => s.id).join('|') + ':' + game.pending.filter(p => p.side === 0).length;
   if (el('squad-cards').dataset.signature !== squadSignature) {
     el('squad-cards').dataset.signature = squadSignature;
-    el('squad-cards').innerHTML = own.map((s, i) => `<button class="squad-card ${s.id === selected ? 'selected' : ''}" data-squad="${s.id}" aria-label="Select squad ${i + 1}, ${s.hp} health"><span><b>◈</b> ${String(i + 1).padStart(2, '0')} <kbd>${i + 1}</kbd></span><div class="hp-track"><i style="width:${s.hp}%"></i></div><small>${s.hp} HP / ${s.disabledUntil > game.tick ? 'DISABLED' : s.suppression >= 60 ? 'SUPPRESSED' : s.shield ? 'SHIELDED' : s.coverId !== null && game.tick - s.coverSince >= R.coverTicks ? 'IN COVER' : 'READY'}</small></button>`).join('') + (game.pending.some(p => p.side === 0) ? '<span class="preparing">PREPARING<br>REINFORCEMENT</span>' : '');
-    el('squad-cards').querySelectorAll<HTMLButtonElement>('[data-squad]').forEach(b => { b.onclick = () => { selected = Number(b.dataset.squad); if (guided && tutorialStage === 0) tutorialStage = 1; updateHud(); }; });
+    el('squad-cards').innerHTML = own.map((s, i) => `<button class="squad-card ${s.id === selected ? 'selected' : ''}" data-squad="${s.id}" aria-pressed="${s.id === selected}" aria-label="Select squad ${i + 1}, ${s.hp} health"><span><b>◈</b> SQUAD ${i + 1} <kbd>${i + 1}</kbd></span><div class="hp-track"><i style="width:${s.hp}%"></i></div><small>${s.id === selected ? '✓ SELECTED' : 'CLICK TO SELECT'} · ${s.hp} HP</small></button>`).join('') + (game.pending.some(p => p.side === 0) ? '<span class="preparing">PREPARING<br>REINFORCEMENT</span>' : own.length ? '' : '<span class="preparing">NO SQUADS LEFT<br>Use DEPLOY SQUAD if you have 20 credits.</span>');
   }
+  el('squad-cards').querySelectorAll<HTMLButtonElement>('[data-squad]').forEach(card => {
+    const squad = own.find(s => s.id === Number(card.dataset.squad))!;
+    const active = squad.id === selected;
+    card.classList.toggle('selected', active);
+    card.setAttribute('aria-pressed', String(active));
+    card.setAttribute('aria-label', `${started ? 'Select' : 'Start guided practice with'} squad ${friendlyName(squad.id)}, ${squad.hp} health`);
+    card.querySelector<HTMLElement>('.hp-track i')!.style.width = `${squad.hp}%`;
+    card.querySelector('small')!.textContent = `${!started ? 'CLICK TO START & SELECT' : active ? '✓ SELECTED' : 'CLICK TO SELECT'} · ${squad.hp} HP`;
+  });
+  el('selected-name').textContent = !started ? 'SELECT A SQUAD TO START PRACTICE' : selected && own.some(s => s.id === selected) ? `SQUAD ${friendlyName(selected)} · ${game.countdown ? 'READY AFTER COUNTDOWN' : 'CHOOSE A STATION ABOVE'}` : 'NO SQUAD SELECTED · CLICK A CARD';
+  el('move').classList.toggle('active', targeting === 'move');
+  el('move').querySelector('strong')!.textContent = targeting === 'move' ? 'PICK GROUND' : 'MOVE TO…';
+  el('emp').classList.toggle('active', targeting === 'emp');
   el('relay-status').innerHTML = game.relays.map(r => `<b class="${r.owner === 0 ? 'friendly' : r.owner === 1 ? 'hostile' : ''}">${r.id}</b>`).join('');
+  document.querySelectorAll<HTMLButtonElement>('[data-relay]').forEach((b, i) => {
+    const r = game.relays[i];
+    b.innerHTML = `<b>${r.id}</b><span>GO TO ${['NORTH', 'CENTRE', 'SOUTH'][i]}<small>${r.contested ? 'CONTESTED' : r.owner === 0 ? 'YOURS · +1 POINT / SEC' : r.owner === 1 ? 'ENEMY STATION' : 'CAPTURE THIS STATION'}</small></span>`;
+    b.disabled = !started || game.countdown > 0 || !!game.result || selected === null || !own.some(s => s.id === selected);
+  });
   for (const kind of ['shield', 'emp', 'deploy'] as const) {
     const cooldown = Math.max(0, Math.ceil((game.cooldowns[0][kind] - game.tick) / R.ticks));
     const cost = kind === 'shield' ? R.shieldCost : kind === 'emp' ? R.empCost : R.deployCost;
@@ -185,17 +258,24 @@ function updateHud() {
   if (guided && tutorialStage === 2 && game.relays.some(r => r.owner === 0)) tutorialStage = 3;
   if (guided && tutorialStage === 3 && observe(game, 0).squads.some(s => s.side === 1)) tutorialStage = 4;
   const guidance = [
-    ['Select your squad', 'Click your cyan soldiers, press 1, or choose the squad card below.'],
-    ['Give a movement order', 'Choose MOVE and tap inside relay B. Cyan strips beside barriers mark cover.'],
-    ['Hold the relay', 'Keep a squad in the circle for five uncontested seconds. Watch the bot approaches.'],
+    ['Choose your soldiers', 'Your team controls the cyan soldiers. The highlighted SQUAD 1 card is at the bottom left. Click it, press 1, or use the button here. You command the whole squad; its guns fire automatically.'],
+    ['Send your squad to station B', 'A relay is a radio station inside a circle on the ground. Look for the large B marker in the middle of the map. Click GO TO CENTRE at the top, or SEND SQUAD TO B here. Your soldiers will walk there by themselves.'],
+    ['Let your squad capture B', 'Your movement order is active. Wait for your soldiers to reach the B circle, then stay inside it for five seconds with no enemy present. You do not need to click again. The station turns cyan when captured and starts earning points.'],
     ['Watch the northern flank', 'The training bot is approaching through relay A. Buildings block sight, so its position appears only when visible.'],
-    ['Bring reinforcements', 'The flanking squad is now visible. Deploy a squad for 20 practice credits. It prepares at home for two seconds.'],
-    ['Time a shield', 'Select a squad and use SHIELD. It costs 10 credits and absorbs 30 damage.'],
-    ['You have command', 'Capture, flank and preserve your reserve. A destroyed squad stays destroyed.'],
+    ['Bring more soldiers', 'An enemy is visible. Click DEPLOY SQUAD at the bottom right or use the button here. It costs 20 of your 100 practice credits. After two seconds a second squad and its selection card appear at home.'],
+    ['Protect your selected squad', 'Click SHIELD in the bottom controls or use the button here. It protects the selected squad for four seconds, absorbs 30 damage and costs 10 credits.'],
+    ['Now hold two stations', 'Select a squad card, then click GO TO NORTH or GO TO SOUTH to capture another station. Each station earns points. Reach 240 points, or lead when three minutes ends. WASD moves your squad; drag to look; V changes camera.'],
   ];
   el('tutorial-card').hidden = !guided || !started || !!game.result;
+  if (el('tutorial-card').dataset.stage !== String(tutorialStage)) { el('tutorial-card').dataset.stage = String(tutorialStage); el('tutorial-card').classList.remove('compact'); }
+  el('tutorial-details').textContent = el('tutorial-card').classList.contains('compact') ? 'Show instructions' : 'Hide instructions to see map';
   el('tutorial-title').textContent = guidance[tutorialStage][0]; el('tutorial-copy').textContent = guidance[tutorialStage][1];
+  el('tutorial-step').textContent = `FIELD TRAINING · STEP ${tutorialStage + 1} OF 7`;
+  const trainingAction = el<HTMLButtonElement>('tutorial-action');
+  trainingAction.textContent = ['SELECT SQUAD 1', 'SEND SQUAD TO B', 'SHOW OVERHEAD MAP', 'SHOW OVERHEAD MAP', 'DEPLOY SECOND SQUAD · 20 CR', 'SHIELD SELECTED SQUAD · 10 CR', 'SHOW OVERHEAD MAP'][tutorialStage];
+  trainingAction.disabled = tutorialStage === 1 ? game.countdown > 0 || selected === null : tutorialStage === 4 ? el<HTMLButtonElement>('deploy').disabled : tutorialStage === 5 ? el<HTMLButtonElement>('shield').disabled : false;
   if (game.result && !resultShown) {
+    clearTarget();
     resultShown = true; el('result-title').textContent = game.result.winner === null ? 'Signal unresolved.' : game.result.winner === 0 ? 'Frequency secured.' : 'Transmission lost.';
     el('result-reason').textContent = `${game.result.reason}. You ${game.scores[0]} / Bot ${game.scores[1]}.`;
     el('result-stats').innerHTML = `<p>Relays held <b>${game.relays.filter(r => r.owner === 0).length} / 3</b></p><p>Squads lost <b>${game.lost[0]}</b></p><p>Reserve spent <b>${game.spent[0]} CR</b></p><p>Reserve remaining <b>${game.budgets[0]} CR</b></p>`;

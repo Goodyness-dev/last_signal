@@ -22,3 +22,11 @@
 18. The owner requested an older war setting while keeping guns and existing interaction. Use a fictional early 20th century inspired front: mud, duckboards, sandbags, damaged brick buildings, timber doors, wooden stocked rifles, steel brim helmets, canvas packs and leather equipment. This is a visual setting, not a claim of historical authenticity. Shield and EMP remain abstract prototype mechanics.
 19. Preserve the authored obstacle footprints and gameplay rules. The communication lanes are shallow visual dressing, not new excavated navigation geometry. Perimeter wire is outside legal bounds. Small crates, barrels and vegetation are cosmetic props, not new cover or damaging hazards. No real faction insignia is introduced.
 20. Use PCFShadowMap directly after the installed renderer logged that PCFSoftShadowMap falls back to it. No dependency changes are required.
+
+22. The owner could not locate squads or relays. Make squad cards cyan and explicitly named; give stations named destination buttons. Guided practice starts overhead, highlights the required control and offers its command inside the tutorial. Explain that a relay is a radio station inside a ground circle. Allow instructions to collapse. Retain the ordinary close camera and simulation rules.
+
+23. Opening screen squad selection starts guided practice so it cannot leave a beginner in an apparently selected but unplayable standby state. Use one selection handler for cards, number keys, tutorial and world picks. Keep card DOM nodes stable during health updates. Give an explicit next action after selection; unavailable squad shortcuts preserve the current selection.
+
+24. Make destination targeting explicit. MOVE TO… opens the overhead view and a persistent ground selection prompt. Hide the training panel temporarily while targeting so it cannot intercept the destination click. Accepted movement and direct relay orders clear targeting. Escape cancels targeting before deselecting a squad. Keep tutorial actions visible while longer explanations scroll.
+
+25. Cancel unfinished targeting on selected squad loss and match completion. Announce automatic replacement selection so a beginner can understand why the camera or selected card changed. No squad left means no selected squad.

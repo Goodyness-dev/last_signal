@@ -64,3 +64,12 @@ The guided match waits for a first player capture, then scripts an ordinary bot 
 Practice pauses when the page is hidden. Reload starts a fresh battle. Recent results are stored locally when storage is available. There is no service worker for an offline cold start; serve bundled files locally. No network game service is needed during practice. Local fonts are bundled with their licenses.
 
 Hackathon eligibility is **UNCONFIRMED**. The event page did not expose readable rules when checked. The pack supplied a deadline of 2 November 2026 at 17:30 UTC, or 18:30 in Nigeria; this was not independently verified.
+
+
+Guidance revision, 31 October 2026: larger cyan squad cards, named relay destination buttons, larger world letters, highlighted training targets and direct tutorial action buttons. Guided practice starts overhead. Instructions collapse to reveal the map. Ordinary practice retains eye level. Strict TypeScript and production build pass. Browser verified guided start, squad selection, accepted B movement, progression to capture guidance, and instruction collapse and restore. Desktop and 390 by 844 phone layouts were inspected. Current period screenshots are docs/evidence/clear-guidance-desktop.png and clear-guidance-phone.png. This closes the missing period screenshot gap for these views. This is local practice only; no new full match, complete tutorial, multiplayer or chain verification is claimed.
+
+New player start: choose Guided first match. Click SELECT SQUAD 1 in the training panel, then SEND SQUAD TO B. The matching card is at the bottom left; the GO TO CENTRE destination is at the top. Wait inside the B ground circle for five uncontested seconds to capture. Hide instructions to see map reveals the battlefield; Show instructions restores the explanation.
+
+Selecting a squad card or pressing 1 on the opening screen now starts guided practice directly. During play both paths select the squad and show a confirmation. Wait for the three second deployment countdown before ordering a station. Click inside the game first if keyboard focus is in another application or the browser address bar.
+
+Move has two steps: click MOVE TO…, then click open ground in the overhead battlefield. The persistent prompt says NOW CLICK THE GROUND while waiting. Station buttons such as GO TO CENTRE are single click movement orders. Escape cancels targeting while keeping the squad selected.

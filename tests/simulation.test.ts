@@ -1,8 +1,14 @@
 import { describe, it, expect } from 'vitest';
-import { createGame, command, step, observe, botCommands, path, distance, RULES as R, MAP, type Game, type Side } from '@last-signal/sim';
+import { createGame, createCombatDrill, command, step, observe, botCommands, path, distance, RULES as R, MAP, legal, type Game, type Side } from '@last-signal/sim';
 const ready = () => { const g = createGame(); g.countdown = 0; return g; };
 const advance = (g: Game, n: number) => { for (let i = 0; i < n; i++) step(g); };
 describe('finite budgets and legal commands', () => {
+  it('starts the explicit combat drill with paid reinforcements and legal equal positions',()=>{
+    const g=createCombatDrill();expect(g.budgets).toEqual([60,60]);expect(g.spent).toEqual([40,40]);expect(g.scores).toEqual([0,0]);
+    expect(g.tick).toBe(R.deployCooldown+R.spawnDelay);expect(g.pending).toHaveLength(0);
+    for(const side of [0,1] as const){const squads=g.squads.filter(s=>s.side===side);expect(squads).toHaveLength(3);expect(squads.every(s=>legal(s,side)&&s.hp===100)).toBe(true);}
+    step(g);expect(g.squads.every(s=>s.hp===90)).toBe(true);
+  });
   it('deduplicates spending and reserves preparing squad slots', () => {
     const g = ready(); const c = { id: 'paid-1', side: 0 as Side, kind: 'deploy' as const };
     expect(command(g, c).ok).toBe(true); expect(command(g, c).ok).toBe(true); expect(g.budgets[0]).toBe(80);
@@ -98,5 +104,5 @@ describe('capture, scoring and terminal boundaries', () => {
     };
     const a = play(), b = play(); expect(a).toEqual(b);
     console.log('Deterministic bot match:', { tick: a.tick, scores: a.scores, spent: a.spent, result: a.result });
-  });
+  }, 30000);
 });

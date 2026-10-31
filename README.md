@@ -27,11 +27,15 @@ Health: http://127.0.0.1:3001/health. This service reports shared rules and map 
 
 ## Play
 
+The default camera is now at squad eye level with visible hands and weapon. WASD moves the selected squad relative to your view. Drag the battlefield to look around. V cycles eye level, squad and command views. F restores camera facing. A, B and C buttons order a relay capture. The minimap supports precise movement orders. Weapons still fire automatically on legal contact.
+
 Select a cyan squad by clicking it, using its card, or pressing 1 to 3. Right click a destination, or press M or Move and tap the ground. Touch supports tap selection followed by tap movement. R retreats. Q shields the selected squad for 10 credits. E opens EMP targeting; a ground tap confirms a valid 15 credit pulse. Escape cancels targeting and clears selection. Hold Space or toggle Tactical to inspect cover. Camera buttons zoom and restore framing.
 
 Hold a relay alone for five seconds to capture it. Each relay generates a point each second, doubled in the last 30 seconds. Reach 240 points or lead at 180 seconds. A tie continues for up to 20 seconds. Existing ownership scores during contested capture. Suppressed squads cannot capture but can contest.
 
 Each side starts with one free squad and 100 practice credits. Deployments cost 20, prepare for two seconds, and have a five second cooldown. At most three squads including preparing reinforcements. Shield absorbs 30 damage for four seconds with an 18 second cooldown. EMP removes enemy shields and disables weapons for two seconds with a 22 second cooldown. No healing, refunds for destroyed squads, or reserve replenishment. The ledger shows accepted spending. Results show scores, losses and reserve, and support rematch.
+
+Quick combat drill starts three squads per side already facing each other. Both sides pay for two reinforcements through the normal command validator, leaving 60 credits each. The seven second preparation is advanced before the drill opens. This is an explicitly labeled local scenario, distinct from a normal match start. It is not multiplayer or chain evidence.
 
 ## Checks
 
@@ -41,7 +45,7 @@ npm test
 npm run preview -w @last-signal/web -- --port 4173 --strictPort
 ```
 
-Strict TypeScript and production build pass. The 13 simulation tests cover budget limits, duplicate spending, squad reservation, navigation, visibility filtering, simultaneous kills, home safety, cover, suppression, shield, EMP, capture, scoring, victory and overtime. Repeated bot matches produce identical final state. See docs/PROOF.md for actual evidence and limits.
+Strict TypeScript and production build pass. The 14 simulation tests cover budget limits, duplicate spending, squad reservation, navigation, visibility filtering, simultaneous kills, home safety, cover, suppression, shield, EMP, capture, scoring, victory and overtime. Repeated bot matches produce identical final state. See docs/PROOF.md for actual evidence and limits.
 
 ## Structure
 
@@ -51,7 +55,7 @@ Strict TypeScript and production build pass. The 13 simulation tests cover budge
 
 This is the first playable slice, not the complete testnet product. Private multiplayer, authenticated rooms, durable command journals, recovery, contracts, local chain, public testnet and public hosting are not implemented. No receipts or deployed addresses exist. There is no refund flow because no funds are accepted.
 
-The guided match waits for a first player capture, then scripts an ordinary bot movement through the northern flank before teaching reinforcement and shield. It then enables the normal bot. The bot chooses relay objectives, reinforcements, retreat and shields. Cluster EMP evaluation and varied openings are pending. Art uses procedural placeholder soldiers and simple geometry. Synthesized audio is limited to command tones. No recordings, advanced smoke, blood decals, full ambient mix, human balance studies, or performance targets are claimed.
+The guided match waits for a first player capture, then scripts an ordinary bot movement through the northern flank before teaching reinforcement and shield. It then enables the normal bot. The bot chooses relay objectives, reinforcements, retreat and shields. Cluster EMP evaluation and varied openings are pending. Art uses procedural placeholder soldiers and simple geometry. Original audio now includes synthesized rain, gunshots, footfall and command cues. No external recordings, blood decals, photorealistic human models, human balance studies, or measured performance targets are claimed. Smoke and casualties are bounded cosmetic effects.
 
 Practice pauses when the page is hidden. Reload starts a fresh battle. Recent results are stored locally when storage is available. There is no service worker for an offline cold start; serve bundled files locally. No network game service is needed during practice. Local fonts are bundled with their licenses.
 

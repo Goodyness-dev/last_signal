@@ -20,3 +20,5 @@ Checked 31 October 2026. External observations are not deployment evidence.
 | Blockchain integration | None | No contract or wallet implementation | LOCALLY_VERIFIED | No chain reads or transactions |
 
 Chain parameters in the parent pack were not reverified because this slice makes no RPC calls or deployments. No address, receipt, token balance or network identity is asserted here.
+
+Camera and feedback revision, 31 October 2026: installed Three.js camera, raycasting, geometry, materials and color management APIs were checked against https://threejs.org/docs/ and https://threejs.org/manual/pages/color-management.html. No dependencies were added or updated. Eye level is a camera on the selected aggregate squad with a cosmetic view weapon; it does not add independent soldier hitboxes, ammunition or manually aimed shots.

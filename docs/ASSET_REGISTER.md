@@ -2,6 +2,8 @@
 
 All battlefield visuals are original procedural source. No purchased assets, generated concept images, commercial game content or recorded audio are included.
 
+Revision: articulated figures and the eye level weapon now live in apps/web/src/soldier.ts. Shells, sparks, dust and splashes are original geometry in combat-fx.ts. field-camera.ts owns the new views. scene.ts adds original concrete weathering, cracks, doors, conduits and bounded smoke. Audio noise and oscillators in main.ts synthesize rain and gunshots. These remain temporary original procedural assets under the same project source ownership as the initial assets. No external models or sounds were introduced.
+
 | Asset | Path | Source and creator | License | Status and replacement |
 | --- | --- | --- | --- | --- |
 | Compound, ground texture, puddles, skyline, towers, barriers | apps/web/src/scene.ts | Original source authored for LAST SIGNAL | Project source. Ownership follows project agreement | Temporary procedural art. Improve detail after gameplay review |

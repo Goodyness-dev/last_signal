@@ -2,6 +2,12 @@
 
 31 October 2026. Local practice slice.
 
+Current presentation supersedes the initial screenshots below. The owner requested close action. The default view is now eye level, with a visible procedural weapon, WASD squad movement, drag to look, squad follow and command camera modes, direct relay orders, a visibility filtered minimap and a full screen world. Art remains stylized procedural geometry. It is not photorealistic.
+
+New feedback includes articulated running and crouching, aiming, muzzle flashes, recoil, visible volleys, casings, impact debris, dust, splashes, smoke and casualty falls. Audio includes original synthesized rain, gunshots, footfall and radio style command tones. Quick combat drill provides immediate opposing squads with both sides paying 40 credits for reinforcements. It is explicitly LOCAL_PRACTICE.
+
+Revision validation: strict build passes and 14 simulation tests pass, including legal drill positions, equal paid reserves and actual opening damage. Browser review verified WASD movement, drag look, all camera modes, relay orders, real close combat, shield expenditure, 390 by 844 phone layout and the 500 by 626 compact app viewport. Browser error log was empty. See the revision section in PROOF.md and new close combat screenshots. Manual aiming, individual soldier simulation and photorealistic assets remain outside this change.
+
 | Gate | State | Evidence |
 | --- | --- | --- |
 | 0 Inspect and initialize | PASS | Separate npm workspace, strict TypeScript, pinned dependencies, production build, web HTTP 200, service health response importing shared rules |

@@ -62,3 +62,17 @@ Final handoff review found that bundled font metrics made the medium height desk
 ## Not present
 
 No multiplayer match, local blockchain, contract tests, funding, settlement, timeout refund, public URL, chain address, transaction hash or organizer eligibility confirmation exists. Contract accounting and signature security are NOT_STARTED. Do not use these screenshots as chain evidence.
+
+## Close action revision
+
+31 October 2026. The owner rejected the distant interface and asked for a closer, more interactive view. Earlier screenshots above remain historical evidence of the first slice.
+
+Implemented and inspected default eye level camera with original hands and weapon, close squad camera, command overview, drag look, WASD squad movement, relay buttons and clickable visibility filtered minimap. Added articulated limbs, crouching, recoil, aiming, flashes, casings, sparks, dust, splashes, smoke and bounded casualty falls. New cosmetics use real visible gameplay events and never add damage.
+
+Quick Combat Drill is an authored local practice fixture. Both sides pay for two additional squads using the ordinary command validator. It advances seven seconds of legal preparation before placing the squads in three opposing lanes. Opening budgets are 60 each and spent totals are 40 each. It is not a standard match start. A browser drill showed active combat at 90 then 80 HP, three squads per side, contested relays and a 60 credit reserve. Purchasing shield changed reserve to 50 and showed the actual cooldown and shield bubble. See combat-drill-eye-level.jpg and close-combat-action.jpg.
+
+Observed movement using a held W key, drag look, eye level and command view switching, central relay order and capture. The new full screen layout was inspected at 1440 by 900, 390 by 844 and 500 by 626. Phone page width equaled the viewport. In the compact view, all three start buttons fit above the command deck. Browser error log returned no entries. Local preview remains http://127.0.0.1:5174/.
+
+New evidence in docs/evidence: combat-drill-eye-level.jpg, close-combat-action.jpg, close-squad-moving.jpg, revised-command-view.jpg and immersive-mobile-390.jpg. eye-level-view.jpg was taken during the camera iteration before the view weapon was added. The drill screenshots show the completed weapon presentation. Still images do not verify the timing of every effect. No video or physical phone test was captured. Art remains visibly stylized procedural geometry.
+
+Executed npm run build and npm test. Fourteen tests passed after adding a drill accounting and combat scenario. A prior run of the two full bot matches exceeded the default five second Vitest limit under host load. Its timeout was raised to 30 seconds; no gameplay rules or assertions were relaxed. Pixel ratio is capped at 1.4, shadows refresh every fourth frame and movement paths are cached. No FPS target is claimed. Vite still reports the large Three.js bundle warning.

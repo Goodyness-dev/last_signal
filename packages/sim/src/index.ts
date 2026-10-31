@@ -15,6 +15,16 @@ export function createGame(seed = 1): Game {
   const g: Game = { tick: 0, countdown: R.countdown, squads: [], relays: RELAYS.map(r => ({ ...r, owner: null, attacker: null, progress: 0, contested: false })), budgets: [100, 100], scores: [0, 0], spent: [0, 0], lost: [0, 0], cooldowns: [{ deploy: 0, shield: 0, emp: 0 }, { deploy: 0, shield: 0, emp: 0 }], pending: [], nextId: 1, events: [], eventSeq: 0, seen: {}, result: null, seed };
   spawn(g, 0); spawn(g, 1); return g;
 }
+// Explicit local drill fixture. Normal match spawning and costs are unchanged.
+export function createCombatDrill(seed=1):Game {
+  const g=createGame(seed);g.countdown=0;
+  for(let wave=0;wave<2;wave++){
+    for(const side of [0,1] as const)command(g,{id:`drill:${wave}`,side,kind:'deploy'});
+    for(let tick=0;tick<(wave===0?R.deployCooldown:R.spawnDelay);tick++)step(g);
+  }
+  for(const side of [0,1] as const)g.squads.filter(s=>s.side===side).forEach((s,i)=>{s.x=side===0?21:27;s.z=RELAYS[i].z;});
+  return g;
+}
 export const protectedHome = (s: Squad) => distance(s, HOMES[s.side]) <= R.homeRadius;
 export function visible(g: Pick<Game, 'squads'>, side: Side, p: Point): boolean {
   return (distance(p, HOMES[side]) <= 6 && lineOfSight(HOMES[side], p)) || g.squads.some(s => s.side === side && distance(s, p) <= R.vision && lineOfSight(s, p));

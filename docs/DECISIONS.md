@@ -1,0 +1,16 @@
+# Decisions
+
+31 October 2026.
+
+1. Preserve the specification pack and earlier projects. Implement in the separate last_signal subdirectory. No application or Git repository was present here. Preserve the unrelated service on port 5173.
+2. Start with Gates 0, 1 and the core of 2. Keep practice useful before multiplayer or chain work. No public hosting is attempted in this local first slice.
+3. Use npm workspaces and a tracked package lock. Pin registry versions after checking official Vite, Three.js, Fastify and Vitest documentation. Node 24 satisfies their reported requirements.
+4. Use a small vanilla TypeScript HUD instead of React for this slice. State stays in the simulation and Three.js owns its scene. React remains an option for future lobby and wallet views. Strict TypeScript is enabled throughout.
+5. Use a fixed perspective camera, original generated ground texture, procedural buildings, rain line geometry and three soldier meshes per squad. These are temporary art. Color management uses sRGB output and ACES tone mapping.
+6. Use stable four neighbor breadth first navigation search. It is sufficient on this authored grid and avoids grid corner cutting. Home protection is part of legal navigation.
+7. Quantize movement to four decimal places each tick. Collect simultaneous volleys and resolve shield absorption sorted by attacker ID. Determinism is verified on this JavaScript runtime. Cross runtime hashing and a persistent replay journal are future work.
+8. Bot input is an authorized observation. Budget, cooldown and spending validation use the same function as the player. Friendly squad overlap is allowed per the spec.
+9. Hide enemy reinforcement announcements and live meshes outside sight. This is local presentation and bot fairness, not a verified multiplayer trust boundary. The browser owns the complete practice state.
+10. Hidden tabs pause practice and drop accumulated render time. Catchup is bounded at five ticks per frame. A slow device slows practice instead of skipping combat. Network overload policies await an authoritative service.
+11. Ship low violence presentation with no blood. Audio initially uses optional original synthesized command tones. Advanced effects and ambience remain unfinished.
+12. Bundle three fonts and SIL Open Font License texts so practice does not rely on a font CDN. Sources and author notices are in the asset register and license files.

@@ -1,0 +1,5 @@
+{
+  "name": "@last-signal/server", "private": true, "version": "0.1.0", "type": "module",
+  "scripts": {"dev": "tsx src/index.ts"},
+  "dependencies": {"@last-signal/sim": "*", "fastify": "5.12.7"}
+}

@@ -1,0 +1,5 @@
+* text=auto
+*.ttf binary
+*.jpg binary
+# Preserve upstream license text including its original trailing spaces.
+assets/licenses/*.txt -whitespace

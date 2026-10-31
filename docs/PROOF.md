@@ -1,3 +1,7 @@
+# Latest proof update
+
+31 October 2026. Private unfunded multiplayer is now verified with two real browser clients, an actual service process restart, restored scores and reserve, and a shared result after player two conceded. See evidence/private-player-one-result.png and evidence/private-player-two-result.png. Production build and all 46 tests pass, including a full threshold match in server tests. Local practice and Endless Front remain available. No local blockchain, escrow, public testnet or public hosting exists. Earlier entries below are historical.
+
 # Proof record
 
 31 October 2026. Every screenshot here is LOCAL_PRACTICE. None proves multiplayer, local chain or public testnet.

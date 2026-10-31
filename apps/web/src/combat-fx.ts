@@ -6,15 +6,15 @@ export class CombatFX {
   constructor(private scene:T.Scene) {}
   private add(e:Effect) { if(this.effects.length>=160) this.remove(this.effects.shift()!); this.effects.push(e); this.scene.add(e.mesh); }
   private remove(e:Effect) { this.scene.remove(e.mesh); e.mesh.traverse(o=>{if(o instanceof T.Mesh||o instanceof T.Line){o.geometry.dispose(); const mats=Array.isArray(o.material)?o.material:[o.material]; mats.forEach(m=>m.dispose());}}); }
-  shot(from:Point,to:Point,side:number,time:number) {
-    for(let i=0;i<3;i++) {
-      const start=new T.Vector3(from.x+(i-1)*.3,1.15,from.z+(i-1)*.3),end=new T.Vector3(to.x,1.05,to.z);
+  shot(from:Point,to:Point,side:number,time:number,rounds=3,height=1.05) {
+    for(let i=0;i<rounds;i++) {
+      const start=new T.Vector3(from.x+(rounds===1?0:(i-1)*.3),rounds===1?1.64:1.15,from.z+(rounds===1?0:(i-1)*.3)),end=new T.Vector3(to.x,height,to.z);
       const tracer=new T.Line(new T.BufferGeometry().setFromPoints([start,end]),new T.LineBasicMaterial({color:side===0?0xffe8b6:0xffad6a,transparent:true,opacity:.85}));
       this.add({mesh:tracer,born:time+i*.07,life:.065});
       const casing=new T.Mesh(new T.CylinderGeometry(.018,.018,.07,5),new T.MeshStandardMaterial({color:0xbca16c,metalness:.8,roughness:.3})); casing.position.copy(start);
       this.add({mesh:casing,born:time+i*.07,life:.75,velocity:new T.Vector3((i-1)*1.1+.8,1.6,.7),gravity:7,spin:9});
     }
-    this.burst(to,1.05,0xf6cf96,time,10);
+    this.burst(to,height,0xf6cf96,time,10);
     const light=new T.PointLight(0xffcb85,4,3,2); light.position.set(from.x,1.3,from.z); this.add({mesh:light,born:time,life:.065});
   }
   burst(at:Point,height:number,color:number,time:number,count=8) {

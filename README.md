@@ -31,7 +31,7 @@ Health: http://127.0.0.1:3001/health. This service reports shared rules and map 
 
 ## Play
 
-The default camera is now at squad eye level with visible hands and weapon. WASD moves the selected squad relative to your view. Drag the battlefield to look around. V cycles eye level, squad and command views. F restores camera facing. A, B and C buttons order a relay capture. The minimap supports precise movement orders. Weapons still fire automatically on legal contact.
+The default camera is now at squad eye level with visible hands and weapon. WASD directly moves the selected squad relative to your view and stops on release. In EYE LEVEL, TAKE CONTROL enables mouse look. Outside that control mode, touch drag still looks around. V cycles eye level, squad and command views. F restores camera facing. A, B and C buttons order a relay capture. The minimap supports precise movement orders. Your soldiers fire automatically on legal contact. In EYE LEVEL, click TAKE CONTROL to use mouse look, left click to fire your rifle and hold right click to aim. Escape releases the mouse.
 
 Select a cyan squad by clicking it, using its card, or pressing 1 to 3. Right click a destination, or press M or Move and tap the ground. Touch supports tap selection followed by tap movement. R retreats. Q shields the selected squad for 10 credits. E opens EMP targeting; a ground tap confirms a valid 15 credit pulse. Escape cancels targeting and clears selection. Hold Space or toggle Tactical to inspect cover. Camera buttons zoom and restore framing.
 
@@ -73,3 +73,7 @@ New player start: choose Guided first match. Click SELECT SQUAD 1 in the trainin
 Selecting a squad card or pressing 1 on the opening screen now starts guided practice directly. During play both paths select the squad and show a confirmation. Wait for the three second deployment countdown before ordering a station. Click inside the game first if keyboard focus is in another application or the browser address bar.
 
 Move has two steps: click MOVE TO…, then click open ground in the overhead battlefield. The persistent prompt says NOW CLICK THE GROUND while waiting. Station buttons such as GO TO CENTRE are single click movement orders. Escape cancels targeting while keeping the squad selected.
+
+## Player rifle controls
+
+Choose Enter the front or Quick combat drill, stay in EYE LEVEL and click TAKE CONTROL after the countdown. Move the mouse to look. WASD moves relative to your view and stops when released. Left click fires; holding repeats at the rifle bolt cadence. Hold right click to aim with lower sensitivity and zoom. Escape releases the mouse so you can use the squad cards and relay buttons. Your soldiers continue automatic volleys. Rifle hits add 5 damage per second maximum; a clear shot within 8 units is required. If mouse capture is unavailable, the fallback looks when the cursor moves over the battlefield; its travel is limited by the window boundary. FIRE RIFLE and AIM buttons remain available before taking control. Health and collision remain squad based.

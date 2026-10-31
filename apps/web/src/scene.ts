@@ -3,7 +3,7 @@ import { createSoldier, animateSoldier, createViewWeapon } from './soldier.ts';
 import { FieldCamera, type ViewMode } from './field-camera.ts';
 import { CombatFX } from './combat-fx.ts';
 import { OldFront } from './old-front.ts';
-import { MAP, HOMES, RULES, distance, type Observation, type Point, type Squad, type GameEvent } from '@last-signal/sim';
+import { MAP, HOMES, RULES, distance, isMoving, type Observation, type Point, type Squad, type GameEvent } from '@last-signal/sim';
 const CYAN = 0xa7bea0, AMBER = 0xcda471;
 export class Battlefield {
   readonly renderer: T.WebGLRenderer;
@@ -104,6 +104,8 @@ export class Battlefield {
   setView(mode:ViewMode) {this.view.setMode(mode);this.container.dataset.view=mode;}
   setZoom(delta: number) {this.view.zoom(delta);}
   resetCamera() {this.view.reset();}
+  aimDirection() { const d=this.camera.getWorldDirection(new T.Vector3()); return {x:d.x,y:d.y,z:d.z}; }
+  fireWeapon() { this.ownFireAt=this.time; }
   resetMatch() {
     this.lastEvent=0;this.ownFireAt=-100;this.fx.reset();this.view.reset();
     for(const group of this.units.values()){this.scene.remove(group);this.disposeObject(group);}this.units.clear();
@@ -132,7 +134,8 @@ export class Battlefield {
     for (const s of o.squads) {
       const group = this.units.get(s.id) ?? this.unit(s);
       group.position.lerp(new T.Vector3(s.x, 0, s.z), this.reducedMotion ? 1 : Math.min(1, dt * 18));
-      const target=s.route[0], fireAge=this.time-(group.userData.fireAt??-100);
+      const driving=s.drive&&(s.driveUntil??0)>=o.tick&&(s.drive.x!==0||s.drive.z!==0);
+      const target=driving?{x:s.x+s.drive!.x,z:s.z+s.drive!.z}:s.route[0], fireAge=this.time-(group.userData.fireAt??-100);
       const face=(fireAge<.7?group.userData.aim as Point|undefined:undefined)??target;
       if(face){const angle=Math.atan2(face.x-s.x,face.z-s.z);const delta=Math.atan2(Math.sin(angle-group.rotation.y),Math.cos(angle-group.rotation.y));group.rotation.y+=delta*Math.min(1,dt*14);}
       const firing=fireAge<.24?Math.max(0,Math.cos(fireAge*65)):0;
@@ -143,12 +146,13 @@ export class Battlefield {
       group.getObjectByName('hp')!.scale.x = Math.max(.01, s.hp / 100);
     }
     const s = o.squads.find(s => s.id === selected)??o.squads.find(s=>s.side===0);
-    this.view.update(s,dt,this.reducedMotion,this.time);
+    this.view.update(s,dt,this.reducedMotion,this.time,o.tick);
     this.viewWeapon.visible=this.viewMode==='eyes'&&!!s;
     const kick=this.reducedMotion?0:Math.max(0,1-(this.time-this.ownFireAt)/.2);
-    this.viewWeapon.position.z=-.65+kick*.09;
+    this.viewWeapon.position.x=this.view.aiming?0:.32;
+    this.viewWeapon.position.z=(this.view.aiming?-.5:-.65)+kick*.09;
     this.viewWeapon.getObjectByName('bolt')!.position.z=-.17+kick*.08;
-    this.viewWeapon.position.y=-.34+(!this.reducedMotion&&s?.route.length?Math.sin(this.time*10)*.012:0);
+    this.viewWeapon.position.y=(this.view.aiming?-.22:-.34)+(!this.reducedMotion&&s&&isMoving(s,o.tick)?Math.sin(this.time*10)*.012:0);
     this.viewWeapon.getObjectByName('flash')!.visible=this.effectsEnabled&&this.time-this.ownFireAt<.055;
     this.selection.visible = !!s;
     if (s) this.selection.position.set(s.x, .06, s.z);
@@ -174,9 +178,8 @@ export class Battlefield {
     for (const e of events) {
       if (e.seq <= this.lastEvent) continue; this.lastEvent = e.seq;
       if (!this.effectsEnabled) continue;
-      if (e.kind === 'ShotFired' && e.from && e.to) {
-        this.fx.shot(e.from,e.to,e.side??0,this.time);
-        if(s&&distance(s,e.from)<.6)this.ownFireAt=this.time;
+      if ((e.kind === 'ShotFired' || e.kind === 'PlayerShot') && e.from && e.to) {
+        this.fx.shot(e.from,e.to,e.side??0,this.time,e.kind==='PlayerShot'?1:3,e.height);
         const shooter=[...this.units.values()].find(g=>distance({x:g.position.x,z:g.position.z},e.from!)<.6);
         if(shooter){shooter.userData.fireAt=this.time;shooter.userData.aim=e.to;}
       } else if (e.kind === 'EmpTriggered' && e.to) { const ring = this.ring(3, 0xc3e2fc, .2); ring.position.set(e.to.x, .15, e.to.z); this.scene.add(ring); this.effects.push({ object: ring, until: this.time + .7, born: this.time, kind: 'emp' }); }

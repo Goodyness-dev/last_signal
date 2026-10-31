@@ -1,7 +1,8 @@
 export const RULES = Object.freeze({
-  version: 'practice-1', ticks: 20, countdown: 60, regulation: 3600, overtime: 400,
+  version: 'practice-2-rifle', ticks: 20, countdown: 60, regulation: 3600, overtime: 400,
   victory: 240, doubleAt: 3000, budget: 100, squadHp: 100, speed: 3,
   range: 8, vision: 12, volley: 10, weaponTicks: 20, firingSpeed: .75,
+  rifleDamage: 5, rifleTicks: 20,
   maxSquads: 3, deployCost: 20, deployCooldown: 100, spawnDelay: 40,
   shieldCost: 10, shieldCapacity: 30, shieldDuration: 80, shieldCooldown: 360,
   empCost: 15, empRange: 10, empRadius: 3, empDuration: 40, empCooldown: 440,

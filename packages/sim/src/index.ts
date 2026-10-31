@@ -5,24 +5,29 @@ export type Weapon = 'rifle' | 'carbine';
 export const WEAPONS = { rifle: {name:'Service rifle',damage:R.rifleDamage,ticks:R.rifleTicks,magazine:R.magazine},carbine:{name:'Field carbine',damage:12,ticks:3,magazine:30} } as const;
 export type Loot = Point & {id:number;weapon:Weapon;ammo:number;tokens:number};
 export type Hero = {squadId:number;alive:boolean;tokens:number;lastDamageAt:number};
+export type Supply = 'ammo' | 'shield' | 'recruit';
+export const SUPPLIES = {ammo:{cost:5,name:'40 spare bullets'},shield:{cost:5,name:'Field shield'},recruit:{cost:10,name:'Replacement helper'}} as const;
+export type Endless = {wave:number;cleared:number;nextWaveAt:number|null};
 export type PracticeOptions = {untimed?:boolean;hero?:boolean};
-export type Squad = Point & { id: number; side: Side; hp: number; suppression: number; lastHit: number; shotAt: number; disabledUntil: number; shield: number; shieldUntil: number; coverId: number | null; coverSince: number; route: Point[]; rifleAt?: number; rifleAim?: Aim; drive?: Point; driveUntil?: number;ammo:number;reserveAmmo:number;reloadUntil:number;weapon:Weapon;weapons:Weapon[];dodgeAt:number;evadeUntil:number;focusId?:number };
+export type Squad = Point & { id: number; side: Side; hp: number; members:number; suppression: number; lastHit: number; shotAt: number; disabledUntil: number; shield: number; shieldUntil: number; coverId: number | null; coverSince: number; route: Point[]; rifleAt?: number; rifleAim?: Aim; drive?: Point; driveUntil?: number;ammo:number;reserveAmmo:number;reloadUntil:number;weapon:Weapon;weapons:Weapon[];dodgeAt:number;evadeUntil:number;focusId?:number };
 export type Relay = Point & { id: string; owner: Side | null; attacker: Side | null; progress: number; contested: boolean };
-export type Command = { id: string; side: Side } & ({kind:'reload';squadId:number}|{kind:'switchWeapon';squadId:number}|{kind:'loot';squadId:number;lootId:number}|{kind:'focus';squadId:number;targetId:number}|{kind:'evade';squadId:number;target:Point}|{ kind: 'drive'; direction: Point; squadId: number } | { kind: 'fire'; direction: Aim; squadId: number } | { kind: 'move'; target: Point; squadId: number } | { kind: 'emp'; target: Point; squadId: number } | { kind: 'shield'; squadId: number } | { kind: 'retreat'; squadId: number } | { kind: 'deploy' } | { kind: 'surrender' });
+export type Command = { id: string; side: Side } & ({kind:'supply';squadId:number;supply:Supply}|{kind:'reload';squadId:number}|{kind:'switchWeapon';squadId:number}|{kind:'loot';squadId:number;lootId:number}|{kind:'focus';squadId:number;targetId:number}|{kind:'evade';squadId:number;target:Point}|{ kind: 'drive'; direction: Point; squadId: number } | { kind: 'fire'; direction: Aim; squadId: number } | { kind: 'move'; target: Point; squadId: number } | { kind: 'emp'; target: Point; squadId: number } | { kind: 'shield'; squadId: number } | { kind: 'retreat'; squadId: number } | { kind: 'deploy' } | { kind: 'surrender' });
 export type GameEvent = { seq: number; tick: number; kind: string; from?: Point; to?: Point; side?: Side; text?: string; height?: number;damage?:number;targetId?:number;memberIndex?:number };
-export type Game = { tick: number; countdown: number; squads: Squad[]; relays: Relay[]; budgets: [number, number]; scores: [number, number]; spent: [number, number]; lost: [number, number]; cooldowns: { deploy: number; shield: number; emp: number }[]; pending: { side: Side; at: number }[]; nextId: number; events: GameEvent[]; eventSeq: number; seen: Record<string, { ok: boolean; reason: string }>; result: null | { winner: Side | null; reason: string }; seed: number;untimed:boolean;hero:Hero|null;loot:Loot[] };
-export type Observation = { tick: number; squads: Squad[]; relays: Relay[]; budgets: [number, number]; scores: [number, number]; cooldowns: Game['cooldowns']; pending: Game['pending']; result: Game['result']; seed: number;untimed:boolean;hero:Hero|null;loot:Loot[] };
+export type Game = { tick: number; countdown: number; squads: Squad[]; relays: Relay[]; budgets: [number, number]; scores: [number, number]; spent: [number, number]; lost: [number, number]; cooldowns: { deploy: number; shield: number; emp: number }[]; pending: { side: Side; at: number }[]; nextId: number; events: GameEvent[]; eventSeq: number; seen: Record<string, { ok: boolean; reason: string }>; result: null | { winner: Side | null; reason: string }; seed: number;untimed:boolean;hero:Hero|null;loot:Loot[];endless:Endless|null };
+export type Observation = { tick: number; squads: Squad[]; relays: Relay[]; budgets: [number, number]; scores: [number, number]; cooldowns: Game['cooldowns']; pending: Game['pending']; result: Game['result']; seed: number;untimed:boolean;hero:Hero|null;loot:Loot[];endless:Endless|null };
 export const isMoving = (s: Squad, tick: number) => s.route.length > 0 || ((s.driveUntil ?? -1) >= tick && Math.hypot(s.drive?.x ?? 0, s.drive?.z ?? 0) > 0);
 export const survivingMembers=(hp:number)=>Math.max(0,Math.min(3,Math.ceil(hp/(R.squadHp/3)-.00001)));
-const volleyDamage=(g:Game,s:Squad)=>!g.hero?R.volley:g.hero.squadId===s.id?R.volley*Math.max(0,survivingMembers(s.hp)-1)/2:R.volley*survivingMembers(s.hp)/3;
+export const squadMembers=(s:Squad)=>Math.min(s.members,survivingMembers(s.hp));
+const volleyDamage=(g:Game,s:Squad)=>!g.hero?R.volley:g.hero.squadId===s.id?R.volley*Math.max(0,squadMembers(s)-1)/2:R.volley*squadMembers(s)/3;
 function event(g: Game, e: Omit<GameEvent, 'seq' | 'tick'>) { g.events.push({ ...e, seq: ++g.eventSeq, tick: g.tick }); if (g.events.length > 100) g.events.shift(); }
 function spawn(g: Game, side: Side) {
   const id=g.nextId++,weapon:Weapon=side===1&&id%3!==0?'carbine':'rifle';
-  const s: Squad = { id, side, ...HOMES[side], hp: R.squadHp, suppression: 0, lastHit: -100, shotAt: -100, disabledUntil: 0, shield: 0, shieldUntil: 0, coverId: null, coverSince: 0, route: [],ammo:WEAPONS[weapon].magazine,reserveAmmo:R.reserveAmmo,reloadUntil:0,weapon,weapons:[weapon],dodgeAt:-100,evadeUntil:0 };
+  const s: Squad = { id, side, ...HOMES[side], hp: R.squadHp, members:3, suppression: 0, lastHit: -100, shotAt: -100, disabledUntil: 0, shield: 0, shieldUntil: 0, coverId: null, coverSince: 0, route: [],ammo:WEAPONS[weapon].magazine,reserveAmmo:R.reserveAmmo,reloadUntil:0,weapon,weapons:[weapon],dodgeAt:-100,evadeUntil:0 };
   g.squads.push(s); event(g, { kind: 'SquadSpawned', side, to: { x: s.x, z: s.z }, text: side === 0 ? 'Friendly squad ready' : 'Bot reinforcement' });
+  return s;
 }
 export function createGame(seed = 1, options:PracticeOptions={}): Game {
-  const g: Game = { tick: 0, countdown: R.countdown, squads: [], relays: RELAYS.map(r => ({ ...r, owner: null, attacker: null, progress: 0, contested: false })), budgets: [100, 100], scores: [0, 0], spent: [0, 0], lost: [0, 0], cooldowns: [{ deploy: 0, shield: 0, emp: 0 }, { deploy: 0, shield: 0, emp: 0 }], pending: [], nextId: 1, events: [], eventSeq: 0, seen: {}, result: null, seed,untimed:options.untimed??false,hero:options.hero?{squadId:1,alive:true,tokens:0,lastDamageAt:-100}:null,loot:[] };
+  const g: Game = { tick: 0, countdown: R.countdown, squads: [], relays: RELAYS.map(r => ({ ...r, owner: null, attacker: null, progress: 0, contested: false })), budgets: [100, 100], scores: [0, 0], spent: [0, 0], lost: [0, 0], cooldowns: [{ deploy: 0, shield: 0, emp: 0 }, { deploy: 0, shield: 0, emp: 0 }], pending: [], nextId: 1, events: [], eventSeq: 0, seen: {}, result: null, seed,untimed:options.untimed??false,hero:options.hero?{squadId:1,alive:true,tokens:0,lastDamageAt:-100}:null,loot:[],endless:null };
   spawn(g, 0); spawn(g, 1); return g;
 }
 // Explicit local drill fixture. Normal match spawning and costs are unchanged.
@@ -43,12 +48,28 @@ export function createLootTraining(seed=1):Game {
   Object.assign(g.squads[1],{x:25,z:16,disabledUntil:Number.MAX_SAFE_INTEGER});
   return g;
 }
+function startWave(g:Game){
+  const state=g.endless!,hero=g.squads.find(s=>s.id===g.hero!.squadId)!;
+  state.nextWaveAt=null;g.budgets[1]=20;
+  const locations=state.wave===1?[{x:27,z:16}]:[{x:30,z:7},{x:30,z:25},{x:38,z:16},{x:24,z:7},{x:24,z:25}];
+  const available=locations.filter(p=>distance(p,hero)>=6);
+  for(let i=0;i<Math.min(3,state.wave);i++){
+    const enemy=spawn(g,1),at=available[(i+state.wave)%available.length];
+    Object.assign(enemy,at);enemy.route=path(enemy,{x:25,z:RELAYS[i].z},1)??[];
+  }
+  event(g,{kind:'WaveStarted',side:0,text:'WAVE '+state.wave+'. Eliminate every enemy. Collect drops with G. H opens field supplies.'});
+}
+export function createEndless(seed=1):Game{
+  const g=createGame(seed,{untimed:true,hero:true});g.countdown=0;
+  g.squads=g.squads.filter(s=>s.side===0);Object.assign(g.squads[0],{x:21,z:16});
+  g.endless={wave:1,cleared:0,nextWaveAt:null};startWave(g);return g;
+}
 export const protectedHome = (s: Squad) => distance(s, HOMES[s.side]) <= R.homeRadius;
 export function visible(g: Pick<Game, 'squads'>, side: Side, p: Point): boolean {
   return (distance(p, HOMES[side]) <= 6 && lineOfSight(HOMES[side], p)) || g.squads.some(s => s.side === side && distance(s, p) <= R.vision && lineOfSight(s, p));
 }
 export function observe(g: Game, side: Side): Observation {
-  return structuredClone({ tick: g.tick, squads: g.squads.filter(s => s.side === side || visible(g, side, s)), relays: g.relays, budgets: side === 0 ? [g.budgets[0], -1] : [-1, g.budgets[1]], scores: g.scores, cooldowns: g.cooldowns.map((c, i) => i === side ? c : { deploy: 0, shield: 0, emp: 0 }), pending: g.pending.filter(p => p.side === side), result: g.result, seed: g.seed,untimed:g.untimed,hero:side===0?g.hero:null,loot:g.loot.filter(l=>visible(g,side,l)) });
+  return structuredClone({ tick: g.tick, squads: g.squads.filter(s => s.side === side || visible(g, side, s)), relays: g.relays, budgets: side === 0 ? [g.budgets[0], -1] : [-1, g.budgets[1]], scores: g.scores, cooldowns: g.cooldowns.map((c, i) => i === side ? c : { deploy: 0, shield: 0, emp: 0 }), pending: g.pending.filter(p => p.side === side), result: g.result, seed: g.seed,untimed:g.untimed,hero:side===0?g.hero:null,endless:g.endless,loot:g.loot.filter(l=>visible(g,side,l)) });
 }
 export function command(g: Game, c: Command): { ok: boolean; reason: string } {
   const key = `${c.side}:${c.id}`;
@@ -59,12 +80,28 @@ export function command(g: Game, c: Command): { ok: boolean; reason: string } {
   if (c.kind === 'surrender') { g.result = { winner: (1 - c.side) as Side, reason: 'Surrender' }; event(g, { kind: 'MatchEnded' }); return answer(true, 'Match conceded'); }
   const s = 'squadId' in c ? g.squads.find(s => s.id === c.squadId && s.side === c.side) : undefined;
   if (c.kind !== 'deploy' && !s) return answer(false, 'Select a living friendly squad');
-  if(g.hero&&c.side===0&&['fire','reload','switchWeapon','loot','drive'].includes(c.kind)&&(!g.hero.alive||s?.id!==g.hero.squadId))return answer(false,'Take control of your main character first');
+  if(g.hero&&c.side===0&&['fire','reload','switchWeapon','loot','drive','supply'].includes(c.kind)&&(!g.hero.alive||s?.id!==g.hero.squadId))return answer(false,'Take control of your main character first');
+  if(c.kind==='supply'){
+    if(!g.hero||c.side!==0||!g.hero.alive||s!.id!==g.hero.squadId)return answer(false,'Only your living main character can request supplies');
+    const offer=SUPPLIES[c.supply];
+    if(!offer)return answer(false,'Unknown supply');
+    if(g.hero.tokens<offer.cost)return answer(false,'Not enough practice WIF. Collect enemy drops or clear a wave.');
+    if(c.supply==='ammo'&&s!.reserveAmmo>=R.maxReserveAmmo)return answer(false,'Spare ammunition already full');
+    if(c.supply==='shield'&&s!.shield>0&&s!.shieldUntil>g.tick)return answer(false,'Shield already active');
+    if(c.supply==='recruit'&&(squadMembers(s!)>=3||g.tick-s!.lastHit<R.regenDelay))return answer(false,'Replacement needs a missing helper and five seconds without damage');
+    g.hero.tokens-=offer.cost;
+    if(c.supply==='ammo')s!.reserveAmmo=Math.min(R.maxReserveAmmo,s!.reserveAmmo+40);
+    if(c.supply==='shield'){s!.shield=R.shieldCapacity;s!.shieldUntil=g.tick+R.shieldDuration;}
+    if(c.supply==='recruit'){s!.members=Math.min(3,squadMembers(s!)+1);s!.hp=R.squadHp;}
+    event(g,{kind:'SupplyReceived',side:0,to:{x:s!.x,z:s!.z},text:offer.name+' received. '+offer.cost+' practice WIF spent.'});
+    return answer(true,offer.name+' received. Simulated practice WIF only.');
+  }
   if(c.kind==='reload'){
+
     if(s!.reloadUntil>g.tick)return answer(false,'Already reloading');
     if(!s!.reserveAmmo)return answer(false,'No spare bullets. Find an enemy gun pickup.');
     if(s!.ammo>=WEAPONS[s!.weapon].magazine)return answer(false,'Magazine already full');
-    s!.reloadUntil=g.tick+R.reloadTicks;delete s!.rifleAim;return answer(true,'Reloading for 2 seconds');
+    s!.reloadUntil=g.tick+R.reloadTicks;delete s!.rifleAim;return answer(true,'Reloading for 1.5 seconds');
   }
   if(c.kind==='switchWeapon'){
     if(s!.reloadUntil>g.tick)return answer(false,'Finish reloading first');
@@ -143,6 +180,10 @@ export function step(g: Game) {
   if (g.result) return;
   if (g.countdown > 0) { g.countdown--; return; }
   g.tick++;
+  // Local endless sessions retain a bounded recent command cache, not multiplayer durability.
+  if(g.endless&&g.tick%200===0){const keys=Object.keys(g.seen);if(keys.length>8192)for(const key of keys.slice(0,-4096))delete g.seen[key];}
+  for(const s of g.squads)s.members=squadMembers(s);
+
   for (const p of g.pending.filter(p => p.at <= g.tick)) spawn(g, p.side);
   g.pending = g.pending.filter(p => p.at > g.tick);
   for (const s of g.squads) {
@@ -168,7 +209,7 @@ export function step(g: Game) {
   }
   const attacks: { from: Squad; to: Squad; damage: number; rifle?: boolean }[] = [];
   for (const s of g.squads) {
-    if (s.disabledUntil > g.tick || g.tick - s.shotAt < R.weaponTicks || protectedHome(s)) continue;
+    if (s.disabledUntil > g.tick || g.tick - s.shotAt < (g.endless&&s.side===1?Math.max(12,R.weaponTicks-g.endless.wave+1):R.weaponTicks) || protectedHome(s)) continue;
     const target = g.squads.filter(e => e.side !== s.side && !protectedHome(e) && distance(s, e) <= R.range && visible(g, s.side, e) && lineOfSight(s, e)).sort((a, b) => Number(b.id===s.focusId)-Number(a.id===s.focusId)||distance(s, a) - distance(s, b) || a.id - b.id)[0];
     if (target && volleyDamage(g,s)>0) attacks.push({ from: s, to: target, damage: volleyDamage(g,s) });
   }
@@ -187,16 +228,17 @@ export function step(g: Game) {
       if(g.tick-g.hero.lastDamageAt<R.heroHitGraceTicks)damage=0;
       else {damage*=R.heroDamageScale;g.hero.lastDamageAt=g.tick;}
     }
-    const beforeHp=to.hp;
+    const beforeMembers=squadMembers(to);
     const absorbed = Math.min(to.shield, damage); to.shield -= absorbed; damage -= absorbed;
     if (damage > 0) {
       const cover = MAP.covers.find(c => c.id === to.coverId);
       if (cover && g.tick - to.coverSince >= R.coverTicks && (from.x - to.x) * cover.facing / distance(from, to) >= .5) damage *= R.coverReduction;
       to.hp = quantize(to.hp-damage); to.suppression = Math.min(100, to.suppression + R.suppressionHit); to.lastHit = g.tick;
     }
-    for(let member=survivingMembers(beforeHp);member>survivingMembers(to.hp);member--){
+    for(let member=beforeMembers;member>Math.min(to.members,survivingMembers(to.hp));member--){
       event(g,{kind:'SoldierFallen',side:to.side,to:{x:to.x,z:to.z},targetId:to.id,memberIndex:[0,2,1][3-member],text:(to.side===0?'Your soldier fell. ':'Enemy soldier fell. ')+(member-1)+'/3 remain.'});
     }
+    to.members=Math.min(to.members,survivingMembers(to.hp));
     event(g, { kind: rifle ? 'PlayerHit' : 'ShotFired', from: { x: from.x, z: from.z }, to: { x: to.x, z: to.z }, side: from.side,damage:quantize(damage),targetId:to.id });
   }
   for (const s of g.squads.filter(s => s.hp <= 0)) {
@@ -205,7 +247,20 @@ export function step(g: Game) {
     if(g.hero?.squadId===s.id){g.hero.alive=false;g.result={winner:1,reason:'Your main character was killed'};event(g,{kind:'HeroKilled',side:0,to:s,text:'YOU DIED. Restart to try again.'});}
   }
   g.squads = g.squads.filter(s => s.hp > 0);
+  // Healing restores health, never fallen men. A new hit cancels recovery.
+  if(g.hero&&!g.result)for(const s of g.squads.filter(s=>s.side===0)){
+    if(g.tick-s.lastHit>=R.regenDelay&&s.hp<R.squadHp)s.hp=quantize(Math.min(R.squadHp,s.hp+R.regenPerSecond/R.ticks));
+  }
+  if(g.endless&&!g.result){
+    if(!g.squads.some(s=>s.side===1)&&g.endless.nextWaveAt===null){
+      g.endless.cleared++;g.endless.nextWaveAt=g.tick+R.waveBreak;g.hero!.tokens+=R.waveReward;
+      const hero=g.squads.find(s=>s.id===g.hero!.squadId)!;hero.reserveAmmo=Math.min(R.maxReserveAmmo,hero.reserveAmmo+20);
+      event(g,{kind:'WaveCleared',side:0,text:'Wave cleared. +10 practice WIF and 20 spare bullets. Recover and collect loot. Next wave in eight seconds.'});
+    }
+    if(g.endless.nextWaveAt!==null&&g.tick>=g.endless.nextWaveAt){g.endless.wave++;startWave(g);}
+  }
   for (const r of g.relays) {
+
     const inside = g.squads.filter(s => distance(s, r) <= R.captureRadius);
     const sides = new Set(inside.map(s => s.side)); r.contested = sides.size === 2;
     if (r.contested) continue;
@@ -217,7 +272,7 @@ export function step(g: Game) {
   }
   if (g.tick % R.ticks === 0) for (const r of g.relays) if (r.owner !== null) g.scores[r.owner] += !g.untimed&&g.tick >= R.doubleAt && g.tick <= R.regulation ? 2 : 1;
   const winner = (): Side | null => g.scores[0] === g.scores[1] ? null : g.scores[0] > g.scores[1] ? 0 : 1;
-  if (!g.result&&(Math.max(...g.scores) >= R.victory || (!g.untimed&&((g.tick >= R.regulation && winner() !== null) || g.tick >= R.regulation + R.overtime)))) {
+  if (!g.result&&!g.endless&&(Math.max(...g.scores) >= R.victory || (!g.untimed&&((g.tick >= R.regulation && winner() !== null) || g.tick >= R.regulation + R.overtime)))) {
     g.result = { winner: winner(), reason: Math.max(...g.scores) >= R.victory ? 'Signal threshold reached' : g.tick >= R.regulation + R.overtime ? 'Overtime complete' : 'Signal majority' };
     event(g, { kind: 'MatchEnded', text: g.result.reason });
   }
@@ -256,7 +311,7 @@ export function botCommands(o: Observation, side: Side): Command[] {
   const add=(squadId:number,action:Record<string,unknown>)=>orders.push({id:'bot:'+o.tick+':'+squadId+':'+action.kind,side,squadId,...action} as Command);
   const threatened=own.find(s=>s.hp<65&&!s.shield&&enemies.some(e=>distance(e,s)<=R.range));
   if(threatened&&o.budgets[side]>=R.shieldCost&&o.cooldowns[side].shield<=o.tick)add(threatened.id,{kind:'shield'});
-  if(own.length+o.pending.length<R.maxSquads&&o.budgets[side]>=R.deployCost&&o.cooldowns[side].deploy<=o.tick)orders.push({id:'bot:'+o.tick+':deploy',side,kind:'deploy'});
+  if(!o.endless&&own.length+o.pending.length<R.maxSquads&&o.budgets[side]>=R.deployCost&&o.cooldowns[side].deploy<=o.tick)orders.push({id:'bot:'+o.tick+':deploy',side,kind:'deploy'});
   // Shared target choice uses only visible opponents. Nearby wounded opponents are prioritised.
   const focus=[...enemies].sort((a,b)=>{
     const value=(e:Squad)=>e.hp*.06+Math.min(...own.map(s=>distance(s,e)));
@@ -264,7 +319,7 @@ export function botCommands(o: Observation, side: Side): Command[] {
   })[0];
   own.forEach((s,index)=>{
     if(focus)add(s.id,{kind:'focus',targetId:focus.id});
-    if(s.hp<=25){
+    if(s.hp<=25&&!o.endless){
       if(!protectedHome(s)&&distance(s.route.at(-1)??s,HOMES[side])>R.homeRadius)add(s.id,{kind:'retreat'});
       return;
     }
@@ -277,6 +332,14 @@ export function botCommands(o: Observation, side: Side): Command[] {
         const target={x:s.x-dz/d*1.6*turn,z:s.z+dx/d*1.6*turn};
         if(legal(target,side)&&lineOfSight(s,target)){add(s.id,{kind:'evade',target});return;}
       }
+    }
+    if(o.endless){
+      const target=focus??o.relays[(index+o.endless.wave)%3];
+      if(!focus||distance(s,focus)>5){
+        const at={x:target.x+(focus?2:0),z:target.z+(focus?(index-1)*1.2:0)};
+        if(legal(at,side)&&(!s.route.length||distance(s.route.at(-1)!,at)>2))add(s.id,{kind:'move',target:at});
+      }
+      return;
     }
     if(s.route.length)return;
     if(focus&&distance(s,focus)<=R.vision){

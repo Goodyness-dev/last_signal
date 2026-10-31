@@ -1,9 +1,10 @@
 export const RULES = Object.freeze({
-  version: 'practice-4-squad-survival', ticks: 20, countdown: 60, regulation: 3600, overtime: 400,
+  version: 'practice-5-endless-front', ticks: 20, countdown: 60, regulation: 3600, overtime: 400,
   victory: 240, doubleAt: 3000, budget: 100, squadHp: 100, speed: 3,
   range: 8, vision: 12, volley: 10, weaponTicks: 20, firingSpeed: .75,
   rifleDamage: 20, rifleTicks: 5, rifleRange: 14, magazine: 20, reserveAmmo: 80, maxReserveAmmo:180, reloadTicks: 30,
   heroDamageScale:.5, heroHitGraceTicks:10,
+  regenDelay:100, regenPerSecond:8, waveBreak:160, waveReward:10,
   lootTokens: 5, lootRange: 2, dodgeCooldown: 60, dodgeDuration: 10,
   maxSquads: 3, deployCost: 20, deployCooldown: 100, spawnDelay: 40,
   shieldCost: 10, shieldCapacity: 30, shieldDuration: 80, shieldCooldown: 360,

@@ -3,7 +3,7 @@ import { createSoldier, animateSoldier, createViewWeapon, periodRifle } from './
 import { FieldCamera, type ViewMode } from './field-camera.ts';
 import { CombatFX } from './combat-fx.ts';
 import { OldFront } from './old-front.ts';
-import { MAP, HOMES, RULES, distance, isMoving, survivingMembers, type Observation, type Point, type Squad, type GameEvent } from '@last-signal/sim';
+import { MAP, HOMES, RULES, distance, isMoving, squadMembers, type Observation, type Point, type Squad, type GameEvent } from '@last-signal/sim';
 const CYAN = 0xa7bea0, AMBER = 0xcda471;
 export class Battlefield {
   readonly renderer: T.WebGLRenderer;
@@ -95,7 +95,7 @@ export class Battlefield {
   }
   private unit(s: Squad) {
     const group = new T.Group(); for (let i = 0; i < 3; i++) group.add(createSoldier(s.side, i));
-    for(const index of [0,2,1].slice(0,3-survivingMembers(s.hp)))group.children[index].userData.fallen=true;
+    for(const index of [0,2,1].slice(0,3-squadMembers(s)))group.children[index].userData.fallen=true;
     group.userData.side=s.side;
     group.rotation.y=s.side===0?Math.PI/2:-Math.PI/2;
     const ring = this.ring(.95, s.side === 0 ? CYAN : AMBER, .04); ring.name = 'unitRing'; group.add(ring);
@@ -156,7 +156,8 @@ export class Battlefield {
       const face=(fireAge<.7?group.userData.aim as Point|undefined:undefined)??target;
       if(face){const angle=Math.atan2(face.x-s.x,face.z-s.z);const delta=Math.atan2(Math.sin(angle-group.rotation.y),Math.cos(angle-group.rotation.y));group.rotation.y+=delta*Math.min(1,dt*14);}
       const firing=fireAge<.24?Math.max(0,Math.cos(fireAge*65)):0;
-      for(const index of [0,2,1].slice(0,3-survivingMembers(s.hp)))this.fallen(group.children[index],s.side,index);
+      for(const index of [0,2,1].slice(0,3-squadMembers(s)))this.fallen(group.children[index],s.side,index);
+      for(const index of [0,2,1].slice(3-squadMembers(s)))group.children[index].userData.fallen=false;
       group.children.slice(0,3).forEach(soldier=>{if(!soldier.userData.fallen)animateSoldier(soldier,this.time,!!target,s.suppression>=RULES.suppressionThreshold||(s.coverId!==null&&o.tick-s.coverSince>=RULES.coverTicks),firing,this.reducedMotion);});
       const cameraId=o.squads.find(unit=>unit.id===selected)?.id??o.squads.find(unit=>unit.side===0)?.id;
       group.children.slice(0,3).forEach((soldier,index)=>soldier.visible=!soldier.userData.fallen&&!(index===1&&this.viewMode==='eyes'&&s.id===cameraId));

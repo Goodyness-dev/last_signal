@@ -2,6 +2,8 @@
 
 All battlefield visuals are original procedural source. No purchased assets, generated concept images, commercial game content or recorded audio are included.
 
+Period setting revision: old-front.ts generates original mud, brick and wood textures, a clouded dawn backdrop, shallow communication lanes, duckboards, sandbags, ruined roof framing, shuttered windows, braced doors, crates, barrels, lanterns, field tables, perimeter wire, dead trees, grass and burned cart remains. Flags, smoke and lamp variation are bounded animation. soldier.ts generates fictional period inspired uniforms, leather straps, canvas packs, bedrolls, canteens, brim helmets and wooden stocked rifles with slings, iron sights and visible bolt details. These are original temporary procedural assets under project source ownership. No third party asset or historical faction branding was added.
+
 Revision: articulated figures and the eye level weapon now live in apps/web/src/soldier.ts. Shells, sparks, dust and splashes are original geometry in combat-fx.ts. field-camera.ts owns the new views. scene.ts adds original concrete weathering, cracks, doors, conduits and bounded smoke. Audio noise and oscillators in main.ts synthesize rain and gunshots. These remain temporary original procedural assets under the same project source ownership as the initial assets. No external models or sounds were introduced.
 
 | Asset | Path | Source and creator | License | Status and replacement |

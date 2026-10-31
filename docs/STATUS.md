@@ -2,6 +2,10 @@
 
 31 October 2026. Local practice slice.
 
+Latest art revision: fictional early 20th century inspired front implemented in old-front.ts and soldier.ts. Mud, duckboards, sandbags, ruined brickwork, plaster damage, rafters, braced timber doors, crates, barrels, lanterns, wire outside the legal bounds, dead trees, grass and burned carts replace the modern compound. Original dawn clouds, swaying flags, smoke and lamp flicker add atmosphere. Cloth uniforms, leather equipment, bedrolls, brim helmets and wooden stocked rifles replace modern equipment. All current camera modes and guns remain.
+
+Verification retry completed 31 October 2026: system Node returned v24.16.0; strict TypeScript checking and the production build passed; all 14 simulation tests passed in 8 seconds. The local page and revised main, period environment and soldier modules returned HTTP 200 at http://127.0.0.1:5174/. Git status and diff checks succeeded. Browser automation still timed out for the in app browser and a Chrome fallback, so fresh period screenshots and a new visual review remain unverified. Earlier screenshots below belong to previous art revisions. No dependencies or gameplay rules changed. Period source, provenance and the remaining stage plan are being preserved in Git.
+
 Current presentation supersedes the initial screenshots below. The owner requested close action. The default view is now eye level, with a visible procedural weapon, WASD squad movement, drag to look, squad follow and command camera modes, direct relay orders, a visibility filtered minimap and a full screen world. Art remains stylized procedural geometry. It is not photorealistic.
 
 New feedback includes articulated running and crouching, aiming, muzzle flashes, recoil, visible volleys, casings, impact debris, dust, splashes, smoke and casualty falls. Audio includes original synthesized rain, gunshots, footfall and radio style command tones. Quick combat drill provides immediate opposing squads with both sides paying 40 credits for reinforcements. It is explicitly LOCAL_PRACTICE.
@@ -12,11 +16,11 @@ Revision validation: strict build passes and 14 simulation tests pass, including
 | --- | --- | --- |
 | 0 Inspect and initialize | PASS | Separate npm workspace, strict TypeScript, pinned dependencies, production build, web HTTP 200, service health response importing shared rules |
 | 1 Visual proof | PASS | Original 3D compound, rain, lighting, three relays, selectable moving squad, HUD. docs/evidence/desktop-1440.jpg and live-practice-1440.jpg |
-| 2 Local full match | PASS | Core simulation and normal bot, 13 passing tests, natural browser threshold result, reserve ledger and rematch reset verified. Scripted tutorial first capture and northern flank observed. Remaining polish listed below |
+| 2 Local full match | PASS | Core simulation and normal bot, 14 tests passed again on the period source revision. Earlier natural browser result, reserve ledger and rematch verified. Fresh period browser review remains pending |
 | 3 Authoritative multiplayer | NOT_STARTED | Health service only. No rooms or WebSocket transport |
 | 4 Local escrow | NOT_STARTED | No contracts or local chain |
 | 5 Public testnet | NOT_STARTED | No credentials, RPC calls, faucets, token deployments or receipts used |
-| 6 Polish and deployment | IN_PROGRESS | Desktop and phone layout review underway. No public hosting or live combat video |
+| 6 Polish and deployment | IN_PROGRESS | Period build and local HTTP verified. Fresh visual automation is blocked. No public hosting or live combat video |
 
 Implemented: map navigation, quantized fixed tick movement, cover arcs, simultaneous automatic volleys, suppression, protected homes, capture and scoring, threshold victory, regulation and overtime, finite credits, paid spawn preparation, shields, EMP, retreat, surrender, result UI, rematch, guided steps, authorized bot observations, keyboard and touch input paths, tactical overlay, optional command tones, effects controls, local result persistence and spend ledger.
 
@@ -26,4 +30,4 @@ Known limits: procedural placeholder art, no human balance evidence, only basic 
 
 External facts: hackathon deadline and mock token eligibility remain unconfirmed. No external blocker prevents the next local engineering step.
 
-Next: authoritative private multiplayer with room sessions, command journal, visibility filtered payloads and reconnect recovery. Local contracts follow only after that stage has evidence. Keep this practice slice usable throughout.
+Next: the concrete delivery sequence and exit evidence are recorded in NEXT_STAGES.md. Start with two unfunded browsers sharing one private server controlled room, then add persistence, visibility security and recovery before local escrow. Testnet follows passing local accounting and refund tests. Public operation requires free deployment access and a persistent authoritative service. Keep this practice slice usable throughout.

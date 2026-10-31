@@ -10,7 +10,9 @@
 | Finite equal practice credits | PASS | Tests and browser ledger. No server accounting claim |
 | Match victory and overtime | PASS | Threshold, regulation, overtime and draw tests |
 | Natural browser match and rematch | PASS | result-practice.jpg, bot reached 241. Rematch restored scores 0 to 0 and reserve 100 |
-| Runtime art direction | PASS | Actual desktop and mobile screenshots. Owner preference still needs play review |
+| Runtime art direction, preceding revision | PASS | Earlier desktop and mobile screenshots. These do not verify the new period setting |
+| Period revision build and delivery | PASS | Strict build, 14 tests and HTTP 200 for page and revised modules on retry |
+| Period runtime visual review | BLOCKED | In app browser and Chrome automation timed out. No fresh period screenshot |
 | Fire and rain | PASS | Original procedural scene |
 | Blood controls and full ambience | NOT_STARTED | No blood assets or ambient audio |
 | Fog security in multiplayer | NOT_STARTED | Local observation filtering tests only |

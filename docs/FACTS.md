@@ -22,3 +22,7 @@ Checked 31 October 2026. External observations are not deployment evidence.
 Chain parameters in the parent pack were not reverified because this slice makes no RPC calls or deployments. No address, receipt, token balance or network identity is asserted here.
 
 Camera and feedback revision, 31 October 2026: installed Three.js camera, raycasting, geometry, materials and color management APIs were checked against https://threejs.org/docs/ and https://threejs.org/manual/pages/color-management.html. No dependencies were added or updated. Eye level is a camera on the selected aggregate squad with a cosmetic view weapon; it does not add independent soldier hitboxes, ammunition or manually aimed shots.
+
+Period art revision is fictional early 20th century inspiration, not a reconstruction of a specific war, army or weapon. No historical accuracy claim is made. New geometry and textures are authored locally. The local renderer log reported a deprecated soft shadow fallback, so the source now selects PCFShadowMap directly.
+
+Verification retry, 31 October 2026: Node 24.16.0 responded again. npm run build passed strict TypeScript and Vite packaging. npm test passed 14 tests. Local page and /src/main.ts, /src/old-front.ts, /src/soldier.ts returned HTTP 200. These checks are LOCALLY_VERIFIED. Current browser automation timed out, so a fresh visual render and screenshot are UNCONFIRMED. Public hosting and chain integrations remain absent.

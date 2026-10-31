@@ -1,0 +1,14 @@
+/* Weathered field command palette, preserving the existing controls and layout. */
+:root{--cyan:#b3c69c;--amber:#d4a474;--muted:#a59b7c;color:#eee1bf}
+.masthead{background:linear-gradient(#1c1c16de,#241e145c,transparent)}
+.matchbar,.command-deck,.briefing,#tutorial-card{background:#211f17d9;border-color:#b9a5793b}
+.command-deck{box-shadow:inset 0 1px 0 #c9b58c22}.squad-card{background:#7d7d4a18}.squad-card.selected{background:#69714d38;border-color:#a7b28788}
+.primary{background:#cbbc91;color:#302b1c}.primary:hover{background:#e0cf9f}
+.scene-controls button,.objectives button,.minimap{background:#2a291bd9;border-color:#b9a57942;color:#d9c9a5}
+.scene-controls button.active{border-color:#bcc59a;color:#dce1ba}
+.action{background:#b5a27708}.action-glyph{color:#c7bd95}.action small{color:#bdb28b}
+.field-readout small{color:#c5c99f}.field-readout strong{color:#f0dfb8}.field-readout>span{color:#c6b896}
+#toast{background:#28281dd4;border-color:#b5bf93;color:#e0d5b4}.relay-label strong,.relay-label span{background:#27271dcc}
+.hp-track i{background:#b3c69c}.hp-track{background:#baae7e22}#deploy{background:#c4b78117;border-color:#c4b78162;color:#d7cba4}
+dialog{background:#27271e;color:#ede1be;border-color:#a99b6d99}dialog p{color:#c2b799}dialog::backdrop{background:#1b1a12bb}
+.vignette{background:linear-gradient(#28261944,transparent 22%,transparent 70%,#191d17bd),radial-gradient(ellipse at center,transparent 55%,#211a1355)}

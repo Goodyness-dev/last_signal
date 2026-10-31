@@ -2,6 +2,10 @@
 
 A playable local tactics prototype built from the parent specification pack. Command squads in an original rain soaked communications compound. Capture A, B and C, manage a finite reserve, and fight a local bot.
 
+The current art direction is a fictional early 20th century inspired front. It includes muddy duckboard lanes, sandbags, damaged brick and plaster, exposed rafters, timber doors, crates, barrels, oil lanterns, wire outside the perimeter, dead trees and burned carts. Soldiers wear cloth uniforms, steel brim helmets, leather pouches and canvas packs with bedrolls. Rifles have wooden stocks, iron sights, bolt details and slings. Flags sway and smoke drifts over a clouded warm dawn sky. The close camera, guns, movement and game rules are retained. It is period inspired fiction with abstract shield and EMP support, not a historical simulation.
+
+Period revision retry: strict TypeScript checking, the production build and all 14 tests passed. The local page and revised source modules return HTTP 200 at http://127.0.0.1:5174/. Git is responding. Browser automation still times out, so fresh period screenshots and a new visual review remain unverified. Older screenshots show preceding art revisions. See docs/STATUS.md and docs/NEXT_STAGES.md.
+
 Current mode: **LOCAL_PRACTICE**. Credits are simulated. No wallet, real money, token purchase, chain balance or settlement is involved. tWIF in the design is a proposed mock token, not official WIF.
 
 ## Launch
@@ -14,7 +18,7 @@ npm ci
 npm run dev -w @last-signal/web -- --port 5174 --strictPort
 ```
 
-Open http://127.0.0.1:5174/. Choose Enter the compound or Guided first match. WebGL 2 is required. `npm run dev` also works and uses the next available Vite port starting at 5173. An earlier project occupied 5173 during this session and was preserved.
+Open http://127.0.0.1:5174/. Choose Enter the front, Quick combat drill or Guided first match. WebGL 2 is required. `npm run dev` also works and uses the next available Vite port starting at 5173. An earlier project occupied 5173 during this session and was preserved.
 
 Optional service baseline in another terminal:
 

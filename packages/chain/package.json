@@ -1,0 +1,1 @@
+{"name":"@last-signal/chain","version":"0.1.0","private":true,"type":"module","exports":"./src/index.ts","dependencies":{"@last-signal/sim":"*","ethers":"6.17.0"}}

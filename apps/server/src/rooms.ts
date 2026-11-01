@@ -4,8 +4,9 @@ import {createGame,command,step,observe,visible,RULES,MAP,type Game,type Side,ty
 import {parseClient,IDENTIFIERS,type Phase,type ServerMessage,type Action} from '@last-signal/protocol';
 export interface Peer{send(data:string):void;close(code?:number):void}
 type Seat={hash:string;ready:boolean;peer:Peer|null;seen:number;cursor:number};
-type Room={id:string;game:Game;phase:Phase;seats:(Seat|null)[];order:number;reason:string};
-type Saved={id:string;game:Game;phase:Phase;seats:({hash:string;ready:boolean}|null)[];order:number;reason:string;identifiers:typeof IDENTIFIERS};
+export type FundedRoom={players:[string,string];chainId:number;matchId:string;escrow:string};
+type Room={id:string;game:Game;phase:Phase;seats:(Seat|null)[];order:number;reason:string;funded?:FundedRoom;fundingReady?:boolean;fundingCheckedAt?:number};
+type Saved={id:string;game:Game;phase:Phase;seats:({hash:string;ready:boolean}|null)[];order:number;reason:string;identifiers:typeof IDENTIFIERS;funded?:FundedRoom};
 const hash=(s:string)=>createHash('sha256').update(s).digest('hex');
 const fresh=()=>randomBytes(32).toString('hex');
 export class Rooms{
@@ -20,24 +21,30 @@ export class Rooms{
     if(hash(data)!==row.digest||JSON.stringify(s.identifiers)!==JSON.stringify(IDENTIFIERS)||s.id!==row.id||!Number.isSafeInteger(s.game.tick)||!Array.isArray(s.game.squads)||!Array.isArray(s.seats)||s.seats.length!==2)throw Error('Unprovable checkpoint');
     const ledger=this.db.prepare("SELECT count(*) AS n,max(json_extract(ack,'$.order')) AS last,max(json_extract(ack,'$.tick')) AS tick FROM commands WHERE room=?").get(s.id)!;
     if(ledger.n!==s.order||(s.order>0&&(ledger.last!==s.order||Number(ledger.tick)>s.game.tick)))throw Error('Command history cannot prove checkpoint');
-    this.rooms.set(s.id,{...s,seats:s.seats.map(p=>p?{...p,peer:null,seen:this.now(),cursor:s.game.eventSeq}:null)});
+    this.rooms.set(s.id,{...s,fundingReady:false,seats:s.seats.map(p=>p?{...p,peer:null,seen:this.now(),cursor:s.game.eventSeq}:null)});
    }catch{
     const game=createGame();this.rooms.set(String(row.id),{id:String(row.id),game,phase:'aborted',seats:[null,null],order:0,reason:'Checkpoint cannot be verified. Room aborted without a result.'});
    }
   }
  }
- private saved(r:Room):Saved{return {id:r.id,game:r.game,phase:r.phase,seats:r.seats.map(p=>p?{hash:p.hash,ready:p.ready}:null),order:r.order,reason:r.reason,identifiers:IDENTIFIERS};}
+ private saved(r:Room):Saved{return {id:r.id,game:r.game,phase:r.phase,seats:r.seats.map(p=>p?{hash:p.hash,ready:p.ready}:null),order:r.order,reason:r.reason,funded:r.funded,identifiers:IDENTIFIERS};}
  private write(r:Room){const data=JSON.stringify(this.saved(r));this.db.prepare('INSERT OR REPLACE INTO rooms VALUES(?,?,?)').run(r.id,data,hash(data));}
  private send(p:Peer,m:ServerMessage){p.send(JSON.stringify(m));}
  private fail(p:Peer,reason:string){this.send(p,{op:'error',reason});}
- connect(peer:Peer){
+ createFunded(funded:FundedRoom){
+  if([...this.rooms.values()].filter(r=>!['finished','aborted'].includes(r.phase)).length>=16)throw Error('Local room limit reached');
+  const id=randomBytes(8).toString('hex'),r:Room={id,game:createGame(1,{untimed:true}),phase:'lobby',seats:[0,1].map(()=>({hash:hash(fresh()),ready:false,peer:null,seen:this.now(),cursor:0})),order:0,reason:'Waiting for confirmed testnet deposits',funded,fundingReady:false};this.rooms.set(id,r);this.write(r);return r;
+ }
+ setFundingVerified(id:string,ready:boolean){const r=this.rooms.get(id);if(r){r.fundingReady=ready;r.fundingCheckedAt=this.now();}}
+ abortFunded(id:string,reason:string){const r=this.rooms.get(id);if(r&&r.phase!=='finished'&&r.phase!=='aborted'){r.phase='aborted';r.game.result=null;r.reason=reason;this.write(r);this.broadcast(r);}}
+ connect(peer:Peer,walletIdentity?:(token:string)=>string|null){
   if(this.clients.size>=64){peer.close(1013);return {receive:(_:string)=>{},close:()=>{}};}
-  this.clients.add(peer);let seat:Seat|null=null,room:Room|null=null,side:Side=0,window=this.now(),count=0,createdAt=this.now();
+  this.clients.add(peer);let seat:Seat|null=null,room:Room|null=null,side:Side=0,walletSession='',window=this.now(),count=0,createdAt=this.now();
   const receive=(raw:string)=>{
    if(this.now()-window>=1000){window=this.now();count=0;}if(++count>60){this.fail(peer,'Rate limit exceeded');peer.close(1008);return;}
    try{
     const m=parseClient(raw);
-    if(m.op==='create'||m.op==='join'||m.op==='resume'){
+    if(m.op==='create'||m.op==='join'||m.op==='resume'||m.op==='funded'){
      if(seat)throw Error('Session already authenticated');
      let token:string;
      if(m.op==='create'){
@@ -48,21 +55,28 @@ export class Rooms{
      }else{
       room=this.rooms.get(m.room)??null;if(!room)throw Error('Room not found');
       if(room.phase==='aborted'&&room.seats.every(s=>s===null))throw Error(room.reason);
-      if(m.op==='resume'){
+      if(m.op==='funded'){
+       const address=walletIdentity?.(m.walletSession);if(!address||!room.funded)throw Error('Valid wallet authentication required');
+       const index=room.funded.players.findIndex(p=>p.toLowerCase()===address.toLowerCase());if(index<0)throw Error('Wallet is not a match participant');
+       side=index as Side;const candidate=room.seats[side];if(!candidate)throw Error('Unprovable room. Use chain refund recovery.');if(candidate.peer)throw Error('Session is already connected');
+       walletSession=m.walletSession;token=fresh();seat=candidate;seat.hash=hash(token);seat.peer=peer;seat.seen=this.now();seat.cursor=room.game.eventSeq;
+      }else if(m.op==='resume'){
+       if(room.funded)throw Error('Funded rooms require wallet authentication');
        const digest=hash(m.token),index=room.seats.findIndex(s=>s&&timingSafeEqual(Buffer.from(s.hash),Buffer.from(digest)));
        if(index<0)throw Error('Invalid session credential');side=index as Side;const candidate=room.seats[side]!;
        if(candidate.peer)throw Error('Session is already connected');seat=candidate;token=m.token;seat.peer=peer;seat.seen=this.now();seat.cursor=room.game.eventSeq;
       }else{
+       if(room.funded)throw Error('Funded rooms require wallet authentication');
        if(room.phase!=='lobby'||room.seats[1])throw Error('Room is full or already started');
        token=fresh();side=1;seat={hash:hash(token),ready:false,peer,seen:this.now(),cursor:room.game.eventSeq};room.seats[1]=seat;
       }
      }
      this.write(room);this.send(peer,{op:'session',room:room.id,token,side,...IDENTIFIERS});this.broadcast(room);return;
     }
-    if(!seat||!room||seat.peer!==peer)throw Error('Authenticate first');seat.seen=this.now();
+    if(!seat||!room||seat.peer!==peer)throw Error('Authenticate first');if(room.funded&&!walletIdentity?.(walletSession))throw Error('Wallet login expired. Reauthenticate.');seat.seen=this.now();
     if(m.op==='ping')return;
     if(m.op==='ready'){
-     if(room.phase!=='lobby')throw Error('Match already started');seat.ready=true;
+     if(room.phase!=='lobby')throw Error('Match already started');if(room.funded&&!this.fundedActive(room))throw Error('Waiting for two verified testnet deposits');seat.ready=true;
      if(room.seats.every(s=>s?.ready)){room.phase='countdown';room.reason='Both ready. Server countdown';}
      this.write(room);this.broadcast(room);return;
     }
@@ -83,7 +97,8 @@ export class Rooms{
   };
   return {receive,close:()=>{this.clients.delete(peer);if(seat?.peer===peer){seat.peer=null;seat.seen=this.now();if(room)this.broadcast(room);}},expired:()=>!seat&&this.now()-createdAt>10000};
  }
- private active(r:Room){return r.seats.every(s=>s?.peer&&this.now()-s.seen<6000);}
+ private fundedActive(r:Room){return !r.funded||!!r.fundingReady&&this.now()-(r.fundingCheckedAt??0)<8000;}
+ private active(r:Room){return this.fundedActive(r)&&r.seats.every(s=>s?.peer&&this.now()-s.seen<6000);}
  private broadcast(r:Room){for(const side of [0,1] as const){
   const seat=r.seats[side];if(!seat?.peer)continue;
   const o=observe(r.game,side);
@@ -91,15 +106,15 @@ export class Rooms{
   for(const s of o.squads.filter(s=>s.side!==side)){s.route=[];delete s.drive;delete s.driveUntil;delete s.focusId;delete s.rifleAim;s.ammo=0;s.reserveAmmo=0;s.weapons=[];}
   const events=r.game.events.filter(e=>e.seq>seat.cursor&&e.kind!=='DeployAccepted'&&(!e.from||visible(r.game,side,e.from))&&(!e.to||visible(r.game,side,e.to))).map(e=>({...e,from:e.from?{x:e.from.x,z:e.from.z}:undefined,to:e.to?{x:e.to.x,z:e.to.z}:undefined}));
   seat.cursor=r.game.eventSeq;
-  this.send(seat.peer,{op:'snapshot',room:r.id,side,phase:r.phase,paused:!this.active(r),reason:r.phase==='aborted'?r.reason:!this.active(r)?'Waiting for both connections. Match paused.':r.reason,ready:r.seats.map(s=>s?.ready??false),connected:r.seats.map(s=>!!s?.peer),countdown:r.game.countdown,observation:o,events,...IDENTIFIERS});
+  this.send(seat.peer,{op:'snapshot',room:r.id,side,phase:r.phase,paused:!this.active(r),reason:r.phase==='aborted'?r.reason:!this.fundedActive(r)?'Waiting for confirmed funding or RPC recovery':!this.active(r)?'Waiting for both connections. Match paused.':r.reason,ready:r.seats.map(s=>s?.ready??false),connected:r.seats.map(s=>!!s?.peer),countdown:r.game.countdown,observation:o,events,...IDENTIFIERS});
  }}
  tick(){for(const r of this.rooms.values()){
   if(r.phase==='finished'||r.phase==='aborted')continue;
   for(const s of r.seats)if(s?.peer&&this.now()-s.seen>=6000){const p=s.peer;s.peer=null;p.close(1001);}
   if(!this.active(r)){
    const missing=r.seats.map((s,i)=>!s?.peer&&this.now()-(s?.seen??this.now())>this.grace?i:-1).filter(i=>i>=0);
-   if(missing.length&&r.phase==='lobby'){r.phase='aborted';r.reason='Lobby connection grace expired';this.write(r);}
-   else if(missing.length){
+   if(missing.length&&r.phase==='lobby'&&!r.funded){r.phase='aborted';r.reason='Lobby connection grace expired';this.write(r);}
+   else if(missing.length&&r.phase!=='lobby'){
     if(r.seats.filter(s=>s?.peer).length===1){const winner=r.seats[0]?.peer?0:1;r.game.result={winner,reason:'Opponent connection grace expired'};r.phase='finished';}
     else {r.phase='aborted';r.reason='Both players disconnected. No winner assigned.';}
     this.write(r);

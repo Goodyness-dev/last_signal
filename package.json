@@ -17,7 +17,11 @@
     "chain:node": "npm run node -w @last-signal/contracts",
     "chain:compile": "npm run compile -w @last-signal/contracts",
     "chain:test": "npm run test -w @last-signal/contracts",
-    "chain:proof": "npm run proof -w @last-signal/contracts"
+    "chain:proof": "npm run proof -w @last-signal/contracts",
+    "testnet:prepare": "npm run testnet:prepare -w @last-signal/contracts",
+    "testnet:deploy": "npm run testnet:deploy -w @last-signal/contracts",
+    "testnet:match": "npm run testnet:match -w @last-signal/contracts",
+    "testnet:test": "npm run test:integration -w @last-signal/contracts"
   },
   "devDependencies": {
     "typescript": "7.0.2",

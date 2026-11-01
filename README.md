@@ -138,3 +138,18 @@ npm run chain:proof
 The hidden helper starts a fresh local EVM at http://127.0.0.1:8545 with chain ID 31337. Test accounts are disposable and their keys are not saved or logged. Contract tests use a separate node on port 18545. The proof writes actual local receipts to docs/evidence/local-chain-receipts.json. Restarting the EVM loses its state, so run the proof again afterward. Do not expose the unlocked development node publicly.
 
 The private multiplayer service is still unfunded; its practice credits and WIF score are separate from chain balances. Robinhood Chain testnet is the intended public target. Wallet login, funded room integration, public testnet deployment and hosting are not part of this local proof. See docs/ESCROW.md for trust, deadlines, ABI, tests and development dependency audit limitations.
+
+## Robinhood Chain testnet integration
+
+Open http://127.0.0.1:5174/testnet.html for wallet connection, exact 100 token approvals and funding, funded rooms, settlement and recovery. Target is Robinhood Chain Testnet, chain 46630. tWIF is the original mock token, not official WIF. Wallet balances are actual RPC reads and never use practice scores as a fallback.
+
+Public deployment is currently blocked because the dedicated deployment wallet has zero free test ETH and no eligible free faucet access is available. The interface shows NOT_DEPLOYED and disables spending. No public contract or transaction is claimed. Local practice and the local chain remain available.
+
+```powershell
+npm run testnet:prepare
+npm run testnet:deploy
+# Restart npm run server after deployment succeeds.
+npm run testnet:match
+```
+
+Preparation generates dedicated Windows encrypted credentials without printing private keys. Deployment will not send while gas is unavailable and refuses other chain IDs. The match proof uses the actual local authoritative server with public testnet transactions only after deployment is verified. It has not completed publicly yet. For local funded integration tests, run npm run testnet:test. See docs/TESTNET.md for evidence, trust and confirmation policy, free gas access, recovery and deployment journals. Hackathon mock token eligibility remains unconfirmed.

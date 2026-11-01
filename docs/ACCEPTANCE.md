@@ -51,3 +51,16 @@
 | Pull claims and recovery | PASS LOCAL | Actual normal, unmatched, timeout and abort transactions |
 | Reentrancy and failed transfer behavior | PASS LOCAL | Hostile token and callback fixture tests |
 | Robinhood Chain testnet | NOT_STARTED | Local chain 31337 proof only |
+
+
+## Testnet integration verification
+
+| Requirement | State | Evidence |
+| --- | --- | --- |
+| Official network and live test RPC | PASS READS | eth_chainId 46630, real head and balances in testnet-preflight.json |
+| Dedicated deployment and settlement roles | PASS LOCAL | Distinct encrypted keys; no dedicated key values in browser build; runtime file denied HTTP access |
+| Wallet authentication and funding gates | PASS LOCAL | One use challenges, origin/address/expiry tests and funded WebSocket integration |
+| Canonical funding and reorganization handling | PASS LOCAL | Receipt/event checks and EVM reorg/RPC outage integration test |
+| Wallet panel | PARTIAL | Desktop blocked/no wallet state verified. Actual injected wallet transactions and phone view unverified |
+| Two funded public testnet participants | BLOCKED_FREE_GAS | Deployer has zero test ETH and no free faucet access is currently available |
+| Public deployment and receipts | NOT_DEPLOYED | No invented public addresses or hashes |

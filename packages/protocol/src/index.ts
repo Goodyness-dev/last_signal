@@ -3,7 +3,7 @@ export const PROTOCOL='private-1';
 export const IDENTIFIERS={protocol:PROTOCOL,rules:RULES.version,map:MAP.version};
 export const MAX_BYTES=2048;
 export type Action=Command extends infer C?C extends Command?Omit<C,'id'|'side'>:never:never;
-export type ClientMessage=({op:'create'}|{op:'join';room:string}|{op:'resume';room:string;token:string})&typeof IDENTIFIERS|{op:'ready'}|{op:'ping'}|{op:'command';id:string;action:Action};
+export type ClientMessage=({op:'create'}|{op:'join';room:string}|{op:'resume';room:string;token:string}|{op:'funded';room:string;walletSession:string})&typeof IDENTIFIERS|{op:'ready'}|{op:'ping'}|{op:'command';id:string;action:Action};
 export type Phase='lobby'|'countdown'|'running'|'finished'|'aborted';
 export type ServerMessage={op:'session';room:string;token:string;side:Side}&typeof IDENTIFIERS|{op:'error';reason:string}|{op:'ack';id:string;ok:boolean;reason:string;tick:number;order:number}|{op:'snapshot';room:string;side:Side;phase:Phase;paused:boolean;reason:string;ready:boolean[];connected:boolean[];countdown:number;observation:Observation;events:GameEvent[]}&typeof IDENTIFIERS;
 const record=(v:unknown):v is Record<string,unknown>=>!!v&&typeof v==='object'&&!Array.isArray(v);
@@ -13,10 +13,11 @@ const point=(v:unknown)=>record(v)&&exact(v,['x','z'])&&number(v.x,.5,47.5)&&num
 export function parseClient(text:string):ClientMessage{
  if(new TextEncoder().encode(text).length>MAX_BYTES)throw Error('Message too large');
  const m:unknown=JSON.parse(text);if(!record(m))throw Error('Invalid message');
- if(['create','join','resume'].includes(String(m.op))){
+ if(['create','join','resume','funded'].includes(String(m.op))){
   if(m.protocol!==PROTOCOL||m.rules!==RULES.version||m.map!==MAP.version)throw Error('Version mismatch');
-  const keys=['op','protocol','rules','map',...(m.op==='create'?[]:['room']),...(m.op==='resume'?['token']:[])];
+  const keys=['op','protocol','rules','map',...(m.op==='create'?[]:['room']),...(m.op==='resume'?['token']:[]),...(m.op==='funded'?['walletSession']:[])];
   if(!exact(m,keys)||m.op!=='create'&&(typeof m.room!=='string'||!/^[a-f0-9]{16}$/.test(m.room))||m.op==='resume'&&(typeof m.token!=='string'||!/^[a-f0-9]{64}$/.test(m.token)))throw Error('Invalid session request');
+  if(m.op==='funded'&&(typeof m.walletSession!=='string'||!/^[a-f0-9]{64}$/.test(m.walletSession)))throw Error('Invalid wallet session');
  }else if(m.op==='ping'||m.op==='ready'){if(!exact(m,['op']))throw Error('Unexpected fields');}
  else if(m.op==='command'){
   if(!exact(m,['op','id','action'])||typeof m.id!=='string'||!/^[a-zA-Z0-9:_.-]{1,96}$/.test(m.id)||!record(m.action))throw Error('Invalid command');

@@ -1,0 +1,10 @@
+import {id} from 'ethers';
+import {RULES,MAP} from '@last-signal/sim';
+export const TESTNET={name:'Robinhood Chain Testnet',chainId:46630,hexChainId:'0xb626',rpc:'https://rpc.testnet.chain.robinhood.com',explorer:'https://explorer.testnet.chain.robinhood.com',faucet:'https://faucet.testnet.chain.robinhood.com',confirmations:2} as const;
+export const rulesHash=id(JSON.stringify({rules:RULES,map:MAP.version,mode:'PRIVATE_RELAY_UNTIMED'}));
+export const offerTypes={Offer:[{name:'matchId',type:'bytes32'},{name:'playerA',type:'address'},{name:'playerB',type:'address'},{name:'rulesHash',type:'bytes32'},{name:'deposit',type:'uint256'},{name:'createdAt',type:'uint256'},{name:'fundingExpiry',type:'uint256'},{name:'nonce',type:'uint256'}]};
+export const resultTypes={Result:[{name:'matchId',type:'bytes32'},{name:'playerA',type:'address'},{name:'playerB',type:'address'},{name:'rulesHash',type:'bytes32'},{name:'spendA',type:'uint256'},{name:'spendB',type:'uint256'},{name:'outcome',type:'uint8'},{name:'terminalTick',type:'uint256'},{name:'resultHash',type:'bytes32'},{name:'nonce',type:'uint256'},{name:'expiry',type:'uint256'}]};
+export type Offer={matchId:string;playerA:string;playerB:string;rulesHash:string;deposit:string;createdAt:string;fundingExpiry:string;nonce:string};
+export type Result={matchId:string;playerA:string;playerB:string;rulesHash:string;spendA:string;spendB:string;outcome:number;terminalTick:string;resultHash:string;nonce:string;expiry:string};
+export type Deployment={chainId:number;rpc:string;token:string;escrow:string;settlementSigner:string;deploymentBlock:number;tokenCodeHash:string;escrowCodeHash:string};
+export const json=(value:unknown)=>JSON.stringify(value,(_key,v)=>typeof v==='bigint'?v.toString():v);

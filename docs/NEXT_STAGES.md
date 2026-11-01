@@ -1,3 +1,7 @@
+# Gate 5 update
+
+31 October 2026. Testnet configuration and live RPC are verified, dedicated account roles are protected, wallet and funded server integration are implemented and local tests pass. Public deployment is blocked by missing free test ETH. See TESTNET.md for exact evidence and resume commands. No public contract address or transaction hash exists for this revision. The remaining public exit evidence still applies below.
+
 # Remaining delivery stages
 
 31 October 2026 Gate 4 update: local token and escrow are implemented, with 26 contract tests and 31 actual local receipts. See ESCROW.md. Robinhood Chain testnet remains the public target. No public testnet transaction or deployed public game is claimed.

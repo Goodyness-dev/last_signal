@@ -1,0 +1,60 @@
+{
+  "mode": "PUBLIC_TESTNET_READS_ONLY",
+  "checkedAt": "2026-10-31T22:55:42.716Z",
+  "sources": [
+    "https://docs.robinhood.com/chain/connecting/",
+    "https://docs.robinhood.com/chain/transaction-finality/"
+  ],
+  "network": {
+    "name": "Robinhood Chain Testnet",
+    "chainId": 46630,
+    "hexChainId": "0xb626",
+    "rpc": "https://rpc.testnet.chain.robinhood.com",
+    "explorer": "https://explorer.testnet.chain.robinhood.com",
+    "faucet": "https://faucet.testnet.chain.robinhood.com",
+    "confirmations": 2
+  },
+  "observedChainId": "46630",
+  "head": {
+    "number": 146198807,
+    "hash": "0x7746ef9be93b8360a16a9922db768b7984ce989fc29ec022a619017b1dd190f5",
+    "timestamp": 1793487341
+  },
+  "roles": {
+    "deployer": {
+      "address": "0x019BF89f9A51b3FdF447df279bb0a493959295bc",
+      "testEth": "0.0"
+    },
+    "settlement": {
+      "address": "0xC9DfDb8D50aD23B25EAFC63a40B525F372A7495d",
+      "testEth": "0.0"
+    },
+    "playerA": {
+      "address": "0xD61053d633e39CdcEfFe41A3bfEf6a621B5D70D3",
+      "testEth": "0.0"
+    },
+    "playerB": {
+      "address": "0x1B55E6639Ad234Ec8B1d62291Ae3EDC8CcB5684f",
+      "testEth": "0.0"
+    }
+  },
+  "deployments": [],
+  "transactions": [],
+  "faucetStatus": "Official page loaded but request form blank in the available browser. No faucet claim made.",
+  "hackathonMockTokenEligibility": "UNCONFIRMED",
+  "accessStatus": "BLOCKED_FREE_TEST_ETH",
+  "ownerHasFreeTestEth": false,
+  "faucetChecks": {
+    "official": "Page opens, request form blank in available browser; no request submitted.",
+    "alchemy": "Official eligibility requires 0.001 ETH plus activity on Ethereum mainnet; fresh dedicated accounts are ineligible.",
+    "quicknode": "Live browser FAQ says a small mainnet balance is required. No request submitted; cached text claiming no requirement was not relied upon."
+  },
+  "verifiedLocally": {
+    "appServerTests": 48,
+    "contractTests": 26,
+    "fundedIntegrationTests": 2,
+    "productionBuild": true,
+    "publicTestnetTransactions": 0
+  },
+  "secretIsolation": "Separate Windows user encrypted role files. Server loads settlement role only. Keys absent from browser build and runtime HTTP access denied."
+}

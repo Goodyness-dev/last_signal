@@ -1,3 +1,7 @@
+# Gate 5 integration proof update
+
+31 October 2026. Public network reads only: eth_chainId 0xb626, actual head and zero account balances are recorded in evidence/testnet-preflight.json. The deployment precheck sent no transaction because test ETH is missing. No public deployed contract or funded match is claimed. The wallet panel honestly shows NOT_DEPLOYED and unavailable balances in evidence/testnet-wallet-blocked.png. All 76 local tests and strict build pass, including two chain funded authenticated WebSocket integration scenarios on a disposable local EVM. Details: TESTNET.md. Earlier entries below are historical.
+
 # Gate 4 proof update
 
 31 October 2026. Local EVM only. Original tWIF and MatchEscrow deployed, 31 successful transaction receipts recorded in evidence/local-chain-receipts.json and verified again through RPC. Winning fixture: 100 deposited each, 45 and 60 spent, 10.5 burned, 149.5 and 40 claimed. Timeout, unmatched and abort scenarios recover the expected deposits. Final escrow balance and liability are zero. All 26 contract tests, 46 game/server tests and strict build pass. Robinhood Chain testnet deployment is not claimed. Details: ESCROW.md. Older statements below are historical.

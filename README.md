@@ -1,5 +1,7 @@
 # LAST SIGNAL
 
+Latest delivery, 1 November 2026: the [Field armory](http://127.0.0.1:5174/armory.html) merges server verified enemy gun pickups with wallet owned testnet NFTs. Buy guns and supplies using mock tWIF, fight repeating waves, bank up to three recovered guns and trade them with other players. An actual recovered Service Rifle #2 was minted and sold for eight tWIF on Robinhood Chain Testnet. All 89 tests and the strict build pass. See [the armory guide](docs/ARMORY.md) for controls, receipts, launch commands and limits. The game service still runs locally; no public game host exists.
+
 Current chain delivery: the original mock tWIF and escrow are deployed on Robinhood Chain Testnet 46630. Two dedicated test wallets completed a local authoritative conceded match and settled on the public testnet. Fourteen confirmed receipts prove free funding, deployment, deposits, burn and claims. See docs/TESTNET_RESULT.md. This is not official WIF or public game hosting.
 
 A playable local tactics prototype built from the parent specification pack. Command squads in an original rain soaked communications compound. Capture A, B and C, manage a finite reserve, and fight a local bot.
@@ -8,7 +10,7 @@ The current art direction is a fictional early 20th century inspired front. It i
 
 Most recent verification includes 51 distinct application and operation tests, two funded local integration tests and an actual public testnet settlement proof. Strict TypeScript and the production build pass. See docs/POLISH.md and docs/TESTNET_RESULT.md for exact evidence and remaining limits.
 
-Current mode: **UNTIMED LOCAL PRACTICE**. Your main character can die. Rifle ammunition is finite. Defeated enemies drop original procedural guns, ammunition and clearly simulated practice WIF. Credits are simulated. No wallet, real money, token purchase, chain balance or settlement is involved. tWIF in the design is a proposed mock token, not official WIF.
+Default mode at /: **UNTIMED LOCAL PRACTICE**. Your main character can die. Rifle ammunition is finite. Defeated enemies drop original procedural guns, ammunition and clearly simulated practice WIF. This practice mode uses no wallet or chain balance. The separate armory and testnet pages use the deployed mock tWIF, not official WIF.
 
 ## Launch
 

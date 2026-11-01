@@ -1,5 +1,7 @@
 # Fact register
 
+1 November 2026 addition: GunArmory at 0x4d9d75e997A7dB3C00bc9abae43Fbec20cb0B3df on chain 46630 has nonempty code matching the recorded hash. Actual local authoritative salvage produced NFT #2 and a public eight mock tWIF sale. Eleven new receipts plus fourteen earlier receipts were reread with canonical hashes. Current chain reads at the recorded check show proof wallet balances 79 and 82, token supply 161 and zero escrow liability. These differ legitimately from the historical escrow proof after shop burns and trade. Historical state at the original proof blocks is now unavailable on the official RPC; original reports were preserved. See evidence/commerce-current.json and ARMORY.md. This does not establish public game hosting, physical mobile play, browser wallet prompt completion, security audit or hackathon eligibility.
+
 Checked 31 October 2026. External observations are not deployment evidence.
 
 | Fact | Value | Source and method | Status | Caveat |

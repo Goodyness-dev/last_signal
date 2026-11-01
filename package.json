@@ -21,7 +21,11 @@
     "testnet:prepare": "npm run testnet:prepare -w @last-signal/contracts",
     "testnet:deploy": "npm run testnet:deploy -w @last-signal/contracts",
     "testnet:match": "npm run testnet:match -w @last-signal/contracts",
-    "testnet:test": "npm run test:integration -w @last-signal/contracts"
+    "testnet:test": "npm run test:integration -w @last-signal/contracts",
+    "armory:test": "tsx --test --test-concurrency=1 packages/contracts/test/armory.check.ts packages/contracts/test/salvage.check.ts",
+    "armory:deploy": "tsx packages/contracts/scripts/armory-deploy.ts",
+    "armory:proof": "tsx packages/contracts/scripts/armory-proof.ts",
+    "armory:verify": "tsx packages/contracts/scripts/armory-verify.ts"
   },
   "devDependencies": {
     "typescript": "7.0.2",

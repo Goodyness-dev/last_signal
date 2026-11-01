@@ -13,7 +13,7 @@ export function compile(){
  const errors=output.errors?.filter(e=>e.severity==='error')??[];if(errors.length)throw Error(errors.map(e=>e.formattedMessage).join('\n'));
  const artifacts:Record<string,Artifact>={};mkdirSync(resolve(root,'artifacts'),{recursive:true});
  for(const [file,contracts] of Object.entries(output.contracts))if(file.startsWith('src/')||file.startsWith('test/'))for(const [name,c] of Object.entries(contracts)){
-  if(!c.evm.bytecode.object)continue;const artifact={abi:c.abi,bytecode:'0x'+c.evm.bytecode.object,compiler:solc.version()};artifacts[name]=artifact;writeFileSync(resolve(root,'artifacts',name+'.json'),JSON.stringify(artifact,null,2));if(['TestWIF','MatchEscrow'].includes(name)){mkdirSync(resolve(root,'abi'),{recursive:true});writeFileSync(resolve(root,'abi',name+'.json'),JSON.stringify(c.abi,null,2)+'\n');}
+  if(!c.evm.bytecode.object)continue;const artifact={abi:c.abi,bytecode:'0x'+c.evm.bytecode.object,compiler:solc.version()};artifacts[name]=artifact;writeFileSync(resolve(root,'artifacts',name+'.json'),JSON.stringify(artifact,null,2));if(['TestWIF','MatchEscrow','GunArmory'].includes(name)){mkdirSync(resolve(root,'abi'),{recursive:true});writeFileSync(resolve(root,'abi',name+'.json'),JSON.stringify(c.abi,null,2)+'\n');}
  }
  return artifacts;
 }

@@ -28,6 +28,7 @@ export function parseClient(text:string):ClientMessage{
    keys.push('direction');const d=a.direction,names=kind==='fire'?['x','y','z']:['x','z'];
    if(!record(d)||!exact(d,names)||!names.every(k=>number(d[k],-1,1)))throw Error('Invalid direction');
   }else if(kind==='focus'){keys.push('targetId');if(!number(a.targetId,1,1000000)||!Number.isInteger(a.targetId))throw Error('Invalid target');}
+  else if(kind==='loot'){keys.push('lootId');if(!number(a.lootId,1,1000000)||!Number.isInteger(a.lootId))throw Error('Invalid loot');}
   else if(!['deploy','surrender','reload','switchWeapon','retreat','shield'].includes(String(kind)))throw Error('Unsupported command');
   if(!exact(a,keys))throw Error('Unexpected command fields');
  }else throw Error('Unknown message');

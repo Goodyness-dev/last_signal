@@ -1,5 +1,7 @@
 # Decisions
 
+1 November 2026: merge collectible gameplay with actual testnet NFT ownership after the owner chose both. Use a separate immutable GunArmory with existing OpenZeppelin Contracts 5.6.1, ethers 6.17.0 and solc 0.8.38; no dependencies added. Official references inspected: https://docs.openzeppelin.com/contracts/5.x/erc721 and https://docs.openzeppelin.com/contracts/5.x/api/utils . Keep the existing multiplayer escrow unchanged. Server controlled solo salvage grants at most three uniquely sourced claims per run; a new enemy drop never transfers another wallet's NFT. Fixed gun and supply prices burn mock tWIF, while a player sale pays its seller directly. Do not put wallet prompts on shooting or movement. Authenticated SDK gameplay through the local proxy proved public minting and trading. Preserve original accounting snapshots when the free RPC prunes archive state and record fresh receipts and current reads separately. See ARMORY.md.
+
 31 October 2026.
 
 1. Preserve the specification pack and earlier projects. Implement in the separate last_signal subdirectory. No application or Git repository was present here. Preserve the unrelated service on port 5173.

@@ -70,3 +70,18 @@
 See docs/POLISH.md for the dated acceptance matrix and measured limits. Local gameplay capture, responsive layout, persisted settings, WebGL context recovery, and actual loopback network database restart are verified. Public frontend and service URLs, two external clients, real host recovery and Gate 5 public receipts remain pending. Gate 6 is IN_PROGRESS, not complete.
 
 Gate 5 exit update, 1 November 2026: actual public testnet deployment and funded authoritative settlement now pass. Fourteen canonical successful receipts, 200 deposits, burn 4, claims 196, zero escrow balance and liabilities are recorded in TESTNET_RESULT.md and evidence/testnet-verified.json. Gate 6 public hosting and external clients remain pending.
+
+Armory acceptance, 1 November 2026. See ARMORY.md for the full scope.
+
+| Requirement | State | Evidence or limit |
+| --- | --- | --- |
+| Combined game and wallet gun ownership | PASS | Actual enemy pickup, banking, NFT mint and eight tWIF sale |
+| Shop and supplies use mock tWIF | PASS | Exact burns, supply receipt applied once, 35 burned in public proof |
+| Signed collectible claims | PASS | Chain, contract, run, drop, recipient, kind, rules and expiry binding; duplicate and failure tests |
+| Service recovery and chain failure | LOCAL_PASS | Restart, corrupt checkpoint, RPC loss and payment reorganization integration cases |
+| Public chain evidence | PASS | Eleven armory receipts; fresh 25 receipt combined check and current code and ownership reads |
+| Desktop and phone locker | VIEWPORT_PASS | Actual NFT metadata, no page overflow at 390 by 844, visible buttons at least 44 pixels |
+| Browser wallet signing and purchasing | UNVERIFIED | Actual SDK proof passes; available IAB has no injected wallet |
+| Physical phone combat | UNVERIFIED | Viewport review only |
+| Public game operation and external clients | BLOCKED_ACCESS | No hosting account available |
+| Security audit and hackathon eligibility | UNCONFIRMED | No independent audit or organizer evidence |

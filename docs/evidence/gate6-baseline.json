@@ -1,0 +1,25 @@
+{
+  "checkedAt": "2026-11-01T03:22:42.805Z",
+  "mode": "LOCAL PRACTICE COMBAT DRILL",
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.0.0 Safari/537.36",
+  "viewport": [
+    480,
+    636
+  ],
+  "renderSize": [
+    600,
+    795
+  ],
+  "effects": true,
+  "reducedMotion": false,
+  "seconds": 15.032199999999998,
+  "frames": 769,
+  "fps": 51.15684996208141,
+  "p95FrameMs": 33.29999999999927,
+  "meanDrawCalls": 705.7555266579974,
+  "geometries": 1309,
+  "textures": 7,
+  "usedJSHeapBytes": 47318900,
+  "renderer": "ANGLE (Intel, Intel(R) HD Graphics 520 (0x00001916) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+  "note": "Visible requestAnimationFrame cadence. Includes rendering and application work. Not GPU timing, total memory, or a benchmark of other devices."
+}

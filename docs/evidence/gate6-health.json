@@ -1,0 +1,22 @@
+{
+  "checkedAt": "2026-11-01T03:47:37.457Z",
+  "url": "http://127.0.0.1:3001/health",
+  "httpStatus": 200,
+  "health": {
+    "status": "ok",
+    "service": "LAST SIGNAL",
+    "version": "0.1.0",
+    "revision": "development",
+    "uptimeSeconds": 372,
+    "mode": "PRIVATE_UNFUNDED",
+    "multiplayer": true,
+    "publicOperation": false,
+    "public": false,
+    "rules": "practice-5-endless-front",
+    "map": "compound-1",
+    "protocol": "private-1",
+    "persistence": "SQLite",
+    "wallet": true,
+    "testnetConfigured": false
+  }
+}

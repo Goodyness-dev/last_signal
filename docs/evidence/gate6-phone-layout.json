@@ -1,0 +1,62 @@
+{
+  "buttons": [
+    {
+      "height": 44,
+      "label": "Move forward",
+      "width": 44
+    },
+    {
+      "height": 44,
+      "label": "Move left",
+      "width": 44
+    },
+    {
+      "height": 44,
+      "label": "Move back",
+      "width": 44
+    },
+    {
+      "height": 44,
+      "label": "Move right",
+      "width": 44
+    },
+    {
+      "height": 44,
+      "label": "FIRE RIFLE",
+      "width": 113
+    },
+    {
+      "height": 44,
+      "label": "AIM",
+      "width": 113
+    },
+    {
+      "height": 44,
+      "label": "SUPPLIES · H",
+      "width": 113
+    },
+    {
+      "height": 44,
+      "label": "RELOAD · R",
+      "width": 113
+    },
+    {
+      "height": 44,
+      "label": "PICK UP · G",
+      "width": 113
+    },
+    {
+      "height": 44,
+      "label": "SWAP GUN · X",
+      "width": 113
+    },
+    {
+      "height": 44,
+      "label": "COMMAND VIEW",
+      "width": 113
+    }
+  ],
+  "documentWidth": 390,
+  "height": 844,
+  "width": 390
+}

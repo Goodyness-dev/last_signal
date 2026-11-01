@@ -83,7 +83,7 @@ export function animateSoldier(root: T.Object3D, time: number, moving: boolean, 
   const rig=root.getObjectByName('rig')!;
   rig.position.y=crouch?-.26:0;
   rig.rotation.x=(moving?.1:0)+(firing>0&&!reduced?-firing*.055:0);
-  root.position.y=moving&&!reduced?Math.abs(Math.sin(phase))*.045:Math.sin(time*1.8+index)*.008;
+  root.position.y=reduced?0:moving?Math.abs(Math.sin(phase))*.045:Math.sin(time*1.8+index)*.008;
   for (const [name,sign] of [['legL',1],['legR',-1]] as const) {
     const leg=rig.getObjectByName(name)!; leg.rotation.x=stride*.65*sign+(crouch?-.55:0);
     leg.getObjectByName('shin')!.rotation.x=Math.max(0,-stride*sign)*.8+(crouch?1.1:0);
@@ -100,8 +100,9 @@ export function createViewWeapon():T.Group {
   function part(geometry:T.BufferGeometry,material:T.Material,x:number,y:number,z:number){const m=new T.Mesh(geometry,material);m.position.set(x,y,z);m.renderOrder=1000;root.add(m);return m;}
   const rifle=periodRifle(true);rifle.rotation.y=Math.PI;rifle.scale.setScalar(.8);rifle.position.z=-.17;root.add(rifle);
   const right=part(new T.CapsuleGeometry(.075,.38,4,8),cloth,.09,-.16,.06);right.rotation.x=.9;
+  right.name='rightSleeve';
   const left=part(new T.CapsuleGeometry(.075,.4,4,8),cloth,-.2,-.2,-.15);left.rotation.z=-.65;left.rotation.x=-.6;
   part(new T.SphereGeometry(.075,8,6),skin,-.06,-.08,-.4);
-  part(new T.SphereGeometry(.07,8,6),skin,.04,-.08,-.05);
+  part(new T.SphereGeometry(.07,8,6),skin,.04,-.08,-.05).name='boltHand';
   return root;
 }

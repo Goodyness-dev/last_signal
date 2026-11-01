@@ -1,0 +1,21 @@
+{
+  "checkedAt": "2026-11-01T03:39:42.351Z",
+  "mode": "LOCAL_UNFUNDED_OPERATIONAL_DRILL",
+  "transport": "Actual TCP loopback WebSocket clients",
+  "clients": 2,
+  "closeCodes": [
+    1001,
+    1001
+  ],
+  "tickBeforeShutdown": 1,
+  "recoveredTick": 1,
+  "recoveredBudget": 80,
+  "duplicatePaidCommand": "same acknowledgement, one 20 credit spend",
+  "sharedResult": {
+    "winner": 1,
+    "reason": "Surrender"
+  },
+  "public": false,
+  "chainTransactions": 0,
+  "credentialsRecorded": false
+}

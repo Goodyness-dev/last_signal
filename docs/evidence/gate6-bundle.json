@@ -1,0 +1,52 @@
+{
+  "checkedAt": "2026-11-01T03:49:48.861Z",
+  "vite": "8.3.5",
+  "assets": [
+    {
+      "name": "main-z_g3hIf_.js",
+      "bytes": 49851,
+      "gzipBytes": 17810
+    },
+    {
+      "name": "modulepreload-polyfill-P2Xu9kJm.js",
+      "bytes": 670,
+      "gzipBytes": 389
+    },
+    {
+      "name": "private-CXdMHBca.js",
+      "bytes": 10646,
+      "gzipBytes": 4371
+    },
+    {
+      "name": "renderer-Dowq4GkI.js",
+      "bytes": 352590,
+      "gzipBytes": 83833
+    },
+    {
+      "name": "renderer-pe7YgtDd.js",
+      "bytes": 211468,
+      "gzipBytes": 56204
+    },
+    {
+      "name": "scene-CGeJT08i.js",
+      "bytes": 33901,
+      "gzipBytes": 12236
+    },
+    {
+      "name": "src-BFwi21yC.js",
+      "bytes": 20129,
+      "gzipBytes": 7772
+    },
+    {
+      "name": "startup-BeWyU-ok.js",
+      "bytes": 3044,
+      "gzipBytes": 1532
+    },
+    {
+      "name": "testnet-CbXlMSz2.js",
+      "bytes": 284422,
+      "gzipBytes": 100834
+    }
+  ],
+  "claims": "Actual emitted bytes and local gzip calculation. No network loading benchmark."
+}

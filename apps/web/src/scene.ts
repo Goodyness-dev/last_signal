@@ -1,4 +1,5 @@
 import * as T from 'three';
+import './graphics.css';
 import { createSoldier, animateSoldier, createViewWeapon, periodRifle } from './soldier.ts';
 import { FieldCamera, type ViewMode } from './field-camera.ts';
 import { CombatFX } from './combat-fx.ts';
@@ -35,6 +36,8 @@ export class Battlefield {
   private ownFireAt=-100;
   private lootMeshes=new Map<number,T.Group>();
   effectsEnabled = true;
+  contextLost=false;
+  private contextEvents=new AbortController();
   reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
   private materials = new Map<string, T.MeshStandardMaterial>();
   constructor(readonly container: HTMLElement, private labels: HTMLElement[]) {
@@ -44,6 +47,11 @@ export class Battlefield {
     this.renderer.outputColorSpace = T.SRGBColorSpace;
     this.renderer.toneMapping = T.ACESFilmicToneMapping; this.renderer.toneMappingExposure = 1.25;
     container.prepend(this.renderer.domElement);
+    this.renderer.domElement.setAttribute('aria-label','Rendered battlefield. Use the labeled controls to move, aim and fire.');
+    const recovery=document.createElement('div');recovery.className='graphics-recovery';recovery.setAttribute('role','alert');recovery.innerHTML='<h2>Graphics paused</h2><p>The graphics context was lost. Local practice is paused. Multiplayer continues on the server.</p><button>RESTORE GRAPHICS</button><a href="/">RELOAD PRACTICE</a>';
+    recovery.querySelector('button')!.onclick=()=>this.renderer.forceContextRestore();
+    this.renderer.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();this.contextLost=true;container.append(recovery);},{signal:this.contextEvents.signal});
+    this.renderer.domElement.addEventListener('webglcontextrestored',()=>{this.contextLost=false;recovery.remove();},{signal:this.contextEvents.signal});
     this.camera.add(this.viewWeapon);this.scene.add(this.camera);
     this.scene.background = new T.Color(0x9a8c70); this.scene.fog = new T.FogExp2(0x9a8c70, .012);
     this.camera.position.set(24, 43, 51); this.camera.lookAt(24, 0, 16);
@@ -141,6 +149,7 @@ export class Battlefield {
     this.camera.updateProjectionMatrix();
   }
   update(o: Observation, selected: number | null, events: GameEvent[], dt: number) {
+    if(this.contextLost)return;
     this.time += dt;
     const ids = new Set(o.squads.map(s => s.id));
     for (const [id, group] of this.units) if (!ids.has(id)) {
@@ -159,6 +168,7 @@ export class Battlefield {
       for(const index of [0,2,1].slice(0,3-squadMembers(s)))this.fallen(group.children[index],s.side,index);
       for(const index of [0,2,1].slice(3-squadMembers(s)))group.children[index].userData.fallen=false;
       group.children.slice(0,3).forEach(soldier=>{if(!soldier.userData.fallen)animateSoldier(soldier,this.time,!!target,s.suppression>=RULES.suppressionThreshold||(s.coverId!==null&&o.tick-s.coverSince>=RULES.coverTicks),firing,this.reducedMotion);});
+      if(!this.effectsEnabled||this.reducedMotion)group.children.slice(0,3).forEach(soldier=>{const flash=soldier.getObjectByName('flash');if(flash)flash.visible=false;});
       const cameraId=o.squads.find(unit=>unit.id===selected)?.id??o.squads.find(unit=>unit.side===0)?.id;
       group.children.slice(0,3).forEach((soldier,index)=>soldier.visible=!soldier.userData.fallen&&!(index===1&&this.viewMode==='eyes'&&s.id===cameraId));
       group.getObjectByName('shield')!.visible = s.shield > 0;
@@ -179,13 +189,16 @@ export class Battlefield {
     this.viewWeapon.rotation.x=this.reducedMotion?0:reloadDip*.25;
     this.viewWeapon.position.y-=this.reducedMotion?0:reloadDip*.3;
     this.viewWeapon.getObjectByName('bolt')!.position.z+=reloadDip*.15;
-    this.viewWeapon.getObjectByName('flash')!.visible=this.effectsEnabled&&this.time-this.ownFireAt<.055;
+    const handMotion=this.reducedMotion?0:reloadDip;
+    this.viewWeapon.getObjectByName('rightSleeve')!.rotation.x=.9+handMotion*.3;
+    this.viewWeapon.getObjectByName('boltHand')!.position.set(.04+handMotion*.08,-.08+handMotion*.04,-.05-handMotion*.18);
+    this.viewWeapon.getObjectByName('flash')!.visible=this.effectsEnabled&&!this.reducedMotion&&this.time-this.ownFireAt<.055;
     this.viewWeapon.getObjectByName('weapon')!.scale.set(.8,.8,s?.weapon==='carbine'?.58:.8);
     for(const [id,mesh] of this.lootMeshes)if(!o.loot.some(l=>l.id===id)){this.scene.remove(mesh);this.disposeObject(mesh);this.lootMeshes.delete(id);}
     for(const drop of o.loot){
       let group=this.lootMeshes.get(drop.id);
       if(!group){group=new T.Group();const gun=periodRifle();gun.rotation.set(0,.5,Math.PI/2);gun.position.y=.3;group.add(gun);const beacon=this.ring(.7,0xffdc76,.1);group.add(beacon);this.scene.add(group);this.lootMeshes.set(drop.id,group);}
-      group.position.set(drop.x,.05+Math.sin(this.time*2)*.025,drop.z);
+      group.position.set(drop.x,.05+(this.reducedMotion?0:Math.sin(this.time*2)*.025),drop.z);
     }
     this.selection.visible = !!s;
     if (s) this.selection.position.set(s.x, .06, s.z);
@@ -236,5 +249,5 @@ export class Battlefield {
   }
   private clearGroup(group: T.Group) { for (const child of [...group.children]) { group.remove(child); this.disposeObject(child); } }
   private disposeObject(object: T.Object3D) { object.traverse(child => { if (child instanceof T.Mesh || child instanceof T.Line) { child.geometry.dispose(); const mats = Array.isArray(child.material) ? child.material : [child.material]; for (const mat of mats) if (![...this.materials.values()].includes(mat as T.MeshStandardMaterial)) mat.dispose(); } }); }
-  dispose() { this.front.dispose(); this.fx.reset(); this.resizeObserver.disconnect(); this.disposeObject(this.scene); this.materials.forEach(m => { m.map?.dispose(); m.dispose(); }); this.renderer.dispose(); }
+  dispose() { this.contextEvents.abort();this.front.dispose(); this.fx.reset(); this.resizeObserver.disconnect(); this.disposeObject(this.scene); this.materials.forEach(m => { m.map?.dispose(); m.dispose(); }); this.renderer.dispose(); }
 }

@@ -5,7 +5,7 @@ import {randomBytes} from 'node:crypto';
 import {TESTNET,rulesHash,offerTypes,resultTypes,json,type Offer,type Result,type Deployment} from '@last-signal/chain';
 import {Rooms} from './rooms.ts';
 import {WalletAuth} from './wallet-auth.ts';
-import {loadRole} from '../../../packages/contracts/scripts/testnet-keys.ts';
+import {settlementSigner} from './signer.ts';
 export type ChainOptions={provider:JsonRpcProvider;signer:Signer;deployment:Deployment;confirmations:number;mode:'PUBLIC_TESTNET'|'LOCAL_TEST'};
 const abi=(name:string)=>JSON.parse(readFileSync(resolve(import.meta.dirname,'../../../packages/contracts/abi',name+'.json'),'utf8'));
 export class TestnetService{
@@ -13,8 +13,8 @@ export class TestnetService{
  constructor(readonly rooms:Rooms,options?:ChainOptions){
   rooms.db.exec('CREATE TABLE IF NOT EXISTS chain_matches(room TEXT PRIMARY KEY,matchId TEXT UNIQUE,offer TEXT,signature TEXT,deployment TEXT,fromBlock INTEGER,proofs TEXT); CREATE TABLE IF NOT EXISTS chain_results(identity TEXT PRIMARY KEY,payload TEXT,signature TEXT);');
   if(options)this.options=options;else{
-   const file=resolve(import.meta.dirname,'../../../.runtime/testnet/deployment.json');
-   if(existsSync(file)){try{const d=JSON.parse(readFileSync(file,'utf8')) as Deployment;if(d.chainId!==TESTNET.chainId)throw Error('Refusing a non testnet deployment');this.options={provider:new JsonRpcProvider(TESTNET.rpc,undefined,{cacheTimeout:-1,batchMaxCount:1}),signer:loadRole('settlement'),deployment:d,confirmations:TESTNET.confirmations,mode:'PUBLIC_TESTNET'};}catch{this.options=null;this.setupStatus='CONFIGURATION_ERROR';this.unavailableReason='Deployment metadata or dedicated signer cannot be loaded. Funding is disabled; use wallet recovery.';}}else this.options=null;
+   const file=process.env.TESTNET_DEPLOYMENT_FILE??resolve(import.meta.dirname,'../../../.runtime/testnet/deployment.json');
+   if(existsSync(file)){try{const d=JSON.parse(readFileSync(file,'utf8')) as Deployment;if(d.chainId!==TESTNET.chainId)throw Error('Refusing a non testnet deployment');this.options={provider:new JsonRpcProvider(TESTNET.rpc,undefined,{cacheTimeout:-1,batchMaxCount:1}),signer:settlementSigner(),deployment:d,confirmations:TESTNET.confirmations,mode:'PUBLIC_TESTNET'};}catch{this.options=null;this.setupStatus='CONFIGURATION_ERROR';this.unavailableReason='Deployment metadata or dedicated signer cannot be loaded. Funding is disabled; use wallet recovery.';}}else this.options=null;
   }
   this.auth=new WalletAuth(rooms.db,this.options?.deployment.chainId??TESTNET.chainId);
  }

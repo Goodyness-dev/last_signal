@@ -126,5 +126,6 @@ export class Rooms{
   try{this.write(r);}catch{r.phase='aborted';r.reason='Checkpoint failed. No result assigned.';r.game.result=null;}
   if(r.game.tick%2===0||r.phase==='finished'||r.phase==='aborted'||r.game.countdown>0)this.broadcast(r);
  }}
- close(){for(const r of this.rooms.values())for(const s of r.seats)s?.peer?.close(1001);this.db.close();}
+ disconnectAll(){for(const r of this.rooms.values())for(const s of r.seats)s?.peer?.close(1001);}
+ close(){this.disconnectAll();this.db.close();}
 }

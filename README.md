@@ -153,3 +153,5 @@ npm run testnet:match
 ```
 
 Preparation generates dedicated Windows encrypted credentials without printing private keys. Deployment will not send while gas is unavailable and refuses other chain IDs. The match proof uses the actual local authoritative server with public testnet transactions only after deployment is verified. It has not completed publicly yet. For local funded integration tests, run npm run testnet:test. See docs/TESTNET.md for evidence, trust and confirmation policy, free gas access, recovery and deployment journals. Hackathon mock token eligibility remains unconfirmed.
+
+Gate 6 local polish and operational handoff: docs/POLISH.md and docs/OPERATION.md. Actual local combat footage: docs/evidence/gate6-local-combat.webm. Public hosting is blocked by missing deployment access. No public URL or external client match is claimed. Use PERFORMANCE & CAPTURE to measure actual gameplay or save a mode labeled silent clip.

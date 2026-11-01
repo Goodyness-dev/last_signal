@@ -64,3 +64,7 @@
 | Wallet panel | PARTIAL | Desktop blocked/no wallet state verified. Actual injected wallet transactions and phone view unverified |
 | Two funded public testnet participants | BLOCKED_FREE_GAS | Deployer has zero test ETH and no free faucet access is currently available |
 | Public deployment and receipts | NOT_DEPLOYED | No invented public addresses or hashes |
+
+## Gate 6 actual acceptance
+
+See docs/POLISH.md for the dated acceptance matrix and measured limits. Local gameplay capture, responsive layout, persisted settings, WebGL context recovery, and actual loopback network database restart are verified. Public frontend and service URLs, two external clients, real host recovery and Gate 5 public receipts remain pending. Gate 6 is IN_PROGRESS, not complete.

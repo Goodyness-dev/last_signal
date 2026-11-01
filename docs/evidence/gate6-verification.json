@@ -1,0 +1,43 @@
+{
+  "checkedAt": "2026-11-01T03:49:48.862Z",
+  "applicationTests": {
+    "serialRun": {
+      "passed": 50,
+      "failed": 0
+    },
+    "additionalOperationSuite": {
+      "passed": 3,
+      "failed": 0
+    },
+    "distinctVerified": 51,
+    "earlierParallelRun": {
+      "passed": 49,
+      "timeouts": 1
+    }
+  },
+  "fundedLocalIntegration": {
+    "passed": 2,
+    "failed": 0
+  },
+  "escrowSuite": "26 preceding Gate 5 passes, unchanged contracts not rerun for Gate 6",
+  "strictBuild": true,
+  "networkRecovery": "Actual two loopback WebSocket clients, restart, same budget and shared conceded result",
+  "webglRecovery": "Actual extension context loss and restore during live combat. Health text unchanged while context lost.",
+  "phone": "390x844 browser viewport, not a physical device",
+  "footage": {
+    "path": "gate6-local-combat.webm",
+    "bytes": 1451595,
+    "decoded": [
+      960,
+      540
+    ],
+    "playbackVerifiedBeyondSeconds": 17,
+    "mode": "LOCAL PRACTICE COMBAT DRILL",
+    "audio": false
+  },
+  "publicDeployment": false,
+  "externalClients": 0,
+  "publicChainTransactions": 0,
+  "dockerImageBuilt": false,
+  "securityAudit": false
+}

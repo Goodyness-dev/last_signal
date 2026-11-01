@@ -47,3 +47,5 @@ Exit evidence: verified public frontend and service URLs if deployed, two extern
 ## Immediate next implementation
 
 Gate 3 local private rooms, server snapshots, durable commands and failure cases are now implemented. Gate 4 local chain and escrow is now implemented and verified. Next is Gate 5: verify official Robinhood Chain testnet configuration and actual eth_chainId, free RPC and faucet access, dedicated credentials and wallet funding integration. Wallet authentication must be added before integrating funded rooms. Public testnet and hosting still need the available free access and credentials described above.
+
+Gate 6 update, 1 November 2026: local polish, actual capture and operation recovery drill delivered. Public operation is blocked on available free hosting with durable storage and deployment access. The owner confirmed no hosting access. Render Free and Koyeb Free do not meet the existing SQLite persistence requirement. No paid fallback selected. See docs/OPERATION.md.

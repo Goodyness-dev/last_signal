@@ -1,0 +1,22 @@
+# Set GAME_DOMAIN to a domain you control. TLS requires real DNS and reachable ports.
+{$GAME_DOMAIN} {
+ encode zstd gzip
+ header {
+  X-Content-Type-Options nosniff
+  Referrer-Policy same-origin
+  Permissions-Policy "camera=(), microphone=(), geolocation=()"
+ }
+ handle_path /api/* {
+  reverse_proxy 127.0.0.1:3001
+ }
+ handle /assets/* {
+  root * /srv/last-signal
+  header Cache-Control "public, max-age=31536000, immutable"
+  file_server
+ }
+ handle {
+  root * /srv/last-signal
+  header Cache-Control no-cache
+  file_server
+ }
+}

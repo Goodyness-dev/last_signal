@@ -9,17 +9,30 @@ export class OldFront {
   private lamps:T.PointLight[]=[];
   private materials:T.Material[]=[];
   private textures:T.Texture[]=[];
+  private staticParts:{mesh:T.Mesh;shape:'box'|'cylinder'}[]=[];
   private readonly soil=this.material(0x62503a,.98);
   private readonly timber=this.material(0x57402a,.92);
   private readonly darkWood=this.material(0x322a20,.95);
   private readonly iron=this.material(0x393b32,.65,.35);
   private readonly canvas=this.material(0x928363,.95);
   private readonly bagMaterial=this.material(0x998968,.96);
-  constructor(private scene:T.Scene){this.sky();this.ground();this.structures();this.cover();this.dressing();}
+  constructor(private scene:T.Scene){this.sky();this.ground();this.structures();this.cover();this.dressing();this.batchStatic();}
   private random(n:number){const x=Math.sin(n*127.1+81.7)*43758.5453;return x-Math.floor(x);}
   private material(color:number,roughness=.8,metalness=.05){const m=new T.MeshStandardMaterial({color,roughness,metalness});this.materials.push(m);return m;}
-  private box(w:number,h:number,d:number,x:number,y:number,z:number,mat:T.Material=this.timber,parent:T.Object3D=this.scene){const m=new T.Mesh(new T.BoxGeometry(w,h,d),mat);m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m;}
-  private cylinder(r:number,h:number,x:number,y:number,z:number,mat:T.Material=this.iron){const m=new T.Mesh(new T.CylinderGeometry(r,r,h,12),mat);m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;this.scene.add(m);return m;}
+  private box(w:number,h:number,d:number,x:number,y:number,z:number,mat:T.Material=this.timber,parent:T.Object3D=this.scene){const m=new T.Mesh(new T.BoxGeometry(1,1,1),mat);m.scale.set(w,h,d);m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;parent.add(m);this.staticParts.push({mesh:m,shape:'box'});return m;}
+  private cylinder(r:number,h:number,x:number,y:number,z:number,mat:T.Material=this.iron){const m=new T.Mesh(new T.CylinderGeometry(1,1,1,12),mat);m.scale.set(r,h,r);m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;this.scene.add(m);this.staticParts.push({mesh:m,shape:'cylinder'});return m;}
+  private batchStatic(){
+    this.scene.updateMatrixWorld(true);
+    const groups=new Map<string,typeof this.staticParts>();
+    for(const part of this.staticParts){const key=part.shape+':'+(part.mesh.material as T.Material).uuid;const list=groups.get(key)??[];list.push(part);groups.set(key,list);}
+    for(const parts of groups.values()){
+      const first=parts[0],geometry=first.mesh.geometry.clone();
+      const batch=new T.InstancedMesh(geometry,first.mesh.material,parts.length);batch.castShadow=true;batch.receiveShadow=true;
+      parts.forEach(({mesh},i)=>{batch.setMatrixAt(i,mesh.matrixWorld);mesh.removeFromParent();mesh.geometry.dispose();});
+      batch.instanceMatrix.needsUpdate=true;batch.computeBoundingSphere();this.scene.add(batch);
+    }
+    this.staticParts=[];
+  }
   private sky(){
     const c=document.createElement('canvas');c.width=1024;c.height=512;const p=c.getContext('2d')!;
     const gradient=p.createLinearGradient(0,0,0,512);gradient.addColorStop(0,'#59635d');gradient.addColorStop(.6,'#ada081');gradient.addColorStop(1,'#d4b383');p.fillStyle=gradient;p.fillRect(0,0,1024,512);

@@ -7,6 +7,8 @@ import { createGame, createCombatDrill, createLootTraining, createEndless, SUPPL
 import './shooter.css';
 import './survival.css';
 import { BattleFeedback } from './battle-feedback.ts';
+import {FieldReview} from './field-review.ts';
+import './polish.css';
 
 const app = document.querySelector<HTMLDivElement>('#app')!;
 app.innerHTML = `
@@ -46,13 +48,15 @@ let scene: Battlefield;
 try { scene = new Battlefield(el('battlefield'), [...document.querySelectorAll<HTMLElement>('.relay-label')]); }
 catch { el('briefing').innerHTML = '<div class="eyebrow">RENDERER UNAVAILABLE</div><h1>WebGL 2 is required.</h1><p>Enable hardware acceleration in a current browser, then reload this page. No wallet or funds are needed.</p>'; throw new Error('WebGL initialization failed'); }
 const feedback=new BattleFeedback(el('battle-feedback'),(at,height)=>scene.screenPoint(at,height));
+const review=new FieldReview(scene,()=>game.endless?'LOCAL PRACTICE ENDLESS':drill?'LOCAL PRACTICE COMBAT DRILL':rangeTraining?'LOCAL PRACTICE LOOT TRAINING':'LOCAL PRACTICE RELAY');
 try {
   const saved = JSON.parse(localStorage.getItem('last-signal-settings') ?? '{}');
   scene.effectsEnabled = saved.effects ?? true; scene.reducedMotion = saved.motion ?? scene.reducedMotion;
+  sound=saved.audio??true;
 } catch { /* Private storage may be unavailable. */ }
 el<HTMLInputElement>('audio').checked = sound;
 el<HTMLInputElement>('effects').checked = scene.effectsEnabled; el<HTMLInputElement>('motion').checked = scene.reducedMotion;
-function saveSettings() { try { localStorage.setItem('last-signal-settings', JSON.stringify({ effects: scene.effectsEnabled, motion: scene.reducedMotion })); } catch { /* Settings remain valid in memory. */ } }
+function saveSettings() { try { localStorage.setItem('last-signal-settings', JSON.stringify({ effects: scene.effectsEnabled, motion: scene.reducedMotion,audio:sound })); } catch { /* Settings remain valid in memory. */ } }
 function tone(frequency: number, duration = .08) {
   if (!sound || !audio || document.hidden) return;
   const osc = audio.createOscillator(), gain = audio.createGain(); osc.frequency.value = frequency; osc.type = 'triangle'; gain.gain.setValueAtTime(.025, audio.currentTime); gain.gain.exponentialRampToValueAtTime(.001, audio.currentTime + duration); osc.connect(gain).connect(audio.destination); osc.start(); osc.stop(audio.currentTime + duration);
@@ -182,9 +186,19 @@ el('ledger-button').onclick = () => {
 };
 el<HTMLInputElement>('effects').onchange = e => { scene.effectsEnabled = (e.target as HTMLInputElement).checked; saveSettings(); };
 el<HTMLInputElement>('motion').onchange = e => { scene.reducedMotion = (e.target as HTMLInputElement).checked; saveSettings(); };
-el<HTMLInputElement>('audio').onchange = () => { sound = el<HTMLInputElement>('audio').checked; if (sound) { audio ??= new AudioContext(); void audio.resume(); tone(380, .2); } ambience(); };
+el<HTMLInputElement>('audio').onchange = () => { sound = el<HTMLInputElement>('audio').checked; if (sound) { audio ??= new AudioContext(); void audio.resume(); tone(380, .2); } ambience();saveSettings(); };
 
 const canvas = scene.renderer.domElement;
+const touchDrive=document.createElement('nav');touchDrive.id='touch-drive';touchDrive.setAttribute('aria-label','Touch movement. Drag the battlefield to look.');
+for(const [label,key,glyph] of [['Move forward','KeyW','↑'],['Move left','KeyA','←'],['Move back','KeyS','↓'],['Move right','KeyD','→']]){
+ const b=document.createElement('button');b.textContent=glyph;b.setAttribute('aria-label',label);
+ b.onpointerdown=e=>{e.preventDefault();b.setPointerCapture(e.pointerId);heldKeys.add(key);};
+ b.onpointerup=b.onpointercancel=()=>heldKeys.delete(key);touchDrive.append(b);
+}
+el('shooter-hud').prepend(touchDrive);
+el('fire-rifle').addEventListener('pointerdown',e=>{if(e.pointerType==='touch'){triggerHeld=true;fireRifle();}});
+canvas.addEventListener('webglcontextlost',()=>{releaseMouse();toast('Graphics lost. Restore graphics to resume local practice.');});
+canvas.addEventListener('webglcontextrestored',()=>toast('Graphics restored. Local practice resumed.'));
 changeView('eyes');
 function changeView(mode:'squad'|'eyes'|'tactical') {
  if(mode!=='eyes') releaseMouse();
@@ -398,6 +412,7 @@ function updateHud() {
 }
 function frame(now: number) {
   const elapsed = Math.min((now - lastFrame) / 1000, .25); lastFrame = now;
+  if(scene.contextLost){requestAnimationFrame(frame);return;}
   if (started && !paused && !game.result && !dialog('supplies').open) {
     accumulator += elapsed;
     let catchup = 0;
@@ -432,6 +447,7 @@ function frame(now: number) {
   lastNotice = game.eventSeq;
   const observation=observe(game,0);
  scene.update(observation,selected,events,elapsed);
+ review.update(now);
  const ownSelected=observation.squads.find(s=>s.id===(game.hero?.squadId??selected));
  feedback.update(observation,events,now);
  if(ownSelected&&scene.viewMode==='eyes'){
@@ -452,4 +468,4 @@ function frame(now: number) {
   requestAnimationFrame(frame);
 }
 updateHud(); requestAnimationFrame(frame);
-window.addEventListener('pagehide', () => { scene.dispose(); void audio?.close(); }, { once: true });
+window.addEventListener('pagehide', () => { review.dispose();scene.dispose(); void audio?.close(); }, { once: true });

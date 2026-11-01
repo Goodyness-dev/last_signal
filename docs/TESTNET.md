@@ -1,6 +1,6 @@
 # Gate 5: Robinhood Chain testnet integration
 
-31 October 2026. State: IMPLEMENTED_LOCALLY, PUBLIC_DEPLOYMENT_BLOCKED_FREE_GAS. This is not a completed public testnet match. No public contract address or transaction receipt is claimed.
+1 November 2026. State: PUBLIC_TESTNET_SETTLEMENT_VERIFIED. The free gas blocker is resolved. Actual deployment, two funded dedicated test wallets, authoritative conceded match, burn and pull claims are recorded in TESTNET_RESULT.md and four public evidence reports. The earlier blocker narrative below is historical. Public game hosting and injected browser wallet signing remain separate, unverified requirements.
 
 ## Verified network
 
@@ -10,7 +10,7 @@ Sources checked: https://docs.robinhood.com/chain/connecting/ , https://docs.rob
 
 This valueless demo requires two canonical L2 blocks for funding verification. This is a soft confirmation policy, not Ethereum finality. The official finality document distinguishes sequencer confirmation, Ethereum posting and Ethereum finality. Funding block hashes and receipts are rechecked; a reorganization aborts the match and prevents an unprovable settlement authorization. RPC loss pauses funded play. Timeouts use contract timestamps, not L2 block.number or the browser clock.
 
-## Current free access blocker
+## Historical free access blocker, before 1 November funding
 
 Four distinct dedicated wallets were generated: deployment, settlement signing and two participants. They are new test wallets with zero test ETH. The settlement signer is separate from the deployment wallet and does not need gas to sign results.
 
@@ -81,4 +81,4 @@ That script uses the two dedicated participant accounts, allocates only free tes
 
 The browser wallet panel was inspected at its actual desktop viewport. With no injected wallet, it gives a clear message and retains unavailable balances. It displays NOT_DEPLOYED and disables spending without public contracts. No runtime browser errors were recorded. A phone viewport override did not take effect, so phone wallet review is not claimed. No real injected wallet signing, public funding or live browser claim has been verified. See evidence/testnet-wallet-blocked.png.
 
-Remaining Gate 5 exit evidence is the actual public deployment and two funded testnet participants finishing an authoritative match and settling or recovering. Free test ETH access is currently missing. Hackathon mock token eligibility remains UNCONFIRMED until organizer evidence is provided. No paid access or mainnet fallback is authorized. Gate 6 public hosting is separate.
+The required Gate 5 public deployment and funded authoritative settlement evidence was obtained on 1 November 2026 through the free BlockVectra faucet. See TESTNET_RESULT.md. Public timeout recovery and injected browser wallet transactions remain unverified. Hackathon mock token eligibility remains UNCONFIRMED until organizer evidence is provided. No paid access or mainnet fallback is authorized. Gate 6 public hosting is separate.

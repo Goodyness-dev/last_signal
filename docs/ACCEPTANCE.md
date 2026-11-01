@@ -68,3 +68,5 @@
 ## Gate 6 actual acceptance
 
 See docs/POLISH.md for the dated acceptance matrix and measured limits. Local gameplay capture, responsive layout, persisted settings, WebGL context recovery, and actual loopback network database restart are verified. Public frontend and service URLs, two external clients, real host recovery and Gate 5 public receipts remain pending. Gate 6 is IN_PROGRESS, not complete.
+
+Gate 5 exit update, 1 November 2026: actual public testnet deployment and funded authoritative settlement now pass. Fourteen canonical successful receipts, 200 deposits, burn 4, claims 196, zero escrow balance and liabilities are recorded in TESTNET_RESULT.md and evidence/testnet-verified.json. Gate 6 public hosting and external clients remain pending.

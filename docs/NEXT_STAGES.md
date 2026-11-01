@@ -1,3 +1,7 @@
+# Current delivery update
+
+1 November 2026: Gate 5 public deployment and funded authoritative settlement are now verified. The free gas blocker is resolved. Fourteen public receipts and conservation are recorded in docs/TESTNET_RESULT.md. Next is Gate 6 public hosting access, external client play and remote recovery. Local polish and actual local footage are already delivered. Historical stage instructions follow.
+
 # Gate 5 update
 
 31 October 2026. Testnet configuration and live RPC are verified, dedicated account roles are protected, wallet and funded server integration are implemented and local tests pass. Public deployment is blocked by missing free test ETH. See TESTNET.md for exact evidence and resume commands. No public contract address or transaction hash exists for this revision. The remaining public exit evidence still applies below.

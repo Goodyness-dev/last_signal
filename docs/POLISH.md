@@ -65,7 +65,7 @@ The strict TypeScript and production build passed after the UI changes. All 50 e
 | Durable storage and server recovery | Source configuration and actual local network restart drill, public disk and restart unverified |
 | Hosted secret storage | Mounted file adapter tested locally, platform integration pending |
 | Two external clients finishing a match | Pending public access, no substitute claim from loopback clients |
-| Actual chain receipts | Gate 4 local evidence retained, Gate 5 free gas blocker remains |
+| Actual chain receipts | Gate 4 local evidence retained; Gate 5 public settlement evidence obtained later on 1 November, see TESTNET_RESULT.md |
 | Asset licenses and handoff | Asset register updated, OFL notices included in distributable, OPERATION.md provided |
 
-Public hosting, public load testing, security audit, physical phone testing and Gate 5 public receipts remain absent. See OPERATION.md for exact launch commands, provider limits, deployment requirements and recovery procedure.
+Public hosting, public load testing, security audit, physical phone testing remain absent. Gate 5 public settlement receipts were obtained after this polish review; see TESTNET_RESULT.md. See OPERATION.md for exact launch commands, provider limits, deployment requirements and recovery procedure.

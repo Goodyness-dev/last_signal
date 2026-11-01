@@ -1,10 +1,12 @@
 # LAST SIGNAL
 
+Current chain delivery: the original mock tWIF and escrow are deployed on Robinhood Chain Testnet 46630. Two dedicated test wallets completed a local authoritative conceded match and settled on the public testnet. Fourteen confirmed receipts prove free funding, deployment, deposits, burn and claims. See docs/TESTNET_RESULT.md. This is not official WIF or public game hosting.
+
 A playable local tactics prototype built from the parent specification pack. Command squads in an original rain soaked communications compound. Capture A, B and C, manage a finite reserve, and fight a local bot.
 
 The current art direction is a fictional early 20th century inspired front. It includes muddy duckboard lanes, sandbags, damaged brick and plaster, exposed rafters, timber doors, crates, barrels, oil lanterns, wire outside the perimeter, dead trees and burned carts. Soldiers wear cloth uniforms, steel brim helmets, leather pouches and canvas packs with bedrolls. Rifles have wooden stocks, iron sights, bolt details and slings. Flags sway and smoke drifts over a clouded warm dawn sky. The close camera, guns, movement and game rules are retained. It is period inspired fiction with abstract shield and EMP support, not a historical simulation.
 
-Current verification: strict TypeScript and production build pass, and all 25 tests pass. Browser checks covered player damage and death, numeric enemy health bars, pause, finite ammo and reload conservation. Loot, weapon switching and practice WIF accounting are covered by simulation tests. See docs/PROOF.md for exact evidence and remaining visual checks.
+Most recent verification includes 51 distinct application and operation tests, two funded local integration tests and an actual public testnet settlement proof. Strict TypeScript and the production build pass. See docs/POLISH.md and docs/TESTNET_RESULT.md for exact evidence and remaining limits.
 
 Current mode: **UNTIMED LOCAL PRACTICE**. Your main character can die. Rifle ammunition is finite. Defeated enemies drop original procedural guns, ammunition and clearly simulated practice WIF. Credits are simulated. No wallet, real money, token purchase, chain balance or settlement is involved. tWIF in the design is a proposed mock token, not official WIF.
 

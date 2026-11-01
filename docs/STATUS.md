@@ -1,6 +1,8 @@
 # Status
 
-Latest work: Gate 6 LOCAL_POLISH_VERIFIED, PUBLIC_OPERATION_BLOCKED_ACCESS. Actual device render samples, responsive browser review, local combat video and two real loopback clients surviving service restart are recorded in docs/POLISH.md. No public URLs or external client proof exists. Gate 5 remains blocked on free test ETH. The Gate 5 revision below is earlier evidence.
+Current delivery, 1 November 2026: Gate 5 PUBLIC_TESTNET_SETTLEMENT_VERIFIED. A free BlockVectra faucet claim, token and escrow deployments, two funded participants, one authoritative conceded match, burn and both claims are confirmed on Robinhood Chain Testnet 46630. Fourteen public receipts and accounting conservation were independently rechecked. See docs/TESTNET_RESULT.md. Gate 6 public hosting and external client evidence remain blocked on deployment access. Earlier narrative notes below preserve the previous blockers.
+
+Latest work: Gate 6 LOCAL_POLISH_VERIFIED, PUBLIC_OPERATION_BLOCKED_ACCESS. Actual device render samples, responsive browser review, local combat video and two real loopback clients surviving service restart are recorded in docs/POLISH.md. No public URLs or external client proof exists. That Gate 6 review preceded the successful Gate 5 public proof above.
 
 Latest revision: Gate 5 integration implemented and locally verified. PUBLIC_DEPLOYMENT_BLOCKED_FREE_GAS. Official testnet RPC returned chain 46630. Wallet authentication, bounded funding, canonical receipts, funded room access, persistent results and offline wallet recovery are implemented. All 76 tests pass: 48 game/server/auth, 26 escrow and two local funded integration scenarios. Strict build passes. Actual dedicated deployer test ETH balance is zero. The official faucet form is unavailable here and alternate eligibility is unmet; the owner has neither free test ETH nor faucet access yet. No public deployment or testnet transaction is claimed. Details: docs/TESTNET.md. Older notes below are historical.
 
@@ -35,8 +37,8 @@ Revision validation: strict build passes and 14 simulation tests pass, including
 | 2 Local full match | PASS | Core simulation and normal bot, 14 tests passed again on the period source revision. Earlier natural browser result, reserve ledger and rematch verified. Fresh period browser review remains pending |
 | 3 Authoritative multiplayer | LOCAL_PASS | Unfunded private rooms, WebSocket transport, SQLite durability, validation, visibility and recovery tests. Two browser clients finished a conceded match after process restart. Wallet authentication remains required before funded rooms. |
 | 4 Local escrow | LOCAL_PASS | Original tWIF and escrow, 26 EVM tests, 31 actual local transaction receipts, burn, claims and refunds. docs/ESCROW.md |
-| 5 Public testnet | BLOCKED_FREE_GAS | Network and live RPC verified, dedicated encrypted roles and wallet/funded integration implemented, 76 local tests pass. Deployer balance zero, no public contracts or transactions. docs/TESTNET.md |
-| 6 Polish and deployment | IN_PROGRESS | Period build and local HTTP verified. Fresh visual automation is blocked. No public hosting or live combat video |
+| 5 Public testnet | PUBLIC_TESTNET_SETTLEMENT_VERIFIED | Fourteen confirmed public receipts, two funded test wallets and authoritative settlement. 200 deposited, 4 burned, 196 claimed, zero escrow liabilities. docs/TESTNET_RESULT.md |
+| 6 Polish and deployment | IN_PROGRESS | Local period gameplay, actual combat video, desktop and phone viewport review, measured rendering and local network restart proof delivered. Public hosting and external clients remain pending. |
 
 Implemented: map navigation, quantized fixed tick movement, cover arcs, simultaneous automatic volleys, suppression, protected homes, capture and scoring, threshold victory, regulation and overtime, finite credits, paid spawn preparation, shields, EMP, retreat, surrender, result UI, rematch, guided steps, authorized bot observations, keyboard and touch input paths, tactical overlay, optional command tones, effects controls, local result persistence and spend ledger.
 
